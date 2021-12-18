@@ -1,6 +1,6 @@
 # ScoreSaberLeaderboards
 
-e
+scoresaber but no score uploads
 
 ## Credits
 
