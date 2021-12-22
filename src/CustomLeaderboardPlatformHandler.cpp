@@ -87,21 +87,14 @@ int getMaxScore(IDifficultyBeatmap* beatmap) {
 
 std::string format(std::string s, std::string color, int i,
                    rapidjson::GenericObject<true, rapidjson::Value> score) {
-  il2cpp_utils::getLogger().info("[ssl] test1");
   std::string modifiers = std::string(score["modifiers"].GetString());
-  il2cpp_utils::getLogger().info("[ssl] test2");
   if (i == 0) {
-    il2cpp_utils::getLogger().info("[ssl] test3");
     for (int i = 0; i < 2; i++) {
       s.pop_back();
     }
-    il2cpp_utils::getLogger().info("[ssl] test4 %s", s.c_str());
     s = s.substr(2);
-    il2cpp_utils::getLogger().info("[ssl] test4.1 %s", s.c_str());
     s.insert(2, ".");
-    il2cpp_utils::getLogger().info("[ssl] test4.2 %s", s.c_str());
     s = s + "%";
-    il2cpp_utils::getLogger().info("[ssl] test5");
     return string_format("%s", (std::string("<color=") + color +
                                 std::string(">") + s + std::string("</color>"))
                                    .c_str());
@@ -109,20 +102,15 @@ std::string format(std::string s, std::string color, int i,
     for (int i = 0; i < 4; i++) {
       s.pop_back();
     }
-    il2cpp_utils::getLogger().info("[ssl] test6");
     s = s + "<size=50%>pp</size>";
     s = "<color=\"white\"> - (</color>" + s + "<color=\"white\">)</color>";
-    il2cpp_utils::getLogger().info("[ssl] test7");
     if (score["pp"].GetDouble() > 0.0f) {
-      il2cpp_utils::getLogger().info("[ssl] test8");
       if (modifiers.compare("") == 0) {
-        il2cpp_utils::getLogger().info("[ssl] test9");
         return string_format(
             "%s", (std::string("<color=") + color + std::string(">") + s +
                    std::string("</color>"))
                       .c_str());
       } else {
-        il2cpp_utils::getLogger().info("[ssl] test10");
         return string_format(
             "%s", (std::string("<color=") + color + std::string(">") + s +
                    std::string("</color>") +
@@ -132,10 +120,8 @@ std::string format(std::string s, std::string color, int i,
 
     } else {
       if (modifiers.compare("") == 0) {
-        il2cpp_utils::getLogger().info("[ssl] test11");
         return "";
       } else {
-        il2cpp_utils::getLogger().info("[ssl] test12");
         return " - <color=#464f55>[" + modifiers + "]</color>";
       }
     }
