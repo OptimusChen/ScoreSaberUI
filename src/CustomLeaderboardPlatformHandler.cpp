@@ -56,6 +56,13 @@ int getDiff(IDifficultyBeatmap* beatmap) {
   return beatmap->get_difficultyRank();
 }
 
+std::string getRoleColor(std::string role) {
+  if (role.compare("Supporter") == 0) {
+    return "f76754";
+  }
+  return "FFFFFF";
+}
+
 int getMaxScore(IDifficultyBeatmap* beatmap) {
   int notesCount = beatmap->get_beatmapData()->get_cuttableNotesCount();
   if (notesCount > 13) {
@@ -63,27 +70,38 @@ int getMaxScore(IDifficultyBeatmap* beatmap) {
            115;
   } else {
     int diff = (beatmap->get_beatmapData()->get_cuttableNotesCount() - 14) * -1;
-    if (diff == 14) {
+    if (diff == 15) {
       return 0;
-    } else if (diff == 13) {
+    } else if (diff == 14) {
       return 115;
+    } else if (diff == 13) {
+      return 115 + (2 * 115);
     } else if (diff < 13 && diff > 8) {
       return 115 + diff * (115 * 2);
     } else if (diff < 8 && diff > 0) {
       return 115 + diff * (115 * 4);
     }
   }
+  return 0;
 }
 
 std::string format(std::string s, std::string color, int i,
                    rapidjson::GenericObject<true, rapidjson::Value> score) {
+  il2cpp_utils::getLogger().info("[ssl] test1");
+  std::string modifiers = std::string(score["modifiers"].GetString());
+  il2cpp_utils::getLogger().info("[ssl] test2");
   if (i == 0) {
+    il2cpp_utils::getLogger().info("[ssl] test3");
     for (int i = 0; i < 2; i++) {
       s.pop_back();
     }
+    il2cpp_utils::getLogger().info("[ssl] test4 %s", s.c_str());
     s = s.substr(2);
+    il2cpp_utils::getLogger().info("[ssl] test4.1 %s", s.c_str());
     s.insert(2, ".");
+    il2cpp_utils::getLogger().info("[ssl] test4.2 %s", s.c_str());
     s = s + "%";
+    il2cpp_utils::getLogger().info("[ssl] test5");
     return string_format("%s", (std::string("<color=") + color +
                                 std::string(">") + s + std::string("</color>"))
                                    .c_str());
@@ -91,16 +109,35 @@ std::string format(std::string s, std::string color, int i,
     for (int i = 0; i < 4; i++) {
       s.pop_back();
     }
+    il2cpp_utils::getLogger().info("[ssl] test6");
     s = s + "<size=50%>pp</size>";
     s = "<color=\"white\"> - (</color>" + s + "<color=\"white\">)</color>";
+    il2cpp_utils::getLogger().info("[ssl] test7");
     if (score["pp"].GetDouble() > 0.0f) {
-      return string_format(
-          "%s", (std::string("<color=") + color + std::string(">") + s +
-                 std::string("</color>"))
-                    .c_str());
+      il2cpp_utils::getLogger().info("[ssl] test8");
+      if (modifiers.compare("") == 0) {
+        il2cpp_utils::getLogger().info("[ssl] test9");
+        return string_format(
+            "%s", (std::string("<color=") + color + std::string(">") + s +
+                   std::string("</color>"))
+                      .c_str());
+      } else {
+        il2cpp_utils::getLogger().info("[ssl] test10");
+        return string_format(
+            "%s", (std::string("<color=") + color + std::string(">") + s +
+                   std::string("</color>") +
+                   std::string(" - <color=#464f55>[") + modifiers + "]</color>")
+                      .c_str());
+      }
 
     } else {
-      return "";
+      if (modifiers.compare("") == 0) {
+        il2cpp_utils::getLogger().info("[ssl] test11");
+        return "";
+      } else {
+        il2cpp_utils::getLogger().info("[ssl] test12");
+        return " - <color=#464f55>[" + modifiers + "]</color>";
+      }
     }
   }
 }
@@ -127,111 +164,70 @@ custom_types::Helpers::Coroutine GetScoresInternal(
       CRASH_UNLESS(webRequest->SendWebRequest()));
   auto scores = System::Collections::Generic::List_1<
       PlatformLeaderboardsModel::LeaderboardScore*>::New_ctor();
+  auto modifiers = System::Collections::Generic::List_1<
+      GameplayModifierParamsSO*>::New_ctor();
   if (!webRequest->get_isNetworkError()) {
-    il2cpp_utils::getLogger().info("[ssl] test1");
     rapidjson::Document doc;
     std::string s =
         to_utf8(csstrtostr(webRequest->get_downloadHandler()->get_text()));
-    il2cpp_utils::getLogger().info("[ssl] test2");
-    rapidjson::ParseResult result = doc.Parse(s);
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-    doc.Accept(writer);
-    il2cpp_utils::getLogger().info("[ssl] test3");
-    std::string errorCodeStr(rapidjson::GetParseError_En(result.Code()));
-    il2cpp_utils::getLogger().info("[ssl] test4");
+    doc.Parse(s);
     const rapidjson::Value& scoreArray = doc["scores"];
     for (int i = 0; i < scoreArray.Size(); i++) {
       auto score = scoreArray[i].GetObject();
-      if (score["pp"].GetDouble() > 0.0f) {
+      double pp = score["pp"].GetDouble();
+      if (pp > 0.0f) {
         self->mapRanked = true;
+        self->ranked->set_text(
+            il2cpp_utils::newcsstr("<i><color=#ffde1c>Ranked Status: "
+                                   "</color>Ranked (modifiers disabled)</i>"));
       } else {
         self->mapRanked = false;
+        self->ranked->set_text(il2cpp_utils::newcsstr(
+            "<i><color=#ffde1c>Ranked Status: "
+            "</color>Unranked (modifiers disabled)</i>"));
       }
-      il2cpp_utils::getLogger().info("[ssl] test5");
-      if (score["leaderboardPlayerInfo"]["role"].IsString()) {
-        if (std::string(score["leaderboardPlayerInfo"]["role"].GetString())
-                .compare("Supporter") == 0) {
-          scores->Add(PlatformLeaderboardsModel::LeaderboardScore::New_ctor(
-              score["baseScore"].GetInt(), score["rank"].GetInt(),
-              il2cpp_utils::newcsstr(
-                  "<size=80%><color=#f76754>" +
-                  std::string(
-                      score["leaderboardPlayerInfo"]["name"].GetString()) +
-                  "</color> - (" +
-                  format(std::to_string(score["baseScore"].GetDouble() /
-                                        getMaxScore(beatmap)),
-                         "#ffd42a", 0, score) +
-                  ")" +
-                  format(std::to_string(score["pp"].GetDouble()), "#6872e5", 1,
-                         score) +
-                  "</size>"),
-              il2cpp_utils::newcsstr("0"),
-              System::Collections::Generic::List_1<
-                  GameplayModifierParamsSO*>::New_ctor()));
-        } else {
-          scores->Add(PlatformLeaderboardsModel::LeaderboardScore::New_ctor(
-              score["baseScore"].GetInt(), score["rank"].GetInt(),
-              il2cpp_utils::newcsstr(
-                  "<size=80%>" +
-                  std::string(
-                      score["leaderboardPlayerInfo"]["name"].GetString()) +
-                  " - (" +
-                  format(std::to_string(score["baseScore"].GetDouble() /
-                                        getMaxScore(beatmap)),
-                         "#ffd42a", 0, score) +
-                  ")" +
-                  format(std::to_string(score["pp"].GetDouble()), "#6872e5", 1,
-                         score) +
-                  "</size>"),
-              il2cpp_utils::newcsstr("0"),
-              System::Collections::Generic::List_1<
-                  GameplayModifierParamsSO*>::New_ctor()));
-        }
-      } else {
+      auto leaderboardPlayerInfo = score["leaderboardPlayerInfo"].GetObject();
+      int baseScore = score["baseScore"].GetInt();
+      int baseScoreDouble = score["baseScore"].GetDouble();
+      int rank = score["rank"].GetInt();
+      std::string name = std::string(leaderboardPlayerInfo["name"].GetString());
+      if (leaderboardPlayerInfo["role"].IsString()) {
+        std::string role =
+            std::string(leaderboardPlayerInfo["role"].GetString());
         scores->Add(PlatformLeaderboardsModel::LeaderboardScore::New_ctor(
-            score["baseScore"].GetInt(), score["rank"].GetInt(),
+            baseScore, rank,
             il2cpp_utils::newcsstr(
-                "<size=80%>" +
-                std::string(
-                    score["leaderboardPlayerInfo"]["name"].GetString()) +
-                " - (" +
+                "<size=80%><color=#" + getRoleColor(role) + ">" + name +
+                "</color> - (" +
                 format(std::to_string(score["baseScore"].GetDouble() /
                                       getMaxScore(beatmap)),
                        "#ffd42a", 0, score) +
-                ")" +
-                format(std::to_string(score["pp"].GetDouble()), "#6872e5", 1,
-                       score) +
+                ")" + format(std::to_string(pp), "#6872e5", 1, score) +
                 "</size>"),
-            il2cpp_utils::newcsstr("0"),
-            System::Collections::Generic::List_1<
-                GameplayModifierParamsSO*>::New_ctor()));
+            il2cpp_utils::newcsstr("0"), modifiers));
+      } else {
+        il2cpp_utils::getLogger().info(
+            "{ssl} %s",
+            std::to_string(baseScoreDouble / getMaxScore(beatmap)).c_str());
+        scores->Add(PlatformLeaderboardsModel::LeaderboardScore::New_ctor(
+            baseScore, rank,
+            il2cpp_utils::newcsstr(
+                "<size=80%>" + name + " - (" +
+                format(std::to_string(score["baseScore"].GetDouble() /
+                                      getMaxScore(beatmap)),
+                       "#ffd42a", 0, score) +
+                ")" + format(std::to_string(pp), "#6872e5", 1, score) +
+                "</size>"),
+            il2cpp_utils::newcsstr("0"), modifiers));
       }
-
-      il2cpp_utils::getLogger().info("[ssl] test6");
     }
-    il2cpp_utils::getLogger().info("[ssl] test7");
     if (scores->size == 0) {
       scores->Add(PlatformLeaderboardsModel::LeaderboardScore::New_ctor(
           000, 1, il2cpp_utils::newcsstr("No scores on this leaderboard!"),
-          il2cpp_utils::newcsstr("0"),
-          System::Collections::Generic::List_1<
-              GameplayModifierParamsSO*>::New_ctor()));
+          il2cpp_utils::newcsstr("0"), modifiers));
     }
     completionHandler->Invoke(PlatformLeaderboardsModel::GetScoresResult::Ok,
                               scores->ToArray(), -1);
-    if (self->ranked) {
-      if (self->mapRanked) {
-        self->ranked->set_text(
-            il2cpp_utils::newcsstr("<color=#ffde1c>Ranked Status: "
-                                   "</color>Ranked (modifiers disabled)"));
-      } else {
-        self->ranked->set_text(
-            il2cpp_utils::newcsstr("<color=#ffde1c>Ranked Status: "
-                                   "</color>Unranked (modifiers disabled)"));
-      }
-    }
-    il2cpp_utils::getLogger().info("[ssl] test8");
   } else {
     completionHandler->Invoke(
         PlatformLeaderboardsModel::GetScoresResult::Failed, scores->ToArray(),
@@ -267,6 +263,5 @@ HMAsyncRequest* FakeSaber::CustomLeaderboardPlatformHandler::UploadScore(
     LeaderboardScoreUploader::ScoreData* scoreData,
     PlatformLeaderboardsModel::UploadScoreCompletionHandler*
         completionHandler) {
-  // ApiController::get_instance()->UploadScore(scoreData, completionHandler);
   return nullptr;
 }

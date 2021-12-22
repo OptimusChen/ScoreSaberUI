@@ -32,6 +32,7 @@
 #include "GlobalNamespace/SharedCoroutineStarter.hpp"
 #include "GlobalNamespace/StandardLevelDetailView.hpp"
 #include "HMUI/CurvedCanvasSettingsHelper.hpp"
+#include "HMUI/CurvedTextMeshPro.hpp"
 #include "HMUI/ImageView.hpp"
 #include "TMPro/TextMeshPro.hpp"
 #include "TMPro/TextMeshProUGUI.hpp"
@@ -39,6 +40,7 @@
 #include "UnityEngine/Networking/DownloadHandler.hpp"
 #include "UnityEngine/Networking/UnityWebRequest.hpp"
 #include "UnityEngine/UI/Button.hpp"
+#include "UnityEngine/UI/CanvasUpdate.hpp"
 #include "UnityEngine/WaitForSeconds.hpp"
 #include "VRUIControls/PhysicsRaycasterWithCache.hpp"
 #include "Zenject/ConcreteIdBinderGeneric_1.hpp"
@@ -100,22 +102,21 @@ MAKE_HOOK_MATCH(
   container->Bind<PhysicsRaycasterWithCache*>()->AsSingle();
 }
 
-MAKE_HOOK_MATCH(TextMeshPro_GenerateTextMesh,
-                &::TMPro::TextMeshPro::GenerateTextMesh, void,
-                TMPro::TextMeshPro* self) {
-  self->set_richText(true);
-  TextMeshPro_GenerateTextMesh(self);
-}
-
 MAKE_HOOK_MATCH(TextMeshProUGUI_GenerateTextMesh,
                 &::TMPro::TextMeshProUGUI::GenerateTextMesh, void,
                 TMPro::TextMeshProUGUI* self) {
-  self->set_richText(true);
+  if (self->get_name()->Equals(il2cpp_utils::newcsstr("PlayerName"))) {
+    self->set_richText(true);
+  }
+
   TextMeshProUGUI_GenerateTextMesh(self);
 }
 
 UnityEngine::UI::Button* up;
 UnityEngine::UI::Button* down;
+std::string iconPath =
+    "/sdcard/ModData/com.beatgames.beatsaber/"
+    "Mods/ScoreSaberLeaderboards/";
 
 MAKE_HOOK_MATCH(
     PlatformLeaderboardViewController_DidActivate,
@@ -125,6 +126,7 @@ MAKE_HOOK_MATCH(
   PlatformLeaderboardViewController_DidActivate(
       self, firstActivation, addedToHeirarchy, screenSystemEnabling);
 
+  leaderboardsHandler->page = 1;
   if (firstActivation) {
     VerticalLayoutGroup* vertical =
         QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(self->get_transform());
@@ -160,23 +162,19 @@ MAKE_HOOK_MATCH(
 
     QuestUI::BeatSaberUI::CreateImage(
         self->get_transform(),
-        BeatSaberUI::FileToSprite("/sdcard/ModData/com.beatgames.beatsaber/"
-                                  "Mods/ScoreSaberLeaderboards/"
-                                  "scoresaber.png"),
+        BeatSaberUI::FileToSprite(iconPath + "scoresaber.png"),
         Vector2(-37.0f, 50.0f), Vector2(12.0f, 12.0f));
     for (int i = 0; i < 13; i++) {
       QuestUI::BeatSaberUI::CreateImage(
           self->get_transform(),
-          BeatSaberUI::FileToSprite("/sdcard/ModData/com.beatgames.beatsaber/"
-                                    "Mods/ScoreSaberLeaderboards/"
-                                    "pixel.png"),
+          BeatSaberUI::FileToSprite(iconPath + "pixel.png"),
           Vector2(-27.0f, 44.0f + i), Vector2(0.5f, 1.0f));
     }
 
     QuestUI::BeatSaberUI::CreateText(
         self->get_transform(),
         "<color=#ffde1c>Global Ranking: "
-        "</color>#893 (<size=80%><color=#6771e5>10,641.92pp</color></size>)",
+        "</color>#893 (<size=80%><color=#6771e5>11,141.92pp</color></size>)",
         true, Vector2(5.0f, 50.0f));
     leaderboardsHandler->ranked = QuestUI::BeatSaberUI::CreateText(
         self->get_transform(),
@@ -213,15 +211,11 @@ MAKE_HOOK_MATCH(PlatformLeaderboardViewController_Refresh,
               self->RefreshDelayed(showLoadingIndicator, clear));
         });
     QuestUI::BeatSaberUI::SetButtonSprites(
-        up,
-        BeatSaberUI::FileToSprite("/sdcard/ModData/com.beatgames.beatsaber/"
-                                  "Mods/ScoreSaberLeaderboards/"
-                                  "arrow.png"),
-        BeatSaberUI::FileToSprite("/sdcard/ModData/com.beatgames.beatsaber/"
-                                  "Mods/ScoreSaberLeaderboards/"
-                                  "arrowactive.png"));
-    reinterpret_cast<RectTransform*>(up->get_transform()->GetChild(0))
-        ->set_sizeDelta({10.0f, 10.0f});
+        up, BeatSaberUI::FileToSprite(iconPath + "arrow.png"),
+        BeatSaberUI::FileToSprite(iconPath + "arrowactive.png"));
+    RectTransform* rectTransform =
+        reinterpret_cast<RectTransform*>(up->get_transform()->GetChild(0));
+    rectTransform->set_sizeDelta({10.0f, 10.0f});
   }
 
   if (!down) {
@@ -233,15 +227,11 @@ MAKE_HOOK_MATCH(PlatformLeaderboardViewController_Refresh,
               self->RefreshDelayed(showLoadingIndicator, clear));
         });
     QuestUI::BeatSaberUI::SetButtonSprites(
-        down,
-        BeatSaberUI::FileToSprite("/sdcard/ModData/com.beatgames.beatsaber/"
-                                  "Mods/ScoreSaberLeaderboards/"
-                                  "arrow_down.png"),
-        BeatSaberUI::FileToSprite("/sdcard/ModData/com.beatgames.beatsaber/"
-                                  "Mods/ScoreSaberLeaderboards/"
-                                  "arrow_downactive.png"));
-    reinterpret_cast<RectTransform*>(down->get_transform()->GetChild(0))
-        ->set_sizeDelta({10.0f, 10.0f});
+        down, BeatSaberUI::FileToSprite(iconPath + "arrow_down.png"),
+        BeatSaberUI::FileToSprite(iconPath + "arrow_downactive.png"));
+    RectTransform* rectTransform =
+        reinterpret_cast<RectTransform*>(down->get_transform()->GetChild(0));
+    rectTransform->set_sizeDelta({10.0f, 10.0f});
   }
 }
 
@@ -260,13 +250,13 @@ extern "C" void setup(ModInfo& info) {
 // Called later on in the game loading - a good time to install function hooks
 extern "C" void load() {
   il2cpp_functions::Init();
+  QuestUI::Init();
   custom_types::Register::AutoRegister();
 
   getLogger().info("Installing hooks...");
   INSTALL_HOOK(getLogger(), PlatformLeaderboardViewController_Refresh);
   INSTALL_HOOK(getLogger(), PlatformLeaderboardViewController_DidActivate);
   INSTALL_HOOK(getLogger(), MainSystemInit_InstallPlatformLeaderboardsModel);
-  INSTALL_HOOK(getLogger(), TextMeshPro_GenerateTextMesh);
   INSTALL_HOOK(getLogger(), TextMeshProUGUI_GenerateTextMesh);
   getLogger().info("Installed all hooks!");
 }
