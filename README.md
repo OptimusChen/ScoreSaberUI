@@ -1,6 +1,6 @@
 # ScoreSaberLeaderboards
 
-scoresaber but no score uploads
+scoresaber but no score uploads<br>please dont buly me for how shit the code is
 
 ## Credits
 
