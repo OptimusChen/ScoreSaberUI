@@ -1,4 +1,4 @@
-#include "CustomLeaderboardPlatformHandler.hpp"
+#include "CustomTypes/CustomLeaderboardPlatformHandler.hpp"
 
 #include <chrono>
 #include <codecvt>
@@ -37,30 +37,20 @@
 #include "UnityEngine/Networking/DownloadHandler.hpp"
 #include "UnityEngine/Networking/UnityWebRequest.hpp"
 #include "UnityEngine/WaitForSeconds.hpp"
+#include "Utils/StringUtils.hpp"
 #include "beatsaber-hook/shared/config/config-utils.hpp"
 #include "beatsaber-hook/shared/rapidjson/include/rapidjson/error/en.h"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/QuestUI.hpp"
 
-DEFINE_TYPE(FakeSaber, CustomLeaderboardPlatformHandler);
+DEFINE_TYPE(ScoreSaberUI::CustomTypes, CustomLeaderboardPlatformHandler);
 
 using namespace GlobalNamespace;
-
-std::string to_utf8(std::u16string_view view) {
-  return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}
-      .to_bytes(view.data());
-}
+using namespace ScoreSaberUI::Utils;
 
 int getDiff(IDifficultyBeatmap* beatmap) {
   return beatmap->get_difficultyRank();
-}
-
-std::string getRoleColor(std::string role) {
-  if (role.compare("Supporter") == 0) {
-    return "f76754";
-  }
-  return "FFFFFF";
 }
 
 int getMaxScore(IDifficultyBeatmap* beatmap) {
@@ -85,51 +75,8 @@ int getMaxScore(IDifficultyBeatmap* beatmap) {
   return 0;
 }
 
-std::string format(std::string s, std::string color, int i,
-                   rapidjson::GenericObject<true, rapidjson::Value> score) {
-  std::string modifiers = std::string(score["modifiers"].GetString());
-  if (i == 0) {
-    for (int i = 0; i < 2; i++) {
-      s.pop_back();
-    }
-    s = s.substr(2);
-    s.insert(2, ".");
-    s = s + "%";
-    return string_format("%s", (std::string("<color=") + color +
-                                std::string(">") + s + std::string("</color>"))
-                                   .c_str());
-  } else {
-    for (int i = 0; i < 4; i++) {
-      s.pop_back();
-    }
-    s = s + "<size=50%>pp</size>";
-    s = "<color=\"white\"> - (</color>" + s + "<color=\"white\">)</color>";
-    if (score["pp"].GetDouble() > 0.0f) {
-      if (modifiers.compare("") == 0) {
-        return string_format(
-            "%s", (std::string("<color=") + color + std::string(">") + s +
-                   std::string("</color>"))
-                      .c_str());
-      } else {
-        return string_format(
-            "%s", (std::string("<color=") + color + std::string(">") + s +
-                   std::string("</color>") +
-                   std::string(" - <color=#464f55>[") + modifiers + "]</color>")
-                      .c_str());
-      }
-
-    } else {
-      if (modifiers.compare("") == 0) {
-        return "";
-      } else {
-        return " - <color=#464f55>[" + modifiers + "]</color>";
-      }
-    }
-  }
-}
-
 custom_types::Helpers::Coroutine GetScoresInternal(
-    FakeSaber::CustomLeaderboardPlatformHandler* self,
+    ScoreSaberUI::CustomTypes::CustomLeaderboardPlatformHandler* self,
     IDifficultyBeatmap* beatmap, PlatformLeaderboardsModel::ScoresScope scope,
     PlatformLeaderboardsModel::GetScoresCompletionHandler* completionHandler) {
   UnityEngine::Networking::UnityWebRequest* webRequest =
@@ -154,8 +101,8 @@ custom_types::Helpers::Coroutine GetScoresInternal(
       GameplayModifierParamsSO*>::New_ctor();
   if (!webRequest->get_isNetworkError()) {
     rapidjson::Document doc;
-    std::string s =
-        to_utf8(csstrtostr(webRequest->get_downloadHandler()->get_text()));
+    std::string s = StringUtils::to_utf8(
+        csstrtostr(webRequest->get_downloadHandler()->get_text()));
     doc.Parse(s);
     const rapidjson::Value& scoreArray = doc["scores"];
     for (int i = 0; i < scoreArray.Size(); i++) {
@@ -173,37 +120,34 @@ custom_types::Helpers::Coroutine GetScoresInternal(
             "</color>Unranked (modifiers disabled)</i>"));
       }
       auto leaderboardPlayerInfo = score["leaderboardPlayerInfo"].GetObject();
-      int baseScore = score["baseScore"].GetInt();
-      int baseScoreDouble = score["baseScore"].GetDouble();
+      int modifiedScore = score["modifiedScore"].GetInt();
+      int modifiedScoreDouble = score["modifiedScore"].GetDouble();
       int rank = score["rank"].GetInt();
       std::string name = std::string(leaderboardPlayerInfo["name"].GetString());
       if (leaderboardPlayerInfo["role"].IsString()) {
         std::string role =
             std::string(leaderboardPlayerInfo["role"].GetString());
         scores->Add(PlatformLeaderboardsModel::LeaderboardScore::New_ctor(
-            baseScore, rank,
-            il2cpp_utils::newcsstr(
-                "<size=80%><color=#" + getRoleColor(role) + ">" + name +
-                "</color> - (" +
-                format(std::to_string(score["baseScore"].GetDouble() /
-                                      getMaxScore(beatmap)),
-                       "#ffd42a", 0, score) +
-                ")" + format(std::to_string(pp), "#6872e5", 1, score) +
-                "</size>"),
+            modifiedScore, rank,
+            il2cpp_utils::newcsstr(StringUtils::Resize(
+                StringUtils::Colorize(name, StringUtils::GetRoleColor(role)) +
+                    " - (" +
+                    StringUtils::FormatScore(
+                        std::to_string(score["modifiedScore"].GetDouble() /
+                                       getMaxScore(beatmap))) +
+                    ")" + StringUtils::FormatPP(std::to_string(pp), score),
+                80)),
             il2cpp_utils::newcsstr("0"), modifiers));
       } else {
-        il2cpp_utils::getLogger().info(
-            "{ssl} %s",
-            std::to_string(baseScoreDouble / getMaxScore(beatmap)).c_str());
         scores->Add(PlatformLeaderboardsModel::LeaderboardScore::New_ctor(
-            baseScore, rank,
-            il2cpp_utils::newcsstr(
-                "<size=80%>" + name + " - (" +
-                format(std::to_string(score["baseScore"].GetDouble() /
-                                      getMaxScore(beatmap)),
-                       "#ffd42a", 0, score) +
-                ")" + format(std::to_string(pp), "#6872e5", 1, score) +
-                "</size>"),
+            modifiedScore, rank,
+            il2cpp_utils::newcsstr(StringUtils::Resize(
+                name + " - (" +
+                    StringUtils::FormatScore(
+                        std::to_string(score["modifiedScore"].GetDouble() /
+                                       getMaxScore(beatmap))) +
+                    ")" + StringUtils::FormatPP(std::to_string(pp), score),
+                80)),
             il2cpp_utils::newcsstr("0"), modifiers));
       }
     }
@@ -223,7 +167,8 @@ custom_types::Helpers::Coroutine GetScoresInternal(
   co_return;
 }
 
-void FakeSaber::CustomLeaderboardPlatformHandler::changePage(bool inc) {
+void ScoreSaberUI::CustomTypes::CustomLeaderboardPlatformHandler::changePage(
+    bool inc) {
   if (inc) {
     page++;
   } else {
@@ -233,7 +178,8 @@ void FakeSaber::CustomLeaderboardPlatformHandler::changePage(bool inc) {
   }
 }
 
-HMAsyncRequest* FakeSaber::CustomLeaderboardPlatformHandler::GetScores(
+HMAsyncRequest*
+ScoreSaberUI::CustomTypes::CustomLeaderboardPlatformHandler::GetScores(
     IDifficultyBeatmap* beatmap, int count, int fromRank,
     PlatformLeaderboardsModel::ScoresScope scope,
     ::Il2CppString* referencePlayerId,
@@ -245,7 +191,8 @@ HMAsyncRequest* FakeSaber::CustomLeaderboardPlatformHandler::GetScores(
   return nullptr;
 }
 
-HMAsyncRequest* FakeSaber::CustomLeaderboardPlatformHandler::UploadScore(
+HMAsyncRequest*
+ScoreSaberUI::CustomTypes::CustomLeaderboardPlatformHandler::UploadScore(
     LeaderboardScoreUploader::ScoreData* scoreData,
     PlatformLeaderboardsModel::UploadScoreCompletionHandler*
         completionHandler) {

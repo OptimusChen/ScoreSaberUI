@@ -16,7 +16,7 @@
   il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::get()
 
 DECLARE_CLASS_CODEGEN(
-    FakeSaber, CustomLeaderboardPlatformHandler,
+    ScoreSaberUI::CustomTypes, CustomLeaderboardPlatformHandler,
     GlobalNamespace::PlatformLeaderboardsHandler,
     DECLARE_OVERRIDE_METHOD(
         GlobalNamespace::HMAsyncRequest*, GetScores,

@@ -3,7 +3,7 @@
 #include <chrono>
 #include <codecvt>
 
-#include "CustomLeaderboardPlatformHandler.hpp"
+#include "CustomTypes/CustomLeaderboardPlatformHandler.hpp"
 #include "GlobalNamespace/GameplayModifiers.hpp"
 #include "GlobalNamespace/GameplayModifiersModelSO.hpp"
 #include "GlobalNamespace/IBeatmapLevel.hpp"
@@ -75,7 +75,8 @@ Logger& getLogger() {
   return *logger;
 }
 
-FakeSaber::CustomLeaderboardPlatformHandler* leaderboardsHandler;
+ScoreSaberUI::CustomTypes::CustomLeaderboardPlatformHandler*
+    leaderboardsHandler;
 
 MAKE_HOOK_MATCH(
     MainSystemInit_InstallPlatformLeaderboardsModel,
@@ -86,7 +87,8 @@ MAKE_HOOK_MATCH(
   using namespace Zenject;
 
   leaderboardsHandler = CRASH_UNLESS(
-      il2cpp_utils::New<FakeSaber::CustomLeaderboardPlatformHandler*>());
+      il2cpp_utils::New<
+          ScoreSaberUI::CustomTypes::CustomLeaderboardPlatformHandler*>());
   leaderboardsHandler->page = 1;
   container->Bind<PlatformLeaderboardsHandler*>()
       ->FromInstance(leaderboardsHandler)
