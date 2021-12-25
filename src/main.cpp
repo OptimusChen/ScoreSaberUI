@@ -107,11 +107,15 @@ MAKE_HOOK_MATCH(
 MAKE_HOOK_MATCH(TextMeshProUGUI_GenerateTextMesh,
                 &::TMPro::TextMeshProUGUI::GenerateTextMesh, void,
                 TMPro::TextMeshProUGUI* self) {
-  if (self->get_name()->Equals(il2cpp_utils::newcsstr("PlayerName"))) {
+  static auto literalString =
+      il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("PlayerName");
+  if (self->get_name()->Equals(literalString)) {
     self->set_richText(true);
+    TextMeshProUGUI_GenerateTextMesh(self);
+    self->Rebuild(UnityEngine::UI::CanvasUpdate::PreRender);
+  } else {
+    TextMeshProUGUI_GenerateTextMesh(self);
   }
-
-  TextMeshProUGUI_GenerateTextMesh(self);
 }
 
 UnityEngine::UI::Button* up;
@@ -218,6 +222,11 @@ MAKE_HOOK_MATCH(PlatformLeaderboardViewController_Refresh,
     RectTransform* rectTransform =
         reinterpret_cast<RectTransform*>(up->get_transform()->GetChild(0));
     rectTransform->set_sizeDelta({10.0f, 10.0f});
+    if (leaderboardsHandler->page == 1) {
+      up->set_interactable(false);
+    } else {
+      up->set_interactable(true);
+    }
   }
 
   if (!down) {

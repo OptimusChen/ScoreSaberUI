@@ -22,6 +22,9 @@ std::string GetRoleColor(std::string role) {
   if (role.compare("Supporter") == 0) {
     return "#f76754";
   }
+  if (role.compare("Ranking Team") == 0){
+    return "#1cbc9c";
+  }
   return "#FFFFFF";
 }
 

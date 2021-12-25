@@ -37,6 +37,7 @@
 #include "UnityEngine/Networking/DownloadHandler.hpp"
 #include "UnityEngine/Networking/UnityWebRequest.hpp"
 #include "UnityEngine/WaitForSeconds.hpp"
+#include "Utils/BeatmapUtils.hpp"
 #include "Utils/StringUtils.hpp"
 #include "beatsaber-hook/shared/config/config-utils.hpp"
 #include "beatsaber-hook/shared/rapidjson/include/rapidjson/error/en.h"
@@ -48,112 +49,85 @@ DEFINE_TYPE(ScoreSaberUI::CustomTypes, CustomLeaderboardPlatformHandler);
 
 using namespace GlobalNamespace;
 using namespace ScoreSaberUI::Utils;
-
-int getDiff(IDifficultyBeatmap* beatmap) {
-  return beatmap->get_difficultyRank();
-}
-
-int getMaxScore(IDifficultyBeatmap* beatmap) {
-  int notesCount = beatmap->get_beatmapData()->get_cuttableNotesCount();
-  if (notesCount > 13) {
-    return (8 * ((115 * (notesCount - 13)))) + 4 * (115 * 7) + 2 * (115 * 5) +
-           115;
-  } else {
-    int diff = (beatmap->get_beatmapData()->get_cuttableNotesCount() - 14) * -1;
-    if (diff == 15) {
-      return 0;
-    } else if (diff == 14) {
-      return 115;
-    } else if (diff == 13) {
-      return 115 + (2 * 115);
-    } else if (diff < 13 && diff > 8) {
-      return 115 + diff * (115 * 2);
-    } else if (diff < 8 && diff > 0) {
-      return 115 + diff * (115 * 4);
-    }
-  }
-  return 0;
-}
+using namespace ScoreSaberUI::Utils::StringUtils;
+using namespace ScoreSaberUI::Utils::BeatmapUtils;
 
 custom_types::Helpers::Coroutine GetScoresInternal(
     ScoreSaberUI::CustomTypes::CustomLeaderboardPlatformHandler* self,
     IDifficultyBeatmap* beatmap, PlatformLeaderboardsModel::ScoresScope scope,
     PlatformLeaderboardsModel::GetScoresCompletionHandler* completionHandler) {
+  Il2CppString* csHash =
+      reinterpret_cast<IPreviewBeatmapLevel*>(beatmap->get_level())
+          ->get_levelID();
+  csHash->Replace(il2cpp_utils::newcsstr("custom_level_"),
+                  Il2CppString::_get_Empty());
+  std::string hash = to_utf8(csstrtostr(csHash));
+
   UnityEngine::Networking::UnityWebRequest* webRequest =
-      UnityEngine::Networking::UnityWebRequest::Get(il2cpp_utils::createcsstr(
-          "https://scoresaber.com/api/leaderboard/by-hash/"
-          "" +
-          to_utf8(csstrtostr(
-              reinterpret_cast<IPreviewBeatmapLevel*>(beatmap->get_level())
-                  ->get_levelID()
-                  ->Replace(il2cpp_utils::newcsstr("custom_level_"),
-                            il2cpp_utils::newcsstr("")))) +
-          "/"
-          "scores?difficulty=" +
-          std::to_string(getDiff(beatmap)) +
+      UnityEngine::Networking::UnityWebRequest::Get(il2cpp_utils::newcsstr(
+          "https://scoresaber.com/api/leaderboard/by-hash/" + hash + "/" +
+          "scores?difficulty=" + std::to_string(getDiff(beatmap)) +
           "&page=" + std::to_string(self->page) + "&gameMode=SoloStandard" +
           "&withMetadata=true"));
+
   co_yield reinterpret_cast<System::Collections::IEnumerator*>(
       CRASH_UNLESS(webRequest->SendWebRequest()));
+
   auto scores = System::Collections::Generic::List_1<
       PlatformLeaderboardsModel::LeaderboardScore*>::New_ctor();
   auto modifiers = System::Collections::Generic::List_1<
       GameplayModifierParamsSO*>::New_ctor();
+
   if (!webRequest->get_isNetworkError()) {
     rapidjson::Document doc;
     std::string s = StringUtils::to_utf8(
         csstrtostr(webRequest->get_downloadHandler()->get_text()));
     doc.Parse(s);
+
     const rapidjson::Value& scoreArray = doc["scores"];
+
     for (int i = 0; i < scoreArray.Size(); i++) {
       auto score = scoreArray[i].GetObject();
-      double pp = score["pp"].GetDouble();
-      if (pp > 0.0f) {
-        self->mapRanked = true;
-        self->ranked->set_text(
-            il2cpp_utils::newcsstr("<i><color=#ffde1c>Ranked Status: "
-                                   "</color>Ranked (modifiers disabled)</i>"));
-      } else {
-        self->mapRanked = false;
-        self->ranked->set_text(il2cpp_utils::newcsstr(
-            "<i><color=#ffde1c>Ranked Status: "
-            "</color>Unranked (modifiers disabled)</i>"));
-      }
+
       auto leaderboardPlayerInfo = score["leaderboardPlayerInfo"].GetObject();
+
       int modifiedScore = score["modifiedScore"].GetInt();
       int modifiedScoreDouble = score["modifiedScore"].GetDouble();
       int rank = score["rank"].GetInt();
+      double pp = score["pp"].GetDouble();
+
+      bool ranked = pp > 0.0f;
+
       std::string name = std::string(leaderboardPlayerInfo["name"].GetString());
+      std::string role = "";
+
       if (leaderboardPlayerInfo["role"].IsString()) {
-        std::string role =
-            std::string(leaderboardPlayerInfo["role"].GetString());
-        scores->Add(PlatformLeaderboardsModel::LeaderboardScore::New_ctor(
-            modifiedScore, rank,
-            il2cpp_utils::newcsstr(StringUtils::Resize(
-                StringUtils::Colorize(name, StringUtils::GetRoleColor(role)) +
-                    " - (" +
-                    StringUtils::FormatScore(
-                        std::to_string(score["modifiedScore"].GetDouble() /
-                                       getMaxScore(beatmap))) +
-                    ")" + StringUtils::FormatPP(std::to_string(pp), score),
-                80)),
-            il2cpp_utils::newcsstr("0"), modifiers));
-      } else {
-        scores->Add(PlatformLeaderboardsModel::LeaderboardScore::New_ctor(
-            modifiedScore, rank,
-            il2cpp_utils::newcsstr(StringUtils::Resize(
-                name + " - (" +
-                    StringUtils::FormatScore(
-                        std::to_string(score["modifiedScore"].GetDouble() /
-                                       getMaxScore(beatmap))) +
-                    ")" + StringUtils::FormatPP(std::to_string(pp), score),
-                80)),
-            il2cpp_utils::newcsstr("0"), modifiers));
+        role = std::string(leaderboardPlayerInfo["role"].GetString());
       }
+
+      std::string rankedStatus = ranked ? "Ranked" : "Unranked";
+
+      self->ranked->set_text(il2cpp_utils::newcsstr(
+          "<i>" + StringUtils::Colorize("Ranked Status: ", "#ffde1c") +
+          +rankedStatus + " (modifiers disabled)</i>"));
+
+      self->mapRanked = ranked;
+
+      double scoreDouble = score["modifiedScore"].GetDouble();
+
+      scores->Add(PlatformLeaderboardsModel::LeaderboardScore::New_ctor(
+          modifiedScore, rank,
+          il2cpp_utils::newcsstr(Resize(
+              Colorize(name, GetRoleColor(role)) + " - (" +
+                  FormatScore(std::to_string(
+                      scoreDouble / BeatmapUtils::getMaxScore(beatmap))) +
+                  ")" + FormatPP(std::to_string(pp), score),
+              80)),
+          il2cpp_utils::newcsstr("0"), modifiers));
     }
     if (scores->size == 0) {
       scores->Add(PlatformLeaderboardsModel::LeaderboardScore::New_ctor(
-          000, 1, il2cpp_utils::newcsstr("No scores on this leaderboard!"),
+          0, 0, il2cpp_utils::newcsstr("No scores on this leaderboard!"),
           il2cpp_utils::newcsstr("0"), modifiers));
     }
     completionHandler->Invoke(PlatformLeaderboardsModel::GetScoresResult::Ok,
@@ -188,11 +162,12 @@ ScoreSaberUI::CustomTypes::CustomLeaderboardPlatformHandler::GetScores(
       reinterpret_cast<custom_types::Helpers::enumeratorT*>(
           custom_types::Helpers::CoroutineHelper::New(
               GetScoresInternal(this, beatmap, scope, completionHandler))));
+
   return nullptr;
 }
 
 HMAsyncRequest*
-ScoreSaberUI::CustomTypes::CustomLeaderboardPlatformHandler::UploadScore(
+ScoreSaberUI::CustomTypes::CustomLeaderboardPlatformHandler::mloadScore(
     LeaderboardScoreUploader::ScoreData* scoreData,
     PlatformLeaderboardsModel::UploadScoreCompletionHandler*
         completionHandler) {
