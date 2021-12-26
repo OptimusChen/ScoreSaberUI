@@ -114,5 +114,7 @@
         "xtree": "cpp",
         "xutility": "cpp",
         "__functional_03": "cpp"
-    }
+    },
+    "C_Cpp.errorSquiggles": "Disabled",
+    "cmake.configureOnOpen": false
 }

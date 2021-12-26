@@ -1,3 +1,5 @@
+#pragma once
+
 #include "GlobalNamespace/HMAsyncRequest.hpp"
 #include "GlobalNamespace/IDifficultyBeatmap.hpp"
 #include "GlobalNamespace/LeaderboardScoreUploader_ScoreData.hpp"

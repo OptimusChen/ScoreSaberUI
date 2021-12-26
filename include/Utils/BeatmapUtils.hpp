@@ -9,8 +9,8 @@ namespace ScoreSaberUI {
 namespace Utils {
 namespace BeatmapUtils {
 
-int getDiff(IDifficultyBeatmap* beatmap);
-int getMaxScore(IDifficultyBeatmap* beatmap);
+int getDiff(GlobalNamespace::IDifficultyBeatmap* beatmap);
+int getMaxScore(GlobalNamespace::IDifficultyBeatmap* beatmap);
 
 }  // namespace BeatmapUtils
 }  // namespace Utils

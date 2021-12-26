@@ -51,20 +51,22 @@ using namespace GlobalNamespace;
 using namespace ScoreSaberUI::Utils;
 using namespace ScoreSaberUI::Utils::StringUtils;
 using namespace ScoreSaberUI::Utils::BeatmapUtils;
+using namespace ScoreSaberUI::CustomTypes;
 
 custom_types::Helpers::Coroutine GetScoresInternal(
     ScoreSaberUI::CustomTypes::CustomLeaderboardPlatformHandler* self,
-    IDifficultyBeatmap* beatmap, PlatformLeaderboardsModel::ScoresScope scope,
+    GlobalNamespace::IDifficultyBeatmap* beatmap,
+    PlatformLeaderboardsModel::ScoresScope scope,
     PlatformLeaderboardsModel::GetScoresCompletionHandler* completionHandler) {
   Il2CppString* csHash =
       reinterpret_cast<IPreviewBeatmapLevel*>(beatmap->get_level())
           ->get_levelID();
-  csHash->Replace(il2cpp_utils::newcsstr("custom_level_"),
-                  Il2CppString::_get_Empty());
-  std::string hash = to_utf8(csstrtostr(csHash));
+  csHash = csHash->Replace(StrToIl2cppStr("custom_level_"),
+                           Il2CppString::_get_Empty());
+  std::string hash = Il2cppStrToStr(csHash);
 
   UnityEngine::Networking::UnityWebRequest* webRequest =
-      UnityEngine::Networking::UnityWebRequest::Get(il2cpp_utils::newcsstr(
+      UnityEngine::Networking::UnityWebRequest::Get(StrToIl2cppStr(
           "https://scoresaber.com/api/leaderboard/by-hash/" + hash + "/" +
           "scores?difficulty=" + std::to_string(getDiff(beatmap)) +
           "&page=" + std::to_string(self->page) + "&gameMode=SoloStandard" +
@@ -107,9 +109,9 @@ custom_types::Helpers::Coroutine GetScoresInternal(
 
       std::string rankedStatus = ranked ? "Ranked" : "Unranked";
 
-      self->ranked->set_text(il2cpp_utils::newcsstr(
+      self->ranked->set_text(StrToIl2cppStr(
           "<i>" + StringUtils::Colorize("Ranked Status: ", "#ffde1c") +
-          +rankedStatus + " (modifiers disabled)</i>"));
+          +rankedStatus.c_str() + " (modifiers disabled)</i>"));
 
       self->mapRanked = ranked;
 
@@ -117,18 +119,18 @@ custom_types::Helpers::Coroutine GetScoresInternal(
 
       scores->Add(PlatformLeaderboardsModel::LeaderboardScore::New_ctor(
           modifiedScore, rank,
-          il2cpp_utils::newcsstr(Resize(
+          StrToIl2cppStr(Resize(
               Colorize(name, GetRoleColor(role)) + " - (" +
                   FormatScore(std::to_string(
                       scoreDouble / BeatmapUtils::getMaxScore(beatmap))) +
                   ")" + FormatPP(std::to_string(pp), score),
               80)),
-          il2cpp_utils::newcsstr("0"), modifiers));
+          StrToIl2cppStr("0"), modifiers));
     }
     if (scores->size == 0) {
       scores->Add(PlatformLeaderboardsModel::LeaderboardScore::New_ctor(
-          0, 0, il2cpp_utils::newcsstr("No scores on this leaderboard!"),
-          il2cpp_utils::newcsstr("0"), modifiers));
+          0, 0, StrToIl2cppStr("No scores on this leaderboard!"),
+          StrToIl2cppStr("0"), modifiers));
     }
     completionHandler->Invoke(PlatformLeaderboardsModel::GetScoresResult::Ok,
                               scores->ToArray(), -1);
@@ -167,7 +169,7 @@ ScoreSaberUI::CustomTypes::CustomLeaderboardPlatformHandler::GetScores(
 }
 
 HMAsyncRequest*
-ScoreSaberUI::CustomTypes::CustomLeaderboardPlatformHandler::mloadScore(
+ScoreSaberUI::CustomTypes::CustomLeaderboardPlatformHandler::UploadScore(
     LeaderboardScoreUploader::ScoreData* scoreData,
     PlatformLeaderboardsModel::UploadScoreCompletionHandler*
         completionHandler) {

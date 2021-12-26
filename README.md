@@ -1,4 +1,4 @@
-# ScoreSaberLeaderboards
+# ScoreSaberUI
 
 scoresaber but no score uploads<br>please dont buly me for how shit the code is
 

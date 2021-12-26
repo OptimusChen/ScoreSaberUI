@@ -21,6 +21,10 @@ std::string Colorize(std::string s, std::string color);
 
 std::string Resize(std::string s, int sizePercent);
 
+std::string Il2cppStrToStr(Il2CppString* s);
+
+Il2CppString* StrToIl2cppStr(std::string s);
+
 }  // namespace StringUtils
 }  // namespace Utils
 }  // namespace ScoreSaberUI

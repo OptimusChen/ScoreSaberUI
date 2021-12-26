@@ -2,8 +2,8 @@
   "sharedDir": "shared",
   "dependenciesDir": "extern",
   "info": {
-    "name": "ScoreSaberLeaderboards",
-    "id": "scoresaberleaderboards",
+    "name": "ScoreSaberUI",
+    "id": "scoresaberui",
     "version": "0.1.0",
     "url": null,
     "additionalData": {}

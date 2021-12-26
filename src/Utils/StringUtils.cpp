@@ -72,5 +72,13 @@ std::string Resize(std::string s, int sizePercent) {
   return size_prefix + to_string(sizePercent) + string("%>") + s + size_suffix;
 }
 
+std::string Il2cppStrToStr(Il2CppString* s){
+  return to_utf8(csstrtostr(s));
+}
+
+Il2CppString* StrToIl2cppStr(std::string s){
+  return il2cpp_utils::newcsstr(s);
+}
+
 }  // namespace StringUtils
 }  // namespace ScoreSaberUI::Utils
