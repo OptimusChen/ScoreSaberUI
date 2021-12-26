@@ -1,5 +1,8 @@
 # ScoreSaberUI
+<<<<<<< HEAD
 
+=======
+>>>>>>> b3f25d5c55a3b845cb3998d20379e1310bdcff6a
 scoresaber but no score uploads<br>please dont buly me for how shit the code is
 
 ## Credits
