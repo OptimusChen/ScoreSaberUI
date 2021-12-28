@@ -1,17 +1,40 @@
 
 {
     "_QPVersion": "0.1.1",
-    "name": "ScoreSaberLeaderboards",
-    "id": "scoresaberleaderboards",
-    "author": "optimus",
+    "name": "ScoreSaberUI",
+    "id": "scoresaberui",
+    "author": "Optimus",
     "version": "0.1.0",
+    "coverImage": "logo.jpg",
     "packageId": "com.beatgames.beatsaber",
-    "packageVersion": "1.14.0",
-    "description": "e",
+    "packageVersion": "1.17.1",
+    "description": "ScoreSaber UI implementation for the Oculus Quest",
     "modFiles": [
-        "libscoresaberleaderboards.so"
+        "scoresaberui.so"
     ],
     "libraryFiles": [
-        "libbeatsaber-hook_1_2_4.so"
+        "libbeatsaber-hook_2_3_2.so"
+    ],
+    "fileCopies": [
+        {
+            "name": "arrow.png",
+            "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/ScoreSaberUI/Icons/arrow.png"
+          },
+          {
+            "name": "arrow_down.png",
+            "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/ScoreSaberUI/Icons/arrow_down.png"
+          },
+          {
+            "name": "arrow_downactive.png",
+            "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/ScoreSaberUI/Icons/arrow_downactive.png"
+          },
+          {
+            "name": "arrowactive.png",
+            "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/ScoreSaberUI/Icons/arrowactive.png"
+          },
+          {
+            "name": "scoresaber.png",
+            "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/ScoreSaberUI/Icons/scoresaber.png"
+          }
     ]
 }

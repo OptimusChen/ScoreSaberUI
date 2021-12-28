@@ -12,26 +12,35 @@
 #include "HMUI/CurvedCanvasSettingsHelper.hpp"
 #include "HMUI/CurvedTextMeshPro.hpp"
 #include "HMUI/ImageView.hpp"
+#include "HMUI/Screen.hpp"
+#include "HMUI/ViewController_AnimationDirection.hpp"
+#include "HMUI/ViewController_AnimationType.hpp"
 #include "ScoreSaberUI.hpp"
 #include "TMPro/TextMeshProUGUI.hpp"
+#include "UI/FlowCoordinators/ScoreSaberFlowCoordinator.hpp"
+#include "UnityEngine/SpriteRenderer.hpp"
 #include "UnityEngine/UI/Button.hpp"
+#include "Utils/StringUtils.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
+#include "questui/shared/CustomTypes/Components/FloatingScreen/FloatingScreen.hpp"
 #include "questui/shared/QuestUI.hpp"
-
 
 using namespace QuestUI;
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 using namespace GlobalNamespace;
+using namespace ScoreSaberUI;
 using namespace ScoreSaberUI::CustomTypes;
+using namespace ScoreSaberUI::UI::FlowCoordinators;
 
 UnityEngine::UI::Button* up;
 UnityEngine::UI::Button* down;
+UnityEngine::UI::Button* menu;
 std::string iconPath =
     "/sdcard/ModData/com.beatgames.beatsaber/"
-    "Mods/ScoreSaberLeaderboards/";
+    "Mods/ScoreSaberUI/Icons/";
 
 MAKE_HOOK_MATCH(
     PlatformLeaderboardViewController_DidActivate,
@@ -46,6 +55,23 @@ MAKE_HOOK_MATCH(
 
   leaderboardsHandler->page = 1;
   if (firstActivation) {
+    // GameObject* floatingScreen = BeatSaberUI::CreateFloatingScreen(
+    //     {100.0f, 15.0f}, Vector3::get_zero(),
+    //     Quaternion::get_identity().get_eulerAngles(), 0.0f, true, false, 4);
+    // floatingScreen->set_name(Utils::StringUtils::StrToIl2cppStr("PanelView"));
+
+    // Transform* transform = floatingScreen->get_transform();
+    // transform->SetParent(self->get_transform(), false);
+    // transform->set_localPosition(
+    //     {3.0f, 50.0f, transform->get_localPosition().z});
+    // transform->set_localScale(Vector3::get_one());
+
+    // floatingScreen->SetActive(false);
+    // floatingScreen->SetActive(true);
+
+    // HMUI::Screen* screen = floatingScreen->AddComponent<HMUI::Screen*>();
+    // screen->SetRootViewController(self, 1);
+
     VerticalLayoutGroup* vertical =
         QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(self->get_transform());
     vertical->get_rectTransform()->set_anchoredPosition({0.0f, 50.0f});
@@ -78,10 +104,33 @@ MAKE_HOOK_MATCH(
     imageView->set_color1(Color(0.0f, 0.45f, 0.65f, 0.0f));
     imageView->curvedCanvasSettingsHelper->Reset();
 
-    QuestUI::BeatSaberUI::CreateImage(
-        self->get_transform(),
-        BeatSaberUI::FileToSprite(iconPath + "scoresaber.png"),
-        Vector2(-37.0f, 50.0f), Vector2(12.0f, 12.0f));
+    menu = QuestUI::BeatSaberUI::CreateUIButton(
+        self->get_transform(), "", "SettingsButton", Vector2(-37.0f, 50.0f),
+        Vector2(12.0f, 12.0f), []() {
+          getLogger().info("ssu: test1");
+          HMUI::FlowCoordinator* currentFlowCoordinator =
+              QuestUI::BeatSaberUI::GetMainFlowCoordinator()
+                  ->YoungestChildFlowCoordinatorOrSelf();
+          ScoreSaberFlowCoordinator* flowCoordinator =
+              ScoreSaberUI::ScoreSaber::flowCoordinator;
+
+          if (!flowCoordinator) {
+            ScoreSaberUI::ScoreSaber::flowCoordinator =
+                BeatSaberUI::CreateFlowCoordinator<
+                    ScoreSaberFlowCoordinator*>();
+            flowCoordinator = ScoreSaberUI::ScoreSaber::flowCoordinator;
+          }
+
+          currentFlowCoordinator->PresentFlowCoordinator(
+              ScoreSaberUI::ScoreSaber::flowCoordinator, nullptr,
+              HMUI::ViewController::AnimationDirection::Horizontal,
+              HMUI::ViewController::AnimationType::In, false);
+        });
+    Sprite* sprite = BeatSaberUI::FileToSprite(iconPath + "scoresaber.png");
+    QuestUI::BeatSaberUI::SetButtonSprites(menu, sprite, sprite);
+    RectTransform* rectTransform =
+        reinterpret_cast<RectTransform*>(menu->get_transform()->GetChild(0));
+    rectTransform->set_sizeDelta({12.0f, 12.0f});
     for (int i = 0; i < 13; i++) {
       QuestUI::BeatSaberUI::CreateImage(
           self->get_transform(),
