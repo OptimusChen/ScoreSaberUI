@@ -11,7 +11,6 @@ void MainSystemInit();
 
 }  // namespace Hooks
 void InstallHooks();
-
 class ScoreSaber {
  public:
   static ScoreSaberUI::CustomTypes::CustomLeaderboardPlatformHandler*

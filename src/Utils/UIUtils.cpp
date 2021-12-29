@@ -9,6 +9,11 @@
 #include "UnityEngine/Canvas.hpp"
 #include "UnityEngine/CanvasGroup.hpp"
 #include "UnityEngine/CanvasRenderer.hpp"
+#include "UnityEngine/EventSystems/IEventSystemHandler.hpp"
+#include "UnityEngine/EventSystems/IPointerClickHandler.hpp"
+#include "UnityEngine/EventSystems/IPointerEnterHandler.hpp"
+#include "UnityEngine/EventSystems/IPointerExitHandler.hpp"
+#include "UnityEngine/EventSystems/PointerEventData.hpp"
 #include "UnityEngine/Object.hpp"
 #include "UnityEngine/RenderMode.hpp"
 #include "UnityEngine/Resources.hpp"
@@ -20,6 +25,7 @@
 using namespace HMUI;
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
+using namespace UnityEngine::EventSystems;
 using namespace QuestUI;
 using namespace QuestUI::BeatSaberUI;
 using namespace TMPro;
@@ -48,4 +54,5 @@ HorizontalLayoutGroup* UIUtils::CreateHeader(UnityEngine::Transform* parent,
 
   return horizontal;
 }
+
 }  // namespace ScoreSaberUI::Utils

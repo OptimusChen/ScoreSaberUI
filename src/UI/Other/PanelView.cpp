@@ -1,26 +1,37 @@
 #include "UI/Other/PanelView.hpp"
 
+#include "GlobalNamespace/SharedCoroutineStarter.hpp"
 #include "HMUI/CurvedCanvasSettingsHelper.hpp"
 #include "HMUI/ViewController_AnimationDirection.hpp"
 #include "HMUI/ViewController_AnimationType.hpp"
 #include "ScoreSaberUI.hpp"
+#include "System/Collections/IEnumerator.hpp"
 #include "TMPro/TextMeshProUGUI.hpp"
 #include "UI/FlowCoordinators/ScoreSaberFlowCoordinator.hpp"
 #include "UnityEngine/Texture2D.hpp"
 #include "UnityEngine/Transform.hpp"
 #include "UnityEngine/UI/Button.hpp"
-#include "UnityEngine/UI/HorizontalLayoutGroup.hpp"
 #include "UnityEngine/UI/VerticalLayoutGroup.hpp"
+#include "UnityEngine/WaitForSeconds.hpp"
+#include "Utils/StringUtils.hpp"
+#include "Utils/UIUtils.hpp"
 #include "beatsaber-hook/shared/utils/il2cpp-functions.hpp"
 #include "main.hpp"
 #include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
 
 DEFINE_TYPE(ScoreSaberUI::UI::Other, PanelView);
 
+using namespace ScoreSaberUI::Utils;
 using namespace ScoreSaberUI::UI::Other;
 using namespace ScoreSaberUI::UI::FlowCoordinators;
 using namespace QuestUI;
 using namespace UnityEngine::UI;
+using namespace GlobalNamespace;
+
+#define BeginCoroutine(method)                             \
+  SharedCoroutineStarter::get_instance()->StartCoroutine(  \
+      reinterpret_cast<System::Collections::IEnumerator*>( \
+          custom_types::Helpers::CoroutineHelper::New(method)));
 
 void PanelView::Init(PlatformLeaderboardViewController* viewController) {
   this->leaderboardView = viewController;
@@ -32,13 +43,46 @@ void PanelView::Init(PlatformLeaderboardViewController* viewController) {
   Transform* transform = screen->get_transform();
   RectTransform* rectTransform = screen->GetComponent<RectTransform*>();
 
-  rectTransform->set_sizeDelta({100.0f, 15.0f});
+  rectTransform->set_sizeDelta({100.0f, 25.0f});
   transform->SetParent(leaderboardView->get_transform(), false);
   transform->set_localPosition({0.0f, 50.0f, 0.0f});
   transform->set_eulerAngles(Quaternion::get_identity().get_eulerAngles());
   transform->set_localScale(Vector3::get_one());
 
   this->floatingScreen = screen;
+
+  promptRoot =
+      BeatSaberUI::CreateHorizontalLayoutGroup(screen->get_transform());
+  promptRoot->set_childAlignment(TextAnchor::UpperLeft);
+  promptRoot->set_childForceExpandWidth(false);
+  promptRoot->set_spacing(1.0f);
+
+  RectTransform* promptRootRect = promptRoot->get_rectTransform();
+  promptRootRect->set_anchoredPosition({0.0f, 10.3f});
+
+  LayoutElement* promptElement = promptRoot->GetComponent<LayoutElement*>();
+  promptElement->set_preferredHeight(7.0f);
+  promptElement->set_preferredWidth(87.0f);
+
+  ContentSizeFitter* promptFitter =
+      promptRoot->GetComponent<ContentSizeFitter*>();
+  promptFitter->set_horizontalFit(ContentSizeFitter::FitMode::PreferredSize);
+
+  HorizontalLayoutGroup* textGroup =
+      BeatSaberUI::CreateHorizontalLayoutGroup(promptRootRect);
+  textGroup->get_rectTransform()->set_anchoredPosition({0.0f, 10.0f});
+
+  this->promptText =
+      BeatSaberUI::CreateText(textGroup->get_transform(), "...", false);
+  this->promptText->set_alignment(TMPro::TextAlignmentOptions::BottomLeft);
+
+  HorizontalLayoutGroup* indicatorGroup =
+      BeatSaberUI::CreateHorizontalLayoutGroup(promptRootRect);
+
+  LayoutElement* indicatorElement =
+      indicatorGroup->GetComponent<LayoutElement*>();
+  indicatorElement->set_preferredHeight(4.0f);
+  indicatorElement->set_preferredWidth(4.0f);
 }
 
 void PanelView::Show() {
@@ -80,6 +124,8 @@ void PanelView::Show() {
   imageView->set_color1(Color(0.0f, 0.45f, 0.65f, 0.0f));
   imageView->curvedCanvasSettingsHelper->Reset();
 
+  Sprite* sprite = BeatSaberUI::FileToSprite(iconPath + "scoresaber.png");
+
   Button* menu = QuestUI::BeatSaberUI::CreateUIButton(
       floatingScreen->get_transform(), "", "SettingsButton",
       Vector2(-37.0f, 0.0f), Vector2(12.0f, 12.0f), []() {
@@ -102,8 +148,6 @@ void PanelView::Show() {
             HMUI::ViewController::AnimationType::In, false);
       });
 
-  Sprite* sprite = BeatSaberUI::FileToSprite(iconPath + "scoresaber.png");
-
   QuestUI::BeatSaberUI::SetButtonSprites(menu, sprite, sprite);
   RectTransform* rectTransform =
       reinterpret_cast<RectTransform*>(menu->get_transform()->GetChild(0));
@@ -118,11 +162,53 @@ void PanelView::Show() {
   QuestUI::BeatSaberUI::CreateText(
       leaderboardView->get_transform(),
       "<color=#ffde1c>Global Ranking: "
-      "</color>#893 (<size=80%><color=#6771e5>11,141.92pp</color></size>)",
+      "</color>#893 "
+      "(<size=80%><color=#6771e5>11,141.92pp</color></size>)",
       true, Vector2(5.0f, 50.0f));
   ScoreSaberUI::ScoreSaber::leaderboard->ranked =
       QuestUI::BeatSaberUI::CreateText(
           leaderboardView->get_transform(),
-          "<color=#ffde1c>Ranked Status: </color>Ranked (modifiers disabled)",
+          "<color=#ffde1c>Ranked Status: </color>Ranked (modifiers "
+          "disabled)",
           true, Vector2(5.0f, 45.0f));
+
+  BeginCoroutine(SetPrompt("Connecting to ScoreSaber", true, 5.0f, [=]() {
+    BeginCoroutine(SetPrompt(
+        StringUtils::Colorize("Successfully Connected to ScoreSaber", "green"),
+        false, 2.0f, nullptr));
+  }));
+}
+
+custom_types::Helpers::Coroutine PanelView::SetPrompt(
+    std::string status, bool showIndicator, float dismiss,
+    std::function<void()> callback) {
+  this->promptText->SetText(il2cpp_utils::newcsstr(status));
+
+  std::string text = status;
+
+  for (int i = 1; i < (dismiss * 2) + 1; i++) {
+    co_yield reinterpret_cast<System::Collections::IEnumerator*>(
+        CRASH_UNLESS(WaitForSeconds::New_ctor(0.5f)));
+
+    // Couldn't get the loading indicator to work so right now it just displays
+    // dots as the loading indicator
+    if (showIndicator) {
+      if (i % 4 != 0) {
+        text = text + ".";
+        promptText->SetText(il2cpp_utils::newcsstr(text));
+      } else {
+        for (int k = 0; k < 3; k++) {
+          text.pop_back();
+        }
+        promptText->SetText(il2cpp_utils::newcsstr(text));
+      }
+    }
+  }
+
+  promptText->SetText(il2cpp_utils::newcsstr(""));
+
+  if (callback) {
+    callback();
+  }
+  co_return;
 }

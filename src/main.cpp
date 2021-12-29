@@ -57,7 +57,6 @@
 #include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
 #include "questui/shared/QuestUI.hpp"
 
-
 using namespace QuestUI;
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
