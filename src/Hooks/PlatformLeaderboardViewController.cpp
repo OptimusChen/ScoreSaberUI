@@ -11,6 +11,8 @@
 #include "GlobalNamespace/PlatformLeaderboardsModel_ScoresScope.hpp"
 #include "HMUI/CurvedCanvasSettingsHelper.hpp"
 #include "HMUI/CurvedTextMeshPro.hpp"
+#include "HMUI/IconSegmentedControl.hpp"
+#include "HMUI/IconSegmentedControl_DataItem.hpp"
 #include "HMUI/ImageView.hpp"
 #include "HMUI/Screen.hpp"
 #include "HMUI/ViewController_AnimationDirection.hpp"
@@ -18,6 +20,8 @@
 #include "ScoreSaberUI.hpp"
 #include "TMPro/TextMeshProUGUI.hpp"
 #include "UI/FlowCoordinators/ScoreSaberFlowCoordinator.hpp"
+#include "UI/Other/PanelView.hpp"
+#include "UnityEngine/Rect.hpp"
 #include "UnityEngine/SpriteRenderer.hpp"
 #include "UnityEngine/UI/Button.hpp"
 #include "Utils/StringUtils.hpp"
@@ -27,17 +31,20 @@
 #include "questui/shared/CustomTypes/Components/FloatingScreen/FloatingScreen.hpp"
 #include "questui/shared/QuestUI.hpp"
 
+using namespace HMUI;
 using namespace QuestUI;
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 using namespace GlobalNamespace;
 using namespace ScoreSaberUI;
+using namespace ScoreSaberUI::Utils::StringUtils;
 using namespace ScoreSaberUI::CustomTypes;
 using namespace ScoreSaberUI::UI::FlowCoordinators;
 
+ScoreSaberUI::UI::Other::PanelView* view;
+
 UnityEngine::UI::Button* up;
 UnityEngine::UI::Button* down;
-UnityEngine::UI::Button* menu;
 std::string iconPath =
     "/sdcard/ModData/com.beatgames.beatsaber/"
     "Mods/ScoreSaberUI/Icons/";
@@ -55,98 +62,33 @@ MAKE_HOOK_MATCH(
 
   leaderboardsHandler->page = 1;
   if (firstActivation) {
-    // GameObject* floatingScreen = BeatSaberUI::CreateFloatingScreen(
-    //     {100.0f, 15.0f}, Vector3::get_zero(),
-    //     Quaternion::get_identity().get_eulerAngles(), 0.0f, true, false, 4);
-    // floatingScreen->set_name(Utils::StringUtils::StrToIl2cppStr("PanelView"));
+    Sprite* globalLeaderboardIcon = self->globalLeaderboardIcon;
+    Sprite* friendsLeaderboardIcon = self->friendsLeaderboardIcon;
+    Sprite* aroundPlayerLeaderboardIcon = self->aroundPlayerLeaderboardIcon;
+    Sprite* countryLeaderboardIcon =
+        BeatSaberUI::FileToSprite(iconPath + "country.png");
+    countryLeaderboardIcon->get_textureRect().set_size({64.0f, 64.0f});
 
-    // Transform* transform = floatingScreen->get_transform();
-    // transform->SetParent(self->get_transform(), false);
-    // transform->set_localPosition(
-    //     {3.0f, 50.0f, transform->get_localPosition().z});
-    // transform->set_localScale(Vector3::get_one());
+    IconSegmentedControl* scopeSegmentedControl = self->scopeSegmentedControl;
 
-    // floatingScreen->SetActive(false);
-    // floatingScreen->SetActive(true);
-
-    // HMUI::Screen* screen = floatingScreen->AddComponent<HMUI::Screen*>();
-    // screen->SetRootViewController(self, 1);
-
-    VerticalLayoutGroup* vertical =
-        QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(self->get_transform());
-    vertical->get_rectTransform()->set_anchoredPosition({0.0f, 50.0f});
-    HorizontalLayoutGroup* horizontal =
-        QuestUI::BeatSaberUI::CreateHorizontalLayoutGroup(
-            vertical->get_transform());
-
-    TMPro::TextMeshProUGUI* text =
-        QuestUI::BeatSaberUI::CreateText(horizontal->get_transform(), "");
-    text->set_fontSize(text->get_fontSize() * 2.0f);
-    text->set_alignment(TMPro::TextAlignmentOptions::Center);
-
-    LayoutElement* layoutelem =
-        text->get_gameObject()->AddComponent<LayoutElement*>();
-    layoutelem->set_preferredHeight(15.0f);
-    layoutelem->set_preferredWidth(90.0f);
-
-    Backgroundable* background =
-        horizontal->get_gameObject()->AddComponent<Backgroundable*>();
-    background->ApplyBackgroundWithAlpha(
-        il2cpp_utils::newcsstr("title-gradient"), 1.0f);
-
-    HMUI::ImageView* imageView =
-        background->get_gameObject()
-            ->GetComponentInChildren<HMUI::ImageView*>();
-    imageView->gradient = true;
-    imageView->gradientDirection = 0;
-    imageView->set_color(Color::get_white());
-    imageView->set_color0(Color(0.0f, 0.45f, 0.65f, 1.0f));
-    imageView->set_color1(Color(0.0f, 0.45f, 0.65f, 0.0f));
-    imageView->curvedCanvasSettingsHelper->Reset();
-
-    menu = QuestUI::BeatSaberUI::CreateUIButton(
-        self->get_transform(), "", "SettingsButton", Vector2(-37.0f, 50.0f),
-        Vector2(12.0f, 12.0f), []() {
-          getLogger().info("ssu: test1");
-          HMUI::FlowCoordinator* currentFlowCoordinator =
-              QuestUI::BeatSaberUI::GetMainFlowCoordinator()
-                  ->YoungestChildFlowCoordinatorOrSelf();
-          ScoreSaberFlowCoordinator* flowCoordinator =
-              ScoreSaberUI::ScoreSaber::flowCoordinator;
-
-          if (!flowCoordinator) {
-            ScoreSaberUI::ScoreSaber::flowCoordinator =
-                BeatSaberUI::CreateFlowCoordinator<
-                    ScoreSaberFlowCoordinator*>();
-            flowCoordinator = ScoreSaberUI::ScoreSaber::flowCoordinator;
-          }
-
-          currentFlowCoordinator->PresentFlowCoordinator(
-              ScoreSaberUI::ScoreSaber::flowCoordinator, nullptr,
-              HMUI::ViewController::AnimationDirection::Horizontal,
-              HMUI::ViewController::AnimationType::In, false);
+    ::Array<IconSegmentedControl::DataItem*>* array =
+        ::Array<IconSegmentedControl::DataItem*>::New({
+            IconSegmentedControl::DataItem::New_ctor(globalLeaderboardIcon,
+                                                     StrToIl2cppStr("Global")),
+            IconSegmentedControl::DataItem::New_ctor(
+                aroundPlayerLeaderboardIcon, StrToIl2cppStr("Around You")),
+            IconSegmentedControl::DataItem::New_ctor(friendsLeaderboardIcon,
+                                                     StrToIl2cppStr("Friends")),
+            IconSegmentedControl::DataItem::New_ctor(countryLeaderboardIcon,
+                                                     StrToIl2cppStr("Country")),
         });
-    Sprite* sprite = BeatSaberUI::FileToSprite(iconPath + "scoresaber.png");
-    QuestUI::BeatSaberUI::SetButtonSprites(menu, sprite, sprite);
-    RectTransform* rectTransform =
-        reinterpret_cast<RectTransform*>(menu->get_transform()->GetChild(0));
-    rectTransform->set_sizeDelta({12.0f, 12.0f});
-    for (int i = 0; i < 13; i++) {
-      QuestUI::BeatSaberUI::CreateImage(
-          self->get_transform(),
-          BeatSaberUI::FileToSprite(iconPath + "pixel.png"),
-          Vector2(-27.0f, 44.0f + i), Vector2(0.5f, 1.0f));
-    }
 
-    QuestUI::BeatSaberUI::CreateText(
-        self->get_transform(),
-        "<color=#ffde1c>Global Ranking: "
-        "</color>#893 (<size=80%><color=#6771e5>11,141.92pp</color></size>)",
-        true, Vector2(5.0f, 50.0f));
-    leaderboardsHandler->ranked = QuestUI::BeatSaberUI::CreateText(
-        self->get_transform(),
-        "<color=#ffde1c>Ranked Status: </color>Ranked (modifiers disabled)",
-        true, Vector2(5.0f, 45.0f));
+    scopeSegmentedControl->SetData(array);
+
+    view = BeatSaberUI::CreateViewController<
+        ScoreSaberUI::UI::Other::PanelView*>();
+    view->Init(self);
+    view->Show();
   }
 }
 

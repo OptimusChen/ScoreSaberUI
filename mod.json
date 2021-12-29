@@ -35,6 +35,14 @@
           {
             "name": "scoresaber.png",
             "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/ScoreSaberUI/Icons/scoresaber.png"
+          },
+          {
+            "name": "bsmg.jpg",
+            "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/ScoreSaberUI/Icons/bsmg.jpg"
+          },
+          {
+            "name": "country.png",
+            "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/ScoreSaberUI/Icons/country.png"
           }
     ]
 }

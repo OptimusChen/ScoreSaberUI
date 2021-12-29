@@ -16,5 +16,6 @@ DECLARE_CLASS_CODEGEN(ScoreSaberUI::UI::Other, ScoreSaberLeaderboardView,
                       UnityEngine::MonoBehaviour,
                       DECLARE_CTOR(ctor, PlatformLeaderboardViewController);
                       DECLARE_INSTANCE_FIELD(HMUI::ModalView*, infoModal);
+                      DECLARE_INSTANCE_FIELD(UI::Button*, playButton);
                       DECLARE_INSTANCE_METHOD(void, SetPlayButtonState, bool);
-                      DECLARE_INSTANCE_METHOD(void, ShowInfoModal););
+                      DECLARE_INSTANCE_METHOD(void, ShowInfoModal, int););

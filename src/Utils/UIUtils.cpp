@@ -25,22 +25,12 @@ using namespace QuestUI::BeatSaberUI;
 using namespace TMPro;
 
 namespace ScoreSaberUI::Utils {
-VerticalLayoutGroup* UIUtils::CreateHeader(UnityEngine::Transform* parent,
-                                           std::string title,
-                                           UnityEngine::Color color) {
+HorizontalLayoutGroup* UIUtils::CreateHeader(UnityEngine::Transform* parent,
+                                             UnityEngine::Color color) {
   VerticalLayoutGroup* vertical = CreateVerticalLayoutGroup(parent);
   vertical->get_rectTransform()->set_anchoredPosition({0.0f, 45.0f});
   HorizontalLayoutGroup* horizontal =
       CreateHorizontalLayoutGroup(vertical->get_transform());
-
-  TextMeshProUGUI* text = CreateText(horizontal->get_transform(), title);
-  text->set_fontSize(text->get_fontSize() * 2.0f);
-  text->set_alignment(TextAlignmentOptions::Center);
-
-  LayoutElement* layoutelem =
-      text->get_gameObject()->AddComponent<LayoutElement*>();
-  layoutelem->set_preferredHeight(10.0f);
-  layoutelem->set_preferredWidth(90.0f);
 
   Backgroundable* background =
       horizontal->get_gameObject()->AddComponent<Backgroundable*>();
@@ -56,6 +46,6 @@ VerticalLayoutGroup* UIUtils::CreateHeader(UnityEngine::Transform* parent,
   imageView->set_color1(color);
   imageView->curvedCanvasSettingsHelper->Reset();
 
-  return vertical;
+  return horizontal;
 }
 }  // namespace ScoreSaberUI::Utils

@@ -5,6 +5,7 @@
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/QuestUI.hpp"
 
+using namespace QuestUI;
 using namespace ScoreSaberUI::UI::FlowCoordinators;
 
 DEFINE_TYPE(ScoreSaberUI::UI::FlowCoordinators, ScoreSaberFlowCoordinator);
@@ -30,13 +31,17 @@ void ScoreSaberFlowCoordinator::DidActivate(bool firstActivation,
           ScoreSaberUI::UI::ViewControllers::TeamViewController*>();
     }
 
-    ScoreSaberFlowCoordinator::ProvideInitialViewControllers(
-        globalView, teamView, faqView, nullptr, nullptr);
+    this->ProvideInitialViewControllers(globalView, teamView, faqView, nullptr,
+                                        nullptr);
   }
 }
 
 void ScoreSaberFlowCoordinator::BackButtonWasPressed(
     HMUI::ViewController* topView) {
+  faqView->get_gameObject()->SetActive(false);
+  SetRightScreenViewController(nullptr,
+                               HMUI::ViewController::AnimationType::Out);
   this->parentFlowCoordinator->DismissFlowCoordinator(
-      this, HMUI::ViewController::AnimationDirection::Vertical, nullptr, false);
+      this, HMUI::ViewController::AnimationDirection::Horizontal, nullptr,
+      false);
 }
