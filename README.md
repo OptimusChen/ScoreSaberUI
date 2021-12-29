@@ -1,6 +1,6 @@
 # ScoreSaberUI
 
-ScoreSaber UI implementation for the Oculus Quest
+ScoreSaber UI implementation for the Oculus Quest<br>plz no buly me 4 my bad code
 
 ## Credits
 
