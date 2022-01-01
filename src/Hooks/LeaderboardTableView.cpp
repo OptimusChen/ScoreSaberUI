@@ -1,5 +1,4 @@
 #include "GlobalNamespace/LeaderboardTableView.hpp"
-
 #include "GlobalNamespace/LeaderboardTableCell.hpp"
 #include "HMUI/TableCell.hpp"
 #include "HMUI/TableView.hpp"
@@ -9,9 +8,11 @@
 #include "UnityEngine/UI/CanvasUpdate.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 
+#include "hooks.hpp"
+
 using namespace GlobalNamespace;
 
-MAKE_HOOK_MATCH(LeaderboardTableView_CellForIdx,
+MAKE_AUTO_HOOK_MATCH(LeaderboardTableView_CellForIdx,
                 &::GlobalNamespace::LeaderboardTableView::CellForIdx,
                 HMUI::TableCell*, GlobalNamespace::LeaderboardTableView* self,
                 HMUI::TableView* tableView, int row) {
@@ -27,8 +28,4 @@ MAKE_HOOK_MATCH(LeaderboardTableView_CellForIdx,
   cell->playerNameText->Rebuild(UnityEngine::UI::CanvasUpdate::PreRender);
 
   return cell;
-}
-
-void ScoreSaberUI::Hooks::LeaderboardTableView() {
-  INSTALL_HOOK(getLogger(), LeaderboardTableView_CellForIdx);
 }

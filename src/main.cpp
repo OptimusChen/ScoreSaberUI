@@ -62,8 +62,7 @@ using namespace UnityEngine;
 using namespace UnityEngine::UI;
 using namespace GlobalNamespace;
 
-static ModInfo modInfo;  // Stores the ID and version of our mod, and is sent to
-                         // the modloader upon startup
+ModInfo modInfo = {ID, VERSION};
 
 // Loads the config from disk using our modInfo, then returns it for use
 Configuration& getConfig() {
@@ -72,31 +71,37 @@ Configuration& getConfig() {
   return config;
 }
 
+// Move to the next scene upon health and safety loading
+// just here to make it faster
+MAKE_AUTO_HOOK_MATCH(HealthWarningFlowCoordinator_DidActivate, &GlobalNamespace::HealthWarningFlowCoordinator::DidActivate, void, GlobalNamespace::HealthWarningFlowCoordinator* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
+{
+    self->dyn__gameScenesManager()->ReplaceScenes(self->dyn__initData()->dyn_nextScenesTransitionSetupData(), 0.0f, nullptr, nullptr);
+}
+
 // Returns a logger, useful for printing debug messages
 Logger& getLogger() {
-  static Logger* logger = new Logger(modInfo);
-  return *logger;
+    static Logger* logger = new Logger(modInfo);
+    return *logger;
 }
 
 // Called at the early stages of game loading
 extern "C" void setup(ModInfo& info) {
-  info.id = ID;
-  info.version = VERSION;
-  modInfo = info;
+    info = modInfo;
 
-  getConfig().Load();
-  getConfig().Reload();
-  getConfig().Write();
-  getLogger().info("Completed setup!");
+    getConfig().Load();
+    getConfig().Reload();
+    getConfig().Write();
+    getLogger().info("Completed setup!");
 }
 
 // Called later on in the game loading - a good time to install function hooks
 extern "C" void load() {
-  il2cpp_functions::Init();
-  QuestUI::Init();
-  custom_types::Register::AutoRegister();
+    il2cpp_functions::Init();
+    il2cpp_functions::Class_Init(classof(HMUI::ImageView*));
+    il2cpp_functions::Class_Init(classof(HMUI::CurvedTextMeshPro*));
+    QuestUI::Init();
+    custom_types::Register::AutoRegister();
 
-  getLogger().info("Installing hooks...");
-  ScoreSaberUI::InstallHooks();
-  getLogger().info("Installed all hooks!");
+    Hooks::InstallHooks(ScoreSaberBanner::Logging::getLogger());
+    TeamUtils::Download();
 }
