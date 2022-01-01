@@ -1,5 +1,6 @@
 #include "UI/Other/PanelView.hpp"
 
+#include "CustomTypes/Components/ImageButton.hpp"
 #include "GlobalNamespace/SharedCoroutineStarter.hpp"
 #include "HMUI/CurvedCanvasSettingsHelper.hpp"
 #include "HMUI/ViewController_AnimationDirection.hpp"
@@ -8,6 +9,7 @@
 #include "System/Collections/IEnumerator.hpp"
 #include "TMPro/TextMeshProUGUI.hpp"
 #include "UI/FlowCoordinators/ScoreSaberFlowCoordinator.hpp"
+#include "UnityEngine/Events/UnityAction.hpp"
 #include "UnityEngine/Texture2D.hpp"
 #include "UnityEngine/Transform.hpp"
 #include "UnityEngine/UI/Button.hpp"
@@ -23,9 +25,11 @@ DEFINE_TYPE(ScoreSaberUI::UI::Other, PanelView);
 
 using namespace ScoreSaberUI::Utils;
 using namespace ScoreSaberUI::UI::Other;
+using namespace ScoreSaberUI::CustomTypes::Components;
 using namespace ScoreSaberUI::UI::FlowCoordinators;
 using namespace QuestUI;
 using namespace UnityEngine::UI;
+using namespace UnityEngine::Events;
 using namespace GlobalNamespace;
 
 #define BeginCoroutine(method)                               \
@@ -86,6 +90,7 @@ void PanelView::Init(PlatformLeaderboardViewController* viewController)
     indicatorElement->set_preferredWidth(4.0f);
 }
 
+<<<<<<< HEAD
 void PanelView::Show()
 {
     this->floatingScreen->SetRootViewController(leaderboardView, 1);
@@ -165,6 +170,72 @@ void PanelView::Show()
     }
 
     QuestUI::BeatSaberUI::CreateText(
+=======
+void PanelView::Show() {
+  this->floatingScreen->SetRootViewController(leaderboardView, 1);
+
+  std::string iconPath =
+      "/sdcard/ModData/com.beatgames.beatsaber/"
+      "Mods/ScoreSaberUI/Icons/";
+
+  VerticalLayoutGroup* vertical =
+      QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(
+          floatingScreen->get_transform());
+  vertical->get_rectTransform()->set_anchoredPosition({0.0f, 0.0f});
+  HorizontalLayoutGroup* horizontal =
+      QuestUI::BeatSaberUI::CreateHorizontalLayoutGroup(
+          vertical->get_transform());
+
+  TMPro::TextMeshProUGUI* text =
+      QuestUI::BeatSaberUI::CreateText(horizontal->get_transform(), "");
+  text->set_fontSize(text->get_fontSize() * 2.0f);
+  text->set_alignment(TMPro::TextAlignmentOptions::Center);
+
+  LayoutElement* layoutelem =
+      text->get_gameObject()->AddComponent<LayoutElement*>();
+  layoutelem->set_preferredHeight(15.0f);
+  layoutelem->set_preferredWidth(90.0f);
+
+  Backgroundable* background =
+      horizontal->get_gameObject()->AddComponent<Backgroundable*>();
+  background->ApplyBackgroundWithAlpha(il2cpp_utils::newcsstr("title-gradient"),
+                                       1.0f);
+
+  HMUI::ImageView* imageView =
+      background->get_gameObject()->GetComponentInChildren<HMUI::ImageView*>();
+  imageView->gradient = true;
+  imageView->gradientDirection = 0;
+  imageView->set_color(Color::get_white());
+  imageView->set_color0(Color(0.0f, 0.45f, 0.65f, 1.0f));
+  imageView->set_color1(Color(0.0f, 0.45f, 0.65f, 0.0f));
+  imageView->curvedCanvasSettingsHelper->Reset();
+
+  Sprite* sprite = BeatSaberUI::FileToSprite(iconPath + "scoresaber.png");
+
+  ImageButton* menu = UIUtils::CreateImageButton(
+      floatingScreen->get_gameObject(), sprite, {-37.0f, 0.0f}, {12.0f, 12.0f},
+      []() {
+        HMUI::FlowCoordinator* currentFlowCoordinator =
+            QuestUI::BeatSaberUI::GetMainFlowCoordinator()
+                ->YoungestChildFlowCoordinatorOrSelf();
+        ScoreSaberFlowCoordinator* flowCoordinator =
+            ScoreSaberUI::ScoreSaber::flowCoordinator;
+
+        if (!flowCoordinator) {
+          ScoreSaberUI::ScoreSaber::flowCoordinator =
+              BeatSaberUI::CreateFlowCoordinator<ScoreSaberFlowCoordinator*>();
+          flowCoordinator = ScoreSaberUI::ScoreSaber::flowCoordinator;
+        }
+
+        currentFlowCoordinator->PresentFlowCoordinator(
+            ScoreSaberUI::ScoreSaber::flowCoordinator, nullptr,
+            HMUI::ViewController::AnimationDirection::Horizontal,
+            HMUI::ViewController::AnimationType::In, false);
+      });
+
+  for (int i = 0; i < 13; i++) {
+    QuestUI::BeatSaberUI::CreateImage(
+>>>>>>> master
         leaderboardView->get_transform(),
         "<color=#ffde1c>Global Ranking: "
         "</color>#893 "

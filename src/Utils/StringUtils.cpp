@@ -22,7 +22,7 @@ std::string GetRoleColor(std::string role) {
   if (role.compare("Supporter") == 0) {
     return "#f76754";
   }
-  if (role.compare("Ranking Team") == 0){
+  if (role.compare("Ranking Team") == 0) {
     return "#1cbc9c";
   }
   return "#FFFFFF";
@@ -36,6 +36,24 @@ std::string FormatScore(std::string s) {
   s.insert(2, ".");
   s = s + "%";
   return Colorize(s, "#ffd42a");
+}
+
+std::string RemoveTrailingZeros(std::string s, int zeros) {
+  for (int i = 0; i < zeros; i++) {
+    s.pop_back();
+  }
+  return s;
+}
+
+std::string ColorizePosNeg(std::string s) {
+  float f = stof(s);
+  if (f > 0) {
+    return Colorize(s, "green");
+  } else if (f < 0) {
+    return Colorize(s, "red");
+  } else {
+    return s;
+  }
 }
 
 std::string FormatPP(std::string s,
@@ -72,11 +90,9 @@ std::string Resize(std::string s, int sizePercent) {
   return size_prefix + to_string(sizePercent) + string("%>") + s + size_suffix;
 }
 
-std::string Il2cppStrToStr(Il2CppString* s){
-  return to_utf8(csstrtostr(s));
-}
+std::string Il2cppStrToStr(Il2CppString* s) { return to_utf8(csstrtostr(s)); }
 
-Il2CppString* StrToIl2cppStr(std::string s){
+Il2CppString* StrToIl2cppStr(std::string s) {
   return il2cpp_utils::newcsstr(s);
 }
 

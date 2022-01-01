@@ -2,6 +2,7 @@
 
 #include "CustomTypes/CustomLeaderboardPlatformHandler.hpp"
 #include "UI/FlowCoordinators/ScoreSaberFlowCoordinator.hpp"
+#include "UnityEngine/Sprite.hpp"
 #include "main.hpp"
 namespace ScoreSaberUI {
 namespace Hooks {
@@ -17,6 +18,9 @@ class ScoreSaber {
       leaderboard;
   static ScoreSaberUI::UI::FlowCoordinators::ScoreSaberFlowCoordinator*
       flowCoordinator;
+  static UnityEngine::Sprite* globalIcon;
+  static UnityEngine::Sprite* playerIcon;
+  static UnityEngine::Sprite* friendsIcon;
 };
 
 }  // namespace ScoreSaberUI

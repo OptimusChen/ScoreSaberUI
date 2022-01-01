@@ -1,11 +1,17 @@
 #include "Utils/UIUtils.hpp"
 
+#include "CustomTypes/Components/ImageButton.hpp"
+#include "HMUI/ButtonSpriteSwap.hpp"
 #include "HMUI/CurvedCanvasSettingsHelper.hpp"
 #include "HMUI/ImageView.hpp"
 #include "UnityEngine/Application.hpp"
 #include "UnityEngine/GameObject.hpp"
 #include "UnityEngine/Resources.hpp"
+#include "UnityEngine/Sprite.hpp"
+#include "UnityEngine/SpriteRenderer.hpp"
 #include "UnityEngine/UI/LayoutElement.hpp"
+#include "UnityEngine/Vector3.hpp"
+#include "main.hpp"
 #include "questui/shared/ArrayUtil.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 
@@ -39,7 +45,7 @@ using namespace QuestUI::BeatSaberUI;
         AddHoverHint(btn##identifier->get_gameObject(), "Opens in Browser");                                                                                                                                         \
     }
 
-namespace UIUtils
+namespace ScoreSaberUI::Utils::UIUtils
 {
     ScoreSaber::ClickableText* CreateClickableText(UnityEngine::Transform* parent, std::u16string_view text, UnityEngine::Vector2 anchoredPosition, UnityEngine::Vector2 sizeDelta, std::function<void()> onClick)
     {
@@ -182,5 +188,16 @@ namespace UIUtils
         imageView->curvedCanvasSettingsHelper->Reset();
 
         return horizontal;
+    }
+
+    ImageButton* UIUtils::CreateImageButton(GameObject* parent, Sprite* sprite,
+                                            Vector2 anchoredPosition,
+                                            Vector2 sizeDelta,
+                                            std::function<void()> onClick)
+    {
+        ImageButton* button = parent->AddComponent<ImageButton*>();
+        button->sprite = sprite;
+        button->Init(parent->get_transform(), anchoredPosition, sizeDelta, onClick);
+        return button;
     }
 }

@@ -32,7 +32,11 @@
     },
     {
       "id": "questui",
+<<<<<<< HEAD
       "versionRange": "^0.11.1",
+=======
+      "versionRange": "0.11.1",
+>>>>>>> master
       "additionalData": {}
     },
     {

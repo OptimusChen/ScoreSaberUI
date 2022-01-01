@@ -1,20 +1,27 @@
 #pragma once
-
-#include <string>
 #include <functional>
+#include <string>
 
-namespace WebUtils
+#include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
+
+namespace ScoreSaberUI::Utils::WebUtils
 {
-    /// @brief gets the contents of url and passes them into the finished callback along with the http response code, calls progressUpdate with progressupdates if given
-    /// @param url the url to query
-    /// @param finished the callback for when we're done downloading
-    /// @param progressUpdate callback to give a progressupdate bar or something
-    void GetAsync(std::string url, std::function<void(long, std::string)> finished, std::function<void(float)> progressUpdate = nullptr);
 
-    /// @brief gets the contents of url and passes them into the finished callback along with the http response code, calls progressUpdate with progressupdates if given
-    /// @param url the url to query
-    /// @param timeout the timeout for the query
-    /// @param finished the callback for when we're done downloading
-    /// @param progressUpdate callback to give a progressupdate bar or something
-    void GetAsync(std::string url, long timeout, std::function<void(long, std::string)> finished, std::function<void(float)> progressUpdate = nullptr);
-}
+    std::optional<rapidjson::Document> GetJSON(std::string url);
+
+    long Get(std::string url, std::string& val);
+
+    long Get(std::string url, long timeout, std::string& val);
+
+    void GetAsync(std::string url, std::function<void(long, std::string)> finished,
+                  std::function<void(float)> progressUpdate = nullptr);
+
+    void GetAsync(std::string url, long timeout,
+                  std::function<void(long, std::string)> finished,
+                  std::function<void(float)> progressUpdate = nullptr);
+
+    void GetJSONAsync(
+        std::string url,
+        std::function<void(long, bool, rapidjson::Document&)> finished);
+
+} // namespace ScoreSaberUI::Utils::WebUtils
