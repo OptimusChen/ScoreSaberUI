@@ -101,6 +101,11 @@ MAKE_AUTO_HOOK_MATCH(
         {
             leaderboardsHandler->scoreSaberBanner = ::ScoreSaber::UI::Banner::Create(self->get_transform());
             leaderboardsHandler->scoreSaberBanner->playerProfileModal = ::ScoreSaber::UI::PlayerProfileModal::Create(self->get_transform());
+
+            leaderboardsHandler->scoreSaberBanner->Prompt("Connecting to ScoreSaber", true, 5.0f, [=]()
+                                                          { leaderboardsHandler->scoreSaberBanner->Prompt(
+                                                                "<color=green>Successfully Connected to ScoreSaber</color>",
+                                                                false, 2.0f, nullptr); });
         }
 
         /*

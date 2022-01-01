@@ -12,6 +12,7 @@
 #include "UnityEngine/Texture2D.hpp"
 #include "UnityEngine/Time.hpp"
 #include "UnityEngine/UI/LayoutElement.hpp"
+#include "UnityEngine/WaitForSeconds.hpp"
 
 #include "Sprites.hpp"
 #include "logging.hpp"
@@ -19,6 +20,8 @@
 #include "HMUI/CurvedCanvasSettingsHelper.hpp"
 #include "HMUI/ImageView.hpp"
 #include "HMUI/ViewController_AnimationDirection.hpp"
+
+#include "GlobalNamespace/SharedCoroutineStarter.hpp"
 
 #include "Utils/UIUtils.hpp"
 
@@ -124,6 +127,31 @@ namespace ScoreSaber::UI
         auto loadingHorizontal = CreateHorizontalLayoutGroup(loadingVertical->get_transform());
         UIUtils::CreateLoadingIndicator(loadingHorizontal->get_transform());
         SetPreferredSize(loadingHorizontal, 10, 10);
+
+        auto promptRoot =
+            BeatSaberUI::CreateHorizontalLayoutGroup(get_transform());
+        promptRoot->set_childAlignment(TextAnchor::UpperLeft);
+        promptRoot->set_childForceExpandWidth(false);
+        promptRoot->set_spacing(1.0f);
+
+        RectTransform* promptRootRect = promptRoot->get_rectTransform();
+        promptRootRect->set_anchoredPosition({0.0f, 10.3f});
+
+        LayoutElement* promptElement = promptRoot->GetComponent<LayoutElement*>();
+        promptElement->set_preferredHeight(7.0f);
+        promptElement->set_preferredWidth(87.0f);
+
+        ContentSizeFitter* promptFitter =
+            promptRoot->GetComponent<ContentSizeFitter*>();
+        promptFitter->set_horizontalFit(ContentSizeFitter::FitMode::PreferredSize);
+
+        HorizontalLayoutGroup* textGroup =
+            BeatSaberUI::CreateHorizontalLayoutGroup(promptRootRect);
+        textGroup->get_rectTransform()->set_anchoredPosition({0.0f, 10.0f});
+
+        promptText =
+            BeatSaberUI::CreateText(textGroup->get_transform(), "...", false);
+        promptText->set_alignment(TMPro::TextAlignmentOptions::BottomLeft);
     }
 
     void Banner::OpenMainMenuFlowCoordinator()
@@ -174,6 +202,56 @@ namespace ScoreSaber::UI
             UnityEngine::Color color = UnityEngine::Color::HSVToRGB(colorAngle, 1.0f, 1.0f);
             set_color(color);
         }
+    }
+
+    void Banner::Prompt(std::string status, bool loadingIndicator, float dismiss,
+                        std::function<void()> callback)
+    {
+        GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine(
+            reinterpret_cast<System::Collections::IEnumerator*>(
+                custom_types::Helpers::CoroutineHelper::New(SetPrompt(status, loadingIndicator, dismiss, callback))));
+    }
+
+    custom_types::Helpers::Coroutine Banner::SetPrompt(
+        std::string status, bool showIndicator, float dismiss,
+        std::function<void()> callback)
+    {
+        this->promptText->SetText(il2cpp_utils::newcsstr(status));
+
+        std::string text = status;
+
+        for (int i = 1; i < (dismiss * 2) + 1; i++)
+        {
+            co_yield reinterpret_cast<System::Collections::IEnumerator*>(
+                CRASH_UNLESS(WaitForSeconds::New_ctor(0.5f)));
+
+            // Couldn't get the loading indicator to work so right now it just displays
+            // dots as the loading indicator
+            if (showIndicator)
+            {
+                if (i % 4 != 0)
+                {
+                    text = text + ".";
+                    promptText->SetText(il2cpp_utils::newcsstr(text));
+                }
+                else
+                {
+                    for (int k = 0; k < 3; k++)
+                    {
+                        text.pop_back();
+                    }
+                    promptText->SetText(il2cpp_utils::newcsstr(text));
+                }
+            }
+        }
+
+        promptText->SetText(il2cpp_utils::newcsstr(""));
+
+        if (callback)
+        {
+            callback();
+        }
+        co_return;
     }
 
     void Banner::set_color(UnityEngine::Color color)
