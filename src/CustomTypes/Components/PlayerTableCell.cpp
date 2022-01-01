@@ -133,9 +133,24 @@ void PlayerTableCell::Refresh(
     {
         ::Array<Il2CppString*>* histories =
             StringUtils::StrToIl2cppStr(player["histories"].GetString())->Split(',');
-
-        int weeklyChange = stof(StringUtils::Il2cppStrToStr(histories->get(41))) -
+        auto length = histories->Length();
+        int weeklyChange;
+        if (length < 48)
+        {
+            if (length > 7)
+                weeklyChange = stof(StringUtils::Il2cppStrToStr(histories->get(length - 8))) -
+                               stof(StringUtils::Il2cppStrToStr(histories->get(length - 1)));
+            else if (length != 0)
+                weeklyChange = stof(StringUtils::Il2cppStrToStr(histories->get(0))) -
+                               stof(StringUtils::Il2cppStrToStr(histories->get(length - 1)));
+            else
+                weeklyChange = 0;
+        }
+        else
+        {
+            weeklyChange = stof(StringUtils::Il2cppStrToStr(histories->get(41))) -
                            stof(StringUtils::Il2cppStrToStr(histories->get(48)));
+        }
         std::string result;
         if (weeklyChange > 0)
         {

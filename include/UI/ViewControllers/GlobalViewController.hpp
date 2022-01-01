@@ -1,5 +1,6 @@
 #pragma once
 #include "CustomTypes/Components/CustomCellListTableData.hpp"
+#include "HMUI/ModalView.hpp"
 #include "HMUI/ViewController.hpp"
 #include "custom-types/shared/macros.hpp"
 
@@ -13,9 +14,11 @@ DECLARE_CLASS_CODEGEN(
                             bool firstActivation, bool addedToHierarchy,
                             bool screenSystemEnabling);
     DECLARE_INSTANCE_FIELD(ScoreSaberUI::CustomTypes::Components::CustomCellListTableData*, leaderboardList);
+    DECLARE_INSTANCE_FIELD(HMUI::ModalView*, moreInfoModal);
     private
     :
 
+    void OpenMoreInfoModal();
     void UpButtonWasPressed();
     void DownButtonWasPressed();
 
