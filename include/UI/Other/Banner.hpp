@@ -37,22 +37,25 @@ DECLARE_CLASS_CODEGEN(
     void set_color(UnityEngine::Color color);
 
     void set_ranking(int rank, float pp);
-    void set_status(std::string_view status);
+    void set_status(std::string_view status, std::string_view songId);
 
     void set_loading(bool value);
     void Prompt(std::string status, bool loadingIndicator, float dismiss,
                 std::function<void()> callback);
+
+    void set_topText(std::u16string_view newText);
+    void set_topText(std::string_view newText) { set_topText(to_utf16(newText)); };
+    void set_bottomText(std::u16string_view newText);
+    void set_bottomText(std::string_view newText) { set_bottomText(to_utf16(newText)); };
+
     private
     :
 
     bool rainbow = false;
     bool wasRainbow = false;
     float colorAngle = 0.0f;
+    std::string scoreboardId;
     static constexpr const UnityEngine::Color defaultColor = {0, 0.47, 0.72, 1.0};
-    void set_topText(std::u16string_view newText);
-    void set_topText(std::string_view newText) { set_topText(to_utf16(newText)); };
-    void set_bottomText(std::u16string_view newText);
-    void set_bottomText(std::string_view newText) { set_bottomText(to_utf16(newText)); };
     custom_types::Helpers::Coroutine SetPrompt(
         std::string status, bool loadingIndicator, float dismiss,
         std::function<void()> callback);

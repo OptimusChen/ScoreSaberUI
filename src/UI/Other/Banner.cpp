@@ -4,6 +4,7 @@
 #include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
 
 #include "TMPro/TextAlignmentOptions.hpp"
+#include "UnityEngine/Application.hpp"
 #include "UnityEngine/Rect.hpp"
 #include "UnityEngine/RectOffset.hpp"
 #include "UnityEngine/Resources.hpp"
@@ -176,7 +177,8 @@ namespace ScoreSaber::UI
 
     void Banner::OpenSongInBrowser()
     {
-        set_rainbow(!rainbow);
+        auto songURL = string_format("https://scoresaber.com/leaderboard/%s", scoreboardId.c_str());
+        Application::OpenURL(il2cpp_utils::newcsstr(songURL));
     }
 
     void Banner::set_rainbow(bool value)
@@ -245,7 +247,7 @@ namespace ScoreSaber::UI
             }
         }
 
-        promptText->SetText(il2cpp_utils::newcsstr(""));
+        promptText->set_text(il2cpp_utils::newcsstr(""));
 
         if (callback)
         {
@@ -275,9 +277,10 @@ namespace ScoreSaber::UI
         set_loading(false);
     }
 
-    void Banner::set_status(std::string_view status)
+    void Banner::set_status(std::string_view status, std::string_view scoreboardId)
     {
         set_bottomText(string_format("<b><color=#FFDE1A>Ranked Status:</color></b> %s", status.data()));
+        this->scoreboardId = scoreboardId;
         set_loading(false);
     }
 
