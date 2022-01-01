@@ -1,4 +1,5 @@
 #include "ScoreSaberUI.hpp"
+#include "Sprites.hpp"
 #include "hooks.hpp"
 
 #include "CustomTypes/CustomLeaderboardPlatformHandler.hpp"
@@ -39,6 +40,7 @@
 
 using namespace HMUI;
 using namespace QuestUI;
+using namespace QuestUI::BeatSaberUI;
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 using namespace GlobalNamespace;
@@ -74,8 +76,9 @@ MAKE_AUTO_HOOK_MATCH(
         Sprite* friendsLeaderboardIcon = self->friendsLeaderboardIcon;
         Sprite* aroundPlayerLeaderboardIcon = self->aroundPlayerLeaderboardIcon;
         Sprite* countryLeaderboardIcon =
-            BeatSaberUI::FileToSprite(iconPath + "country.png");
-        countryLeaderboardIcon->get_textureRect().set_size({64.0f, 64.0f});
+            Base64ToSprite(country_base64);
+        countryLeaderboardIcon->get_textureRect()
+            .set_size({64.0f, 64.0f});
 
         IconSegmentedControl* scopeSegmentedControl = self->scopeSegmentedControl;
 
@@ -163,8 +166,8 @@ MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardViewController_Refresh,
                 updateUpButton();
             });
         QuestUI::BeatSaberUI::SetButtonSprites(
-            up, BeatSaberUI::FileToSprite(iconPath + "arrow.png"),
-            BeatSaberUI::FileToSprite(iconPath + "arrowactive.png"));
+            up, Base64ToSprite(carat_up_inactive_base64),
+            Base64ToSprite(carat_up_base64));
         RectTransform* rectTransform =
             reinterpret_cast<RectTransform*>(up->get_transform()->GetChild(0));
         rectTransform->set_sizeDelta({10.0f, 10.0f});
@@ -183,8 +186,9 @@ MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardViewController_Refresh,
                 updateUpButton();
             });
         QuestUI::BeatSaberUI::SetButtonSprites(
-            down, BeatSaberUI::FileToSprite(iconPath + "arrow_down.png"),
-            BeatSaberUI::FileToSprite(iconPath + "arrow_downactive.png"));
+            down, Base64ToSprite(carat_down_inactive_base64),
+            Base64ToSprite(carat_down_base64));
+
         RectTransform* rectTransform =
             reinterpret_cast<RectTransform*>(down->get_transform()->GetChild(0));
         rectTransform->set_sizeDelta({10.0f, 10.0f});
