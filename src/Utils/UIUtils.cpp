@@ -1,5 +1,7 @@
 #include "Utils/UIUtils.hpp"
 
+#include "CustomTypes/Components/ImageButton.hpp"
+#include "HMUI/ButtonSpriteSwap.hpp"
 #include "HMUI/CurvedCanvasSettingsHelper.hpp"
 #include "HMUI/CurvedTextMeshPro.hpp"
 #include "HMUI/ImageView.hpp"
@@ -17,7 +19,10 @@
 #include "UnityEngine/Object.hpp"
 #include "UnityEngine/RenderMode.hpp"
 #include "UnityEngine/Resources.hpp"
+#include "UnityEngine/Sprite.hpp"
+#include "UnityEngine/SpriteRenderer.hpp"
 #include "UnityEngine/Vector3.hpp"
+#include "main.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
 #include "questui/shared/QuestUI.hpp"
@@ -26,6 +31,7 @@ using namespace HMUI;
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 using namespace UnityEngine::EventSystems;
+using namespace ScoreSaberUI::CustomTypes::Components;
 using namespace QuestUI;
 using namespace QuestUI::BeatSaberUI;
 using namespace TMPro;
@@ -53,6 +59,16 @@ HorizontalLayoutGroup* UIUtils::CreateHeader(UnityEngine::Transform* parent,
   imageView->curvedCanvasSettingsHelper->Reset();
 
   return horizontal;
+}
+
+ImageButton* UIUtils::CreateImageButton(GameObject* parent, Sprite* sprite,
+                                        Vector2 anchoredPosition,
+                                        Vector2 sizeDelta,
+                                        std::function<void()> onClick) {
+  ImageButton* button = parent->AddComponent<ImageButton*>();
+  button->sprite = sprite;
+  button->Init(parent->get_transform(), anchoredPosition, sizeDelta, onClick);
+  return button;
 }
 
 }  // namespace ScoreSaberUI::Utils

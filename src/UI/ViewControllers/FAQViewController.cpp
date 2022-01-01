@@ -86,9 +86,8 @@ void CreateLinkBoxes(Transform* parent, int i) {
     imageView->set_color1(Color(0.1f, 0.0f, 0.1f, 1.0f));
   }
 
-  HMUI::ImageView* image = BeatSaberUI::CreateImage(
-      imageElement->get_transform(), logo, {0.0f, 0.0f}, {0.0f, 0.0f});
-  image->set_preserveAspect(true);
+  UIUtils::CreateImageButton(imageElement->get_gameObject(), logo, {0.0f, 0.0f},
+                             {20.0f, 20.0f}, []() {});
 }
 
 void FAQViewController::DidActivate(bool firstActivation, bool addedToHierarchy,

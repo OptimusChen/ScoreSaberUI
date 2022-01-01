@@ -1,5 +1,6 @@
 #include "UI/Other/PanelView.hpp"
 
+#include "CustomTypes/Components/ImageButton.hpp"
 #include "GlobalNamespace/SharedCoroutineStarter.hpp"
 #include "HMUI/CurvedCanvasSettingsHelper.hpp"
 #include "HMUI/ViewController_AnimationDirection.hpp"
@@ -8,6 +9,7 @@
 #include "System/Collections/IEnumerator.hpp"
 #include "TMPro/TextMeshProUGUI.hpp"
 #include "UI/FlowCoordinators/ScoreSaberFlowCoordinator.hpp"
+#include "UnityEngine/Events/UnityAction.hpp"
 #include "UnityEngine/Texture2D.hpp"
 #include "UnityEngine/Transform.hpp"
 #include "UnityEngine/UI/Button.hpp"
@@ -23,9 +25,11 @@ DEFINE_TYPE(ScoreSaberUI::UI::Other, PanelView);
 
 using namespace ScoreSaberUI::Utils;
 using namespace ScoreSaberUI::UI::Other;
+using namespace ScoreSaberUI::CustomTypes::Components;
 using namespace ScoreSaberUI::UI::FlowCoordinators;
 using namespace QuestUI;
 using namespace UnityEngine::UI;
+using namespace UnityEngine::Events;
 using namespace GlobalNamespace;
 
 #define BeginCoroutine(method)                             \
@@ -126,10 +130,9 @@ void PanelView::Show() {
 
   Sprite* sprite = BeatSaberUI::FileToSprite(iconPath + "scoresaber.png");
 
-  Button* menu = QuestUI::BeatSaberUI::CreateUIButton(
-      floatingScreen->get_transform(), "", "SettingsButton",
-      Vector2(-37.0f, 0.0f), Vector2(12.0f, 12.0f), []() {
-        getLogger().info("ssu: test1");
+  ImageButton* menu = UIUtils::CreateImageButton(
+      floatingScreen->get_gameObject(), sprite, {-37.0f, 0.0f}, {12.0f, 12.0f},
+      []() {
         HMUI::FlowCoordinator* currentFlowCoordinator =
             QuestUI::BeatSaberUI::GetMainFlowCoordinator()
                 ->YoungestChildFlowCoordinatorOrSelf();
@@ -148,10 +151,6 @@ void PanelView::Show() {
             HMUI::ViewController::AnimationType::In, false);
       });
 
-  QuestUI::BeatSaberUI::SetButtonSprites(menu, sprite, sprite);
-  RectTransform* rectTransform =
-      reinterpret_cast<RectTransform*>(menu->get_transform()->GetChild(0));
-  rectTransform->set_sizeDelta({12.0f, 12.0f});
   for (int i = 0; i < 13; i++) {
     QuestUI::BeatSaberUI::CreateImage(
         leaderboardView->get_transform(),

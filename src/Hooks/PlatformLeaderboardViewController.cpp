@@ -83,6 +83,10 @@ MAKE_HOOK_MATCH(
                                                      StrToIl2cppStr("Country")),
         });
 
+    ScoreSaber::globalIcon = globalLeaderboardIcon;
+    ScoreSaber::friendsIcon = friendsLeaderboardIcon;
+    ScoreSaber::playerIcon = aroundPlayerLeaderboardIcon;
+
     scopeSegmentedControl->SetData(array);
 
     view = BeatSaberUI::CreateViewController<

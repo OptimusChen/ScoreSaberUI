@@ -20,7 +20,7 @@
     },
     {
       "id": "questui",
-      "versionRange": "*",
+      "versionRange": "0.11.1",
       "additionalData": {}
     },
     {
@@ -35,7 +35,7 @@
     },
     {
       "id": "libcurl",
-      "versionRange": "*",
+      "versionRange": "^7.78.0",
       "additionalData": {}
     },
     {
