@@ -177,6 +177,7 @@ custom_types::Helpers::Coroutine GetLeaderboardInfoInternal(
     csHash = csHash->Replace(StrToIl2cppStr("custom_level_"),
                              Il2CppString::_get_Empty());
     std::string hash = Il2cppStrToStr(csHash);
+    //TODO: Implement gamemode fetching
     std::string url =
         "https://scoresaber.com/api/leaderboard/by-hash/" + hash + "/" +
         "info?difficulty=" + std::to_string(getDiff(beatmap)) +
