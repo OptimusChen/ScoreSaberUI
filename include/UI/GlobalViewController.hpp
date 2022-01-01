@@ -1,7 +1,7 @@
 #pragma once
 
-#include "CustomTypes/PlayerProfileModal.hpp"
 #include "HMUI/ViewController.hpp"
+#include "UI/Other/PlayerProfileModal.hpp"
 #include "custom-types/shared/macros.hpp"
 
 DECLARE_CLASS_CODEGEN(ScoreSaber::UI, GlobalViewController, HMUI::ViewController,

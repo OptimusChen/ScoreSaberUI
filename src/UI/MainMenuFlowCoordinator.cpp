@@ -18,21 +18,21 @@ namespace ScoreSaber::UI
         if (firstActivation)
         {
             globalViewController = CreateViewController<GlobalViewController*>();
-            linksViewController = CreateViewController<LinksViewController*>();
+            faqViewController = CreateViewController<ScoreSaberUI::UI::ViewControllers::FAQViewController*>();
             teamAndContributorsViewController = CreateViewController<TeamAndContributorsViewController*>();
 
             SetTitle(il2cpp_utils::newcsstr("ScoreSaber"), ViewController::AnimationType::Out);
             set_showBackButton(true);
-            ProvideInitialViewControllers(globalViewController, teamAndContributorsViewController, linksViewController, nullptr, nullptr);
+            ProvideInitialViewControllers(globalViewController, teamAndContributorsViewController, faqViewController, nullptr, nullptr);
         }
         // HACK: if we don't do this the viewcontroller remains active when returning to the main song menu (don't ask me why)
-        linksViewController->get_gameObject()->SetActive(true);
+        faqViewController->get_gameObject()->SetActive(true);
     }
 
     void MainMenuFlowCoordinator::BackButtonWasPressed(HMUI::ViewController* topViewController)
     {
         // HACK: if we don't do this the viewcontroller remains active when returning to the main song menu (don't ask me why)
-        linksViewController->get_gameObject()->SetActive(false);
+        faqViewController->get_gameObject()->SetActive(false);
         this->parentFlowCoordinator->DismissFlowCoordinator(this, ViewController::AnimationDirection::Horizontal, nullptr, false);
     }
 }

@@ -111,6 +111,7 @@ namespace UIUtils
         auto url = member.get_profilePicture();
         auto image = ScoreSaber::UI::DelayedCreateImage::CreateImage(horizontal->get_transform(), url, nullptr);
         SetPreferredSize(image, 12, 12);
+        image->set_preserveAspect(true);
 
         auto infoVertical = CreateVerticalLayoutGroup(horizontal->get_transform());
         SetPreferredSize(infoVertical, -1, 15);

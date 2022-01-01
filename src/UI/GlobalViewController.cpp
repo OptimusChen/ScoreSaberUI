@@ -174,8 +174,43 @@ namespace ScoreSaber::UI
         if (!moreInfoModal)
         {
             // make it
-            moreInfoModal = CreateModal(get_transform());
-            CreateText(moreInfoModal->get_transform(), "HAHAHAHA penis");
+            moreInfoModal = CreateModal(get_transform(), Vector2(84.0f, 64.0f), nullptr, true);
+            auto textVertical = CreateVerticalLayoutGroup(moreInfoModal->get_transform());
+            textVertical->set_spacing(1.0f);
+            textVertical->set_padding(RectOffset::New_ctor(2, 2, 2, 2));
+            auto h1 = CreateText(textVertical->get_transform(), "What is <color=#6772E5>PP</color>?", false);
+            h1->set_alignment(TMPro::TextAlignmentOptions::TopLeft);
+            h1->set_fontSize(4.0f);
+            auto t1 = CreateText(textVertical->get_transform(), "Performance Points (<color=#6772E5>PP</color>) are earned through playing ranked maps. Harder maps and higher\n"
+                                                                "scores will increase the amount of <color=#6772E5>PP</color> you receive from beating a map. Performance Points\n"
+                                                                "determine your rank on the ScoreSaber global leaderboards, the more <color=#6772E5>PP</color> you have the higher\n"
+                                                                "your rank will be.",
+                                 false);
+            t1->set_alignment(TMPro::TextAlignmentOptions::TopLeft);
+            t1->set_fontSize(2.5f);
+            t1->set_enableWordWrapping(true);
+            t1->get_rectTransform()->set_sizeDelta({0, 0});
+            Object::Destroy(t1->GetComponent<LayoutElement*>());
+            auto h2 = CreateText(textVertical->get_transform(), "How Does Ranking Work?", false);
+            h2->set_alignment(TMPro::TextAlignmentOptions::TopLeft);
+            h2->set_fontSize(4.0f);
+            auto t2 = CreateText(textVertical->get_transform(), "Ranked maps are maps passed through a ranking system that judges maps to make sure they\n"
+                                                                "are objectively fair. The Ranking Team votes based on the Ranking Criteria, a document that\n"
+                                                                "goes over the rules a map must follow to be ranked. The Quality Assurance Team votes to\n"
+                                                                "either speed up or slow down maps in queue based on whether the map meets their quality\n"
+                                                                "standards, however they cannot fully block a map that meets the criteria from being ranked.",
+                                 false);
+            t2->set_alignment(TMPro::TextAlignmentOptions::TopLeft);
+            t2->set_fontSize(2.5f);
+            t2->set_enableWordWrapping(true);
+            t2->get_rectTransform()->set_sizeDelta({0, 0});
+            Object::Destroy(t2->GetComponent<LayoutElement*>());
+            auto buttonHorizontal = CreateHorizontalLayoutGroup(textVertical->get_transform());
+            auto dismiss = CreateUIButton(buttonHorizontal->get_transform(), "Dismiss", [&]()
+                                          { moreInfoModal->Hide(true, nullptr); });
+            auto moreInfo = CreateUIButton(
+                buttonHorizontal->get_transform(), "More Info", []()
+                { Application::OpenURL(il2cpp_utils::newcsstr("http://bit.ly/2X8Anko")); });
         }
         moreInfoModal->Show(true, true, nullptr);
     }

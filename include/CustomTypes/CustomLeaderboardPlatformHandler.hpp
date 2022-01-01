@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CustomTypes/ScoreSaberBanner.hpp"
+#include "UI/Other/Banner.hpp"
 
 #include "GlobalNamespace/HMAsyncRequest.hpp"
 #include "GlobalNamespace/IDifficultyBeatmap.hpp"

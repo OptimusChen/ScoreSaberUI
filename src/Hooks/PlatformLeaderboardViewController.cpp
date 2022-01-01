@@ -3,7 +3,7 @@
 #include "hooks.hpp"
 
 #include "CustomTypes/CustomLeaderboardPlatformHandler.hpp"
-#include "CustomTypes/ScoreSaberBanner.hpp"
+#include "UI/Other/Banner.hpp"
 
 #include "GlobalNamespace/IPreviewBeatmapLevel.hpp"
 #include "GlobalNamespace/LoadingControl.hpp"
