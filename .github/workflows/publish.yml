@@ -79,7 +79,11 @@ jobs:
     - name: QPM Edit Version
       run: |
         ./QPM/qpm-rust package edit --version "${{ steps.get_tag_version.outputs.VERSION }}"
-        
+    
+    - name: Apply Legacy fix
+      run: |
+        ./QPM/qpm-rust cache legacy-fix
+
     - name: Build
       run: |
         cd ${GITHUB_WORKSPACE}

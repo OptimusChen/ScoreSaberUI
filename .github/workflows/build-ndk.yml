@@ -83,7 +83,11 @@ jobs:
         ls -la ${GITHUB_WORKSPACE}/extern/libs
         echo cache:
         ls -la $HOME/.local/share/QPM-Rust/cache
-      
+
+    - name: Apply Legacy fix
+      run: |
+        ./QPM/qpm-rust cache legacy-fix
+
     - name: Build
       run: |
         cd ${GITHUB_WORKSPACE}
