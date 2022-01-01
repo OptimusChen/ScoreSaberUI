@@ -3,7 +3,7 @@
 #include <string>
 
 std::map<std::string, LoggerContextObject> contextLoggers;
-namespace ScoreSaberBanner
+namespace ScoreSaberUI
 {
     Logger& Logging::getLogger()
     {

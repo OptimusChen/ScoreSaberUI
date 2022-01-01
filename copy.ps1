@@ -12,9 +12,9 @@ if (-not ($LastExitCode -eq 0)) {
 }
 
 if ($debug_so.IsPresent) {
-    & adb push build/debug/libscoresaberbanner.so /sdcard/Android/data/com.beatgames.beatsaber/files/mods/libscoresaberbanner.so
+    & adb push build/debug/libScoreSaberUI.so /sdcard/Android/data/com.beatgames.beatsaber/files/mods/libScoreSaberUI.so
 } else {
-    & adb push build/libscoresaberbanner.so /sdcard/Android/data/com.beatgames.beatsaber/files/mods/libscoresaberbanner.so
+    & adb push build/libScoreSaberUI.so /sdcard/Android/data/com.beatgames.beatsaber/files/mods/libScoreSaberUI.so
 }
 
 & adb shell am force-stop com.beatgames.beatsaber

@@ -1,5 +1,7 @@
 #include "Utils/UIUtils.hpp"
 
+#include "HMUI/CurvedCanvasSettingsHelper.hpp"
+#include "HMUI/ImageView.hpp"
 #include "UnityEngine/Application.hpp"
 #include "UnityEngine/GameObject.hpp"
 #include "UnityEngine/Resources.hpp"
@@ -7,10 +9,14 @@
 #include "questui/shared/ArrayUtil.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 
+#include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
+
 #include "CustomTypes/DelayedCreateImage.hpp"
 
 #include "Sprites.hpp"
 #include "logging.hpp"
+
+using namespace HMUI;
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 using namespace QuestUI;
@@ -153,26 +159,27 @@ namespace UIUtils
     }
 
     HorizontalLayoutGroup* CreateHeader(UnityEngine::Transform* parent,
-                                             UnityEngine::Color color) {
-  VerticalLayoutGroup* vertical = CreateVerticalLayoutGroup(parent);
-  vertical->get_rectTransform()->set_anchoredPosition({0.0f, 45.0f});
-  HorizontalLayoutGroup* horizontal =
-      CreateHorizontalLayoutGroup(vertical->get_transform());
+                                        UnityEngine::Color color)
+    {
+        VerticalLayoutGroup* vertical = CreateVerticalLayoutGroup(parent);
+        vertical->get_rectTransform()->set_anchoredPosition({0.0f, 45.0f});
+        HorizontalLayoutGroup* horizontal =
+            CreateHorizontalLayoutGroup(vertical->get_transform());
 
-  Backgroundable* background =
-      horizontal->get_gameObject()->AddComponent<Backgroundable*>();
-  background->ApplyBackgroundWithAlpha(il2cpp_utils::newcsstr("panel-top"),
-                                       1.0f);
+        Backgroundable* background =
+            horizontal->get_gameObject()->AddComponent<Backgroundable*>();
+        background->ApplyBackgroundWithAlpha(il2cpp_utils::newcsstr("panel-top"),
+                                             1.0f);
 
-  ImageView* imageView =
-      background->get_gameObject()->GetComponentInChildren<ImageView*>();
-  imageView->gradient = true;
-  imageView->gradientDirection = 0;
-  imageView->set_color(Color::get_white());
-  imageView->set_color0(color);
-  imageView->set_color1(color);
-  imageView->curvedCanvasSettingsHelper->Reset();
+        ImageView* imageView =
+            background->get_gameObject()->GetComponentInChildren<ImageView*>();
+        imageView->gradient = true;
+        imageView->gradientDirection = 0;
+        imageView->set_color(Color::get_white());
+        imageView->set_color0(color);
+        imageView->set_color1(color);
+        imageView->curvedCanvasSettingsHelper->Reset();
 
-  return horizontal;
-}
+        return horizontal;
+    }
 }
