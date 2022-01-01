@@ -95,62 +95,74 @@ custom_types::Helpers::Coroutine GetScoresInternal(
             csstrtostr(webRequest->get_downloadHandler()->get_text()));
         //INFO("Received data: %s", s.c_str());
         doc.Parse(s.c_str());
-        auto errorItr = doc.FindMember("errorMessage");
-        if (errorItr == doc.MemberEnd())
+        if (doc.GetParseError() == 0)
         {
-            const rapidjson::Value& scoreArray = doc["scores"];
-
-            for (int i = 0; i < scoreArray.Size(); i++)
+            auto errorItr = doc.FindMember("errorMessage");
+            if (errorItr == doc.MemberEnd())
             {
-                auto score = scoreArray[i].GetObject();
+                const rapidjson::Value& scoreArray = doc["scores"];
 
-                auto leaderboardPlayerInfo = score["leaderboardPlayerInfo"].GetObject();
-
-                int modifiedScore = score["modifiedScore"].GetInt();
-                int modifiedScoreDouble = score["modifiedScore"].GetDouble();
-                int rank = score["rank"].GetInt();
-                double pp = score["pp"].GetDouble();
-
-                bool ranked = pp > 0.0f;
-
-                std::string name = std::string(leaderboardPlayerInfo["name"].GetString());
-                std::string role = "";
-
-                if (leaderboardPlayerInfo["role"].IsString())
+                for (int i = 0; i < scoreArray.Size(); i++)
                 {
-                    role = std::string(leaderboardPlayerInfo["role"].GetString());
+                    auto score = scoreArray[i].GetObject();
+
+                    auto leaderboardPlayerInfo = score["leaderboardPlayerInfo"].GetObject();
+
+                    int modifiedScore = score["modifiedScore"].GetInt();
+                    int modifiedScoreDouble = score["modifiedScore"].GetDouble();
+                    int rank = score["rank"].GetInt();
+                    double pp = score["pp"].GetDouble();
+
+                    bool ranked = pp > 0.0f;
+
+                    std::string name = std::string(leaderboardPlayerInfo["name"].GetString());
+                    std::string role = "";
+
+                    if (leaderboardPlayerInfo["role"].IsString())
+                    {
+                        role = std::string(leaderboardPlayerInfo["role"].GetString());
+                    }
+
+                    std::string rankedStatus = ranked ? "Ranked" : "Unranked";
+                    self->scoreSaberBanner->set_ranking(rank, pp);
+
+                    self->mapRanked = ranked;
+
+                    double scoreDouble = score["modifiedScore"].GetDouble();
+
+                    scores->Add(PlatformLeaderboardsModel::LeaderboardScore::New_ctor(
+                        modifiedScore, rank,
+                        StrToIl2cppStr(Resize(
+                            Colorize(name, GetRoleColor(role)) + " - (" +
+                                FormatScore(std::to_string(
+                                    scoreDouble / BeatmapUtils::getMaxScore(beatmap))) +
+                                ")" + FormatPP(std::to_string(pp), score),
+                            80)),
+                        StrToIl2cppStr("0"), modifiers));
                 }
-
-                std::string rankedStatus = ranked ? "Ranked" : "Unranked";
-                self->scoreSaberBanner->set_ranking(rank, pp);
-
-                self->mapRanked = ranked;
-
-                double scoreDouble = score["modifiedScore"].GetDouble();
-
-                scores->Add(PlatformLeaderboardsModel::LeaderboardScore::New_ctor(
-                    modifiedScore, rank,
-                    StrToIl2cppStr(Resize(
-                        Colorize(name, GetRoleColor(role)) + " - (" +
-                            FormatScore(std::to_string(
-                                scoreDouble / BeatmapUtils::getMaxScore(beatmap))) +
-                            ")" + FormatPP(std::to_string(pp), score),
-                        80)),
-                    StrToIl2cppStr("0"), modifiers));
+                if (scores->size == 0)
+                {
+                    scores->Add(PlatformLeaderboardsModel::LeaderboardScore::New_ctor(
+                        0, 0, StrToIl2cppStr("No scores on this leaderboard!"),
+                        StrToIl2cppStr("0"), modifiers));
+                }
+                completionHandler->Invoke(PlatformLeaderboardsModel::GetScoresResult::Ok,
+                                          scores->ToArray(), -1);
             }
-            if (scores->size == 0)
+            else
             {
                 scores->Add(PlatformLeaderboardsModel::LeaderboardScore::New_ctor(
-                    0, 0, StrToIl2cppStr("No scores on this leaderboard!"),
+                    0, 0, StrToIl2cppStr(errorItr->value.GetString()),
                     StrToIl2cppStr("0"), modifiers));
+                completionHandler->Invoke(
+                    PlatformLeaderboardsModel::GetScoresResult::Ok, scores->ToArray(),
+                    -1);
             }
-            completionHandler->Invoke(PlatformLeaderboardsModel::GetScoresResult::Ok,
-                                      scores->ToArray(), -1);
         }
         else
         {
             scores->Add(PlatformLeaderboardsModel::LeaderboardScore::New_ctor(
-                0, 0, StrToIl2cppStr(errorItr->value.GetString()),
+                0, 0, StrToIl2cppStr("Received invalid response from server"),
                 StrToIl2cppStr("0"), modifiers));
             completionHandler->Invoke(
                 PlatformLeaderboardsModel::GetScoresResult::Ok, scores->ToArray(),
@@ -177,14 +189,16 @@ custom_types::Helpers::Coroutine GetLeaderboardInfoInternal(
     csHash = csHash->Replace(StrToIl2cppStr("custom_level_"),
                              Il2CppString::_get_Empty());
     std::string hash = Il2cppStrToStr(csHash);
-    //TODO: Implement gamemode fetching
-    std::string url =
-        "https://scoresaber.com/api/leaderboard/by-hash/" + hash + "/" +
-        "info?difficulty=" + std::to_string(getDiff(beatmap)) +
-        "&page=" + std::to_string(self->page) + "&gameMode=SoloStandard";
+
+    auto set = beatmap->get_parentDifficultyBeatmapSet();
+    auto characteristic = set->get_beatmapCharacteristic();
+    auto gameMode = ::to_utf8(csstrtostr(characteristic->dyn__serializedName()));
+    if (gameMode == "Standard")
+        gameMode = "SoloStandard";
+
+    std::string url = string_format("https://scoresaber.com/api/leaderboard/by-hash/%s/info?difficulty=%d&page=%d&gameMode=%s", hash.c_str(), getDiff(beatmap), self->page, gameMode.c_str());
     UnityEngine::Networking::UnityWebRequest* webRequest =
         UnityEngine::Networking::UnityWebRequest::Get(StrToIl2cppStr(url));
-    INFO("Getting url %s", url.c_str());
     co_yield reinterpret_cast<System::Collections::IEnumerator*>(
         CRASH_UNLESS(webRequest->SendWebRequest()));
 
@@ -193,7 +207,6 @@ custom_types::Helpers::Coroutine GetLeaderboardInfoInternal(
         rapidjson::Document doc;
         std::string s = ::to_utf8(
             csstrtostr(webRequest->get_downloadHandler()->get_text()));
-        INFO("Received data: %s", s.c_str());
         doc.Parse(s.c_str());
         auto errorItr = doc.FindMember("errorMessage");
         if (errorItr == doc.MemberEnd())
