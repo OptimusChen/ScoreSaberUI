@@ -54,5 +54,5 @@ extern "C" void load()
     custom_types::Register::AutoRegister();
 
     Hooks::InstallHooks(ScoreSaberUI::Logging::getLogger());
-    TeamUtils::Download();
+    ScoreSaberUI::Utils::TeamUtils::Download();
 }

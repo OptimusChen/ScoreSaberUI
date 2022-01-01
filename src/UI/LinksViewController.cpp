@@ -24,6 +24,7 @@ using namespace QuestUI::BeatSaberUI;
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 using namespace HMUI;
+using namespace ScoreSaberUI::Utils;
 
 #define SetPreferredSize(identifier, width, height)                                         \
     auto layout##identifier = identifier->get_gameObject()->GetComponent<LayoutElement*>(); \

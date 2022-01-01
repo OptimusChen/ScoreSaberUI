@@ -17,7 +17,7 @@ namespace ScoreSaber::UI
     {
         if (firstActivation)
         {
-            globalViewController = CreateViewController<GlobalViewController*>();
+            globalViewController = CreateViewController<ScoreSaberUI::UI::ViewControllers::GlobalViewController*>();
             faqViewController = CreateViewController<ScoreSaberUI::UI::ViewControllers::FAQViewController*>();
             teamAndContributorsViewController = CreateViewController<TeamAndContributorsViewController*>();
 

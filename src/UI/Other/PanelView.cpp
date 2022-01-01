@@ -90,7 +90,6 @@ void PanelView::Init(PlatformLeaderboardViewController* viewController)
     indicatorElement->set_preferredWidth(4.0f);
 }
 
-<<<<<<< HEAD
 void PanelView::Show()
 {
     this->floatingScreen->SetRootViewController(leaderboardView, 1);
@@ -133,11 +132,10 @@ void PanelView::Show()
 
     Sprite* sprite = BeatSaberUI::FileToSprite(iconPath + "scoresaber.png");
 
-    Button* menu = QuestUI::BeatSaberUI::CreateUIButton(
-        floatingScreen->get_transform(), "", "SettingsButton",
-        Vector2(-37.0f, 0.0f), Vector2(12.0f, 12.0f), []()
+    ImageButton* menu = UIUtils::CreateImageButton(
+        floatingScreen->get_gameObject(), sprite, {-37.0f, 0.0f}, {12.0f, 12.0f},
+        []()
         {
-            getLogger().info("ssu: test1");
             HMUI::FlowCoordinator* currentFlowCoordinator =
                 QuestUI::BeatSaberUI::GetMainFlowCoordinator()
                     ->YoungestChildFlowCoordinatorOrSelf();
@@ -156,86 +154,9 @@ void PanelView::Show()
                 HMUI::ViewController::AnimationDirection::Horizontal,
                 HMUI::ViewController::AnimationType::In, false);
         });
-
-    QuestUI::BeatSaberUI::SetButtonSprites(menu, sprite, sprite);
-    RectTransform* rectTransform =
-        reinterpret_cast<RectTransform*>(menu->get_transform()->GetChild(0));
-    rectTransform->set_sizeDelta({12.0f, 12.0f});
-    for (int i = 0; i < 13; i++)
-    {
-        QuestUI::BeatSaberUI::CreateImage(
-            leaderboardView->get_transform(),
-            BeatSaberUI::FileToSprite(iconPath + "pixel.png"),
-            Vector2(-27.0f, 44.0f + i), Vector2(0.5f, 1.0f));
-    }
-
-    QuestUI::BeatSaberUI::CreateText(
-=======
-void PanelView::Show() {
-  this->floatingScreen->SetRootViewController(leaderboardView, 1);
-
-  std::string iconPath =
-      "/sdcard/ModData/com.beatgames.beatsaber/"
-      "Mods/ScoreSaberUI/Icons/";
-
-  VerticalLayoutGroup* vertical =
-      QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(
-          floatingScreen->get_transform());
-  vertical->get_rectTransform()->set_anchoredPosition({0.0f, 0.0f});
-  HorizontalLayoutGroup* horizontal =
-      QuestUI::BeatSaberUI::CreateHorizontalLayoutGroup(
-          vertical->get_transform());
-
-  TMPro::TextMeshProUGUI* text =
-      QuestUI::BeatSaberUI::CreateText(horizontal->get_transform(), "");
-  text->set_fontSize(text->get_fontSize() * 2.0f);
-  text->set_alignment(TMPro::TextAlignmentOptions::Center);
-
-  LayoutElement* layoutelem =
-      text->get_gameObject()->AddComponent<LayoutElement*>();
-  layoutelem->set_preferredHeight(15.0f);
-  layoutelem->set_preferredWidth(90.0f);
-
-  Backgroundable* background =
-      horizontal->get_gameObject()->AddComponent<Backgroundable*>();
-  background->ApplyBackgroundWithAlpha(il2cpp_utils::newcsstr("title-gradient"),
-                                       1.0f);
-
-  HMUI::ImageView* imageView =
-      background->get_gameObject()->GetComponentInChildren<HMUI::ImageView*>();
-  imageView->gradient = true;
-  imageView->gradientDirection = 0;
-  imageView->set_color(Color::get_white());
-  imageView->set_color0(Color(0.0f, 0.45f, 0.65f, 1.0f));
-  imageView->set_color1(Color(0.0f, 0.45f, 0.65f, 0.0f));
-  imageView->curvedCanvasSettingsHelper->Reset();
-
-  Sprite* sprite = BeatSaberUI::FileToSprite(iconPath + "scoresaber.png");
-
-  ImageButton* menu = UIUtils::CreateImageButton(
-      floatingScreen->get_gameObject(), sprite, {-37.0f, 0.0f}, {12.0f, 12.0f},
-      []() {
-        HMUI::FlowCoordinator* currentFlowCoordinator =
-            QuestUI::BeatSaberUI::GetMainFlowCoordinator()
-                ->YoungestChildFlowCoordinatorOrSelf();
-        ScoreSaberFlowCoordinator* flowCoordinator =
-            ScoreSaberUI::ScoreSaber::flowCoordinator;
-
-        if (!flowCoordinator) {
-          ScoreSaberUI::ScoreSaber::flowCoordinator =
-              BeatSaberUI::CreateFlowCoordinator<ScoreSaberFlowCoordinator*>();
-          flowCoordinator = ScoreSaberUI::ScoreSaber::flowCoordinator;
-        }
-
-        currentFlowCoordinator->PresentFlowCoordinator(
-            ScoreSaberUI::ScoreSaber::flowCoordinator, nullptr,
-            HMUI::ViewController::AnimationDirection::Horizontal,
-            HMUI::ViewController::AnimationType::In, false);
-      });
-
+    /*
   for (int i = 0; i < 13; i++) {
     QuestUI::BeatSaberUI::CreateImage(
->>>>>>> master
         leaderboardView->get_transform(),
         "<color=#ffde1c>Global Ranking: "
         "</color>#893 "
@@ -247,7 +168,7 @@ void PanelView::Show() {
             "<color=#ffde1c>Ranked Status: </color>Ranked (modifiers "
             "disabled)",
             true, Vector2(5.0f, 45.0f));
-
+*/
     BeginCoroutine(SetPrompt("Connecting to ScoreSaber", true, 5.0f, [=]()
                              { BeginCoroutine(SetPrompt(
                                    StringUtils::Colorize("Successfully Connected to ScoreSaber", "green"),

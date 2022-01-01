@@ -2,9 +2,12 @@
 
 #include "CustomTypes/Components/ImageButton.hpp"
 #include "HMUI/ImageView.hpp"
+#include "HMUI/Touchable.hpp"
+#include "Sprites.hpp"
 #include "UnityEngine/Sprite.hpp"
 #include "Utils/StringUtils.hpp"
 #include "Utils/WebUtils.hpp"
+#include "logging.hpp"
 #include "main.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
@@ -16,52 +19,199 @@ using namespace ScoreSaberUI::CustomTypes::Components;
 using namespace ScoreSaberUI::Utils::StringUtils;
 using namespace ScoreSaberUI::Utils;
 using namespace UnityEngine;
+using namespace UnityEngine::UI;
 using namespace QuestUI;
+using namespace QuestUI::BeatSaberUI;
+using namespace TMPro;
 
 void PlayerTableCell::ctor() {}
 
+VerticalLayoutGroup* CreateHost(Transform* parent, Vector2 anchoredPos,
+                                Vector2 size)
+{
+    VerticalLayoutGroup* group = BeatSaberUI::CreateVerticalLayoutGroup(parent);
+    group->get_rectTransform()->set_anchoredPosition(anchoredPos);
+
+    LayoutElement* elem = group->GetComponent<LayoutElement*>();
+    elem->set_preferredHeight(size.y);
+    elem->set_preferredWidth(size.x);
+
+    ContentSizeFitter* fitter = group->GetComponent<ContentSizeFitter*>();
+    fitter->set_verticalFit(ContentSizeFitter::FitMode::PreferredSize);
+    fitter->set_horizontalFit(ContentSizeFitter::FitMode::PreferredSize);
+    return group;
+}
+
+std::string flag_url(std::string_view COUNTRY)
+{
+    auto country = std::string(COUNTRY);
+    for (auto& c : country)
+        c = tolower(c);
+    auto url = string_format("https://github.com/hampusborgos/country-flags/raw/main/png250px/%s.png", country.c_str());
+    return url;
+}
+
 void PlayerTableCell::Refresh(
-    rapidjson::GenericObject<true, rapidjson::Value> player) {
-  getLogger().info("test1");
+    rapidjson::GenericObject<true, rapidjson::Value> player)
+{
+    std::string iconPath =
+        "/sdcard/ModData/com.beatgames.beatsaber/"
+        "Mods/ScoreSaberUI/Icons/";
+    auto profilePictureItr = player.FindMember("profilePicture");
+    if (profilePictureItr != player.MemberEnd() && profilePictureItr->value.IsString())
+    {
+        std::string profilePictureURL = profilePictureItr->value.GetString();
+        INFO("Getting profile picture @ %s", profilePictureURL.c_str());
+        WebUtils::GetAsync(profilePictureURL, 64,
+                           [=](long httpCode, std::string data)
+                           {
+                               if (httpCode == 200)
+                               {
+                                   std::vector<uint8_t> bytes(data.begin(), data.end());
+                                   MainThreadScheduler::Schedule([=]()
+                                                                 {
+                                                                     getLogger().info("test9");
+                                                                     Sprite* profilePicture =
+                                                                         BeatSaberUI::VectorToSprite(bytes);
+                                                                     profile->set_sprite(profilePicture);
+                                                                     getLogger().info("test10");
+                                                                 });
+                               };
+                           });
+    }
 
-  std::string iconPath =
-      "/sdcard/ModData/com.beatgames.beatsaber/"
-      "Mods/ScoreSaberUI/Icons/";
+    auto nameItr = player.FindMember("name");
+    if (nameItr != player.MemberEnd() && nameItr->value.IsString())
+    {
+        std::string name = nameItr->value.GetString();
+        INFO("Setting playername %s", name.c_str());
+        this->name->set_text(StrToIl2cppStr(name));
+    }
 
-  profile->set_sprite(BeatSaberUI::FileToSprite(iconPath + "oculus.png"));
-  WebUtils::GetAsync(std::string(player["profilePicture"].GetString()), 64,
-                     [=](long httpCode, std::string data) {
-                       std::vector<uint8_t> bytes(data.begin(), data.end());
-                       MainThreadScheduler::Schedule([=]() {
-                         getLogger().info("test8");
-                         Sprite* profilePicture =
-                             BeatSaberUI::VectorToSprite(bytes);
-                         profile->set_sprite(profilePicture);
-                         getLogger().info("test9");
-                       });
-                     });
-  getLogger().info("test2");
+    auto rankItr = player.FindMember("rank");
+    if (rankItr != player.MemberEnd() && rankItr->value.IsInt())
+    {
+        int rank = rankItr->value.GetInt();
+        INFO("Setting rank %d", rank);
+        this->rank->set_text(StrToIl2cppStr(string_format("#%d", rank)));
+    }
 
-  name->set_text(StrToIl2cppStr(std::string(player["name"].GetString())));
-  rank->set_text(StrToIl2cppStr(std::string("#") +
-                                std::to_string(player["rank"].GetInt())));
-  getLogger().info("test3");
-  pp->set_text(StrToIl2cppStr(
-      StringUtils::Colorize(StringUtils::RemoveTrailingZeros(
-                                std::to_string(player["pp"].GetDouble()), 5) +
-                                std::string("pp"),
-                            "#6872e5")));
-  getLogger().info("test4");
-  country->set_text(StrToIl2cppStr(std::string(player["country"].GetString())));
+    auto ppItr = player.FindMember("pp");
+    if (ppItr != player.MemberEnd() && ppItr->value.IsDouble())
+    {
+        double pp = ppItr->value.GetDouble();
+        INFO("Setting pp %.2f", pp);
+        this->pp->set_text(StrToIl2cppStr(string_format("<color=#6872e5>%.0fpp<color>", pp)));
+    }
 
-  ::Array<Il2CppString*>* histories =
-      StringUtils::StrToIl2cppStr(player["histories"].GetString())->Split(',');
-  getLogger().info("test5");
+    auto countryItr = player.FindMember("country");
+    if (countryItr != player.MemberEnd() && countryItr->value.IsString())
+    {
+        std::string country = countryItr->value.GetString();
+        INFO("Setting country %s", country.c_str());
+        WebUtils::GetAsync(flag_url(country), 64,
+                           [=](long httpCode, std::string data)
+                           {
+                               if (httpCode == 200)
+                               {
+                                   std::vector<uint8_t> bytes(data.begin(), data.end());
+                                   MainThreadScheduler::Schedule([=]()
+                                                                 {
+                                                                     getLogger().info("test11");
+                                                                     Sprite* flagPicture =
+                                                                         BeatSaberUI::VectorToSprite(bytes);
+                                                                     flag->set_sprite(flagPicture);
+                                                                     getLogger().info("test12");
+                                                                 });
+                               };
+                           });
+        this->country->set_text(StrToIl2cppStr(country));
+    }
 
-  int weeklyChange = stof(StringUtils::Il2cppStrToStr(histories->get(41))) -
-                     stof(StringUtils::Il2cppStrToStr(histories->get(48)));
-  getLogger().info("test6");
+    auto historiesItr = player.FindMember("histories");
+    if (historiesItr != player.MemberEnd() && historiesItr->value.IsString())
+    {
+        ::Array<Il2CppString*>* histories =
+            StringUtils::StrToIl2cppStr(player["histories"].GetString())->Split(',');
 
-  weekly->set_text(StrToIl2cppStr(std::to_string(weeklyChange)));
-  getLogger().info("test7");
+        int weeklyChange = stof(StringUtils::Il2cppStrToStr(histories->get(41))) -
+                           stof(StringUtils::Il2cppStrToStr(histories->get(48)));
+        std::string result;
+        if (weeklyChange > 0)
+        {
+            result = string_format("<color=green>+%d</color>", weeklyChange);
+        }
+        else if (weeklyChange < 0)
+        {
+            result = string_format("<color=red>%d</color>", weeklyChange);
+        }
+        else
+        {
+            result = string_format("%d", weeklyChange);
+        }
+        weekly->set_text(StrToIl2cppStr(result));
+    }
+}
+
+PlayerTableCell* PlayerTableCell::CreateCell()
+{
+    static auto playerTableCellStr = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("CustomPlayerTableCell");
+    auto cellGO = UnityEngine::GameObject::New_ctor();
+    auto playerCell = cellGO->AddComponent<PlayerTableCell*>();
+    cellGO->set_name(playerTableCellStr);
+
+    cellGO->AddComponent<HMUI::Touchable*>();
+    playerCell->set_interactable(false);
+
+    auto verticalLayoutGroup = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(
+        playerCell->get_transform());
+
+    auto layout = verticalLayoutGroup->get_gameObject()
+                      ->GetComponent<UnityEngine::UI::LayoutElement*>();
+    layout->set_preferredHeight(11.0f);
+    layout->set_preferredWidth(200.0f);
+
+    Transform* t = playerCell->get_transform();
+
+    playerCell->profile = BeatSaberUI::CreateImage(
+        CreateHost(t, {-45.0f, 0.0f}, {10.0f, 10.0f})->get_transform(),
+        Base64ToSprite(oculus_base64), {0.0f, 0.0f},
+        {10.0f, 10.0f});
+
+    playerCell->name = BeatSaberUI::CreateText(
+        CreateHost(t, {-11.0f, 2.8f}, {55.0f, 8.0f})->get_transform(),
+        "Username", false, {0.0f, 0.0f});
+    playerCell->name->set_overflowMode(TextOverflowModes::Ellipsis);
+    playerCell->name->set_alignment(TextAlignmentOptions::Left);
+    playerCell->name->set_fontSize(5.0f);
+
+    playerCell->rank = BeatSaberUI::CreateText(
+        CreateHost(t, {-18.0f, -2.0f}, {40.0f, 8.0f})->get_transform(),
+        "#---", false,
+        {0.0f, 0.0f});
+    playerCell->rank->set_alignment(TextAlignmentOptions::Left);
+
+    playerCell->pp = BeatSaberUI::CreateText(
+        CreateHost(t, {27.0f, 0.0f}, {20.0f, 11.0f})->get_transform(),
+        "---<color=#6872e5>pp</color>", false, {0.0f, 0.0f});
+    playerCell->pp->set_fontSize(5.0f);
+    playerCell->pp->set_overflowMode(TextOverflowModes::Ellipsis);
+
+    playerCell->flag = BeatSaberUI::CreateImage(
+        CreateHost(t, {19.42f, -1.65f}, {4.0f, 3.0f})->get_transform(),
+        Base64ToSprite(country_base64), {0.0f, 0.0f},
+        {4.0, 3.0f});
+    playerCell->flag->set_preserveAspect(true);
+
+    playerCell->country = BeatSaberUI::CreateText(
+        CreateHost(t, {31.0f, -2.0f}, {17.0f, 0.0f})->get_transform(), "N/A", false, {0.0f, 0.0f});
+    playerCell->country->set_alignment(TextAlignmentOptions::Left);
+    playerCell->country->set_fontSize(3.5f);
+
+    playerCell->weekly = BeatSaberUI::CreateText(
+        CreateHost(t, {41.0f, -1.0f}, {15.0f, 0.0f})->get_transform(), "0", false,
+        {0.0f, 0.0f});
+    playerCell->weekly->set_alignment(TextAlignmentOptions::Right);
+    playerCell->weekly->set_fontSize(5.0f);
+    return playerCell;
 }

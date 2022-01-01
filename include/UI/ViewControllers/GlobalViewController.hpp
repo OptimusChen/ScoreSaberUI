@@ -1,4 +1,5 @@
 #pragma once
+#include "CustomTypes/Components/CustomCellListTableData.hpp"
 #include "HMUI/ViewController.hpp"
 #include "custom-types/shared/macros.hpp"
 
@@ -10,4 +11,12 @@ DECLARE_CLASS_CODEGEN(
                                                            "ViewController",
                                                            "DidActivate", 3),
                             bool firstActivation, bool addedToHierarchy,
-                            bool screenSystemEnabling););
+                            bool screenSystemEnabling);
+    DECLARE_INSTANCE_FIELD(ScoreSaberUI::CustomTypes::Components::CustomCellListTableData*, leaderboardList);
+    private
+    :
+
+    void UpButtonWasPressed();
+    void DownButtonWasPressed();
+
+);

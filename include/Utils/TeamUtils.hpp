@@ -1,10 +1,10 @@
 #pragma once
+#include "beatsaber-hook/shared/rapidjson/include/rapidjson/document.h"
 
 #include "UnityEngine/Sprite.hpp"
-#include "beatsaber-hook/shared/rapidjson/include/rapidjson/document.h"
 #include <string>
 
-namespace TeamUtils
+namespace ScoreSaberUI::Utils::TeamUtils
 {
     class TeamMember
     {

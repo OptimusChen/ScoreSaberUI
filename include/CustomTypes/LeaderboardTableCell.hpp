@@ -29,13 +29,14 @@ DECLARE_CLASS_CODEGEN(
         std::string country;
         std::string history;
     };
+
     bool inited = false;
     Data data;
     static LeaderboardTableCell * CreateTemplate();
 
     void SetupCell();
     void SetData(Data data);
-    custom_types::Helpers::Coroutine LoadImage(HMUI::ImageView* out, std::string_view url);
+    custom_types::Helpers::Coroutine LoadImage(HMUI::ImageView * out, std::string_view url);
     void OpenPlayerInfoModal();
 
 )

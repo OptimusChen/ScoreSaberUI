@@ -23,6 +23,7 @@ DEFINE_TYPE(ScoreSaber::UI, TeamAndContributorsViewController);
 
 using namespace QuestUI;
 using namespace QuestUI::BeatSaberUI;
+using namespace ScoreSaberUI::Utils;
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 using namespace HMUI;

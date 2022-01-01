@@ -190,12 +190,12 @@ namespace ScoreSaberUI::Utils::UIUtils
         return horizontal;
     }
 
-    ImageButton* UIUtils::CreateImageButton(GameObject* parent, Sprite* sprite,
-                                            Vector2 anchoredPosition,
-                                            Vector2 sizeDelta,
-                                            std::function<void()> onClick)
+    CustomTypes::Components::ImageButton* CreateImageButton(GameObject* parent, Sprite* sprite,
+                                                            Vector2 anchoredPosition,
+                                                            Vector2 sizeDelta,
+                                                            std::function<void()> onClick)
     {
-        ImageButton* button = parent->AddComponent<ImageButton*>();
+        CustomTypes::Components::ImageButton* button = parent->AddComponent<CustomTypes::Components::ImageButton*>();
         button->sprite = sprite;
         button->Init(parent->get_transform(), anchoredPosition, sizeDelta, onClick);
         return button;

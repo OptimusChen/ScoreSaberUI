@@ -15,7 +15,7 @@
 #include "questui/shared/CustomTypes/Components/SegmentedControl/CustomTextSegmentedControlData.hpp"
 
 #define GET_FIND_METHOD(mPtr) \
-  il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::get()
+    il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::get()
 
 DECLARE_CLASS_CODEGEN(
     ScoreSaberUI::CustomTypes::Components, PlayerTableCell, HMUI::TableCell,
@@ -31,4 +31,7 @@ DECLARE_CLASS_CODEGEN(
     DECLARE_CTOR(ctor);
 
     public
-    : void Refresh(rapidjson::GenericObject<true, rapidjson::Value> players);)
+    :
+
+    static PlayerTableCell * CreateCell();
+    void Refresh(rapidjson::GenericObject<true, rapidjson::Value> players);)

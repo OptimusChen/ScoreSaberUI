@@ -8,6 +8,7 @@
 DEFINE_TYPE(ScoreSaberUI::UI::ViewControllers, TeamViewController);
 
 using namespace ScoreSaberUI::UI::ViewControllers;
+using namespace ScoreSaberUI::Utils;
 using namespace TMPro;
 using namespace UnityEngine;
 using namespace UnityEngine::UI;

@@ -20,6 +20,7 @@
 
 DEFINE_TYPE(ScoreSaber::UI, GlobalViewController);
 
+using namespace ScoreSaberUI::Utils;
 using namespace QuestUI;
 using namespace QuestUI::BeatSaberUI;
 using namespace UnityEngine;

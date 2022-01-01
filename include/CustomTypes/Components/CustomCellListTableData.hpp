@@ -15,10 +15,11 @@
 #include "questui/shared/CustomTypes/Components/SegmentedControl/CustomTextSegmentedControlData.hpp"
 
 #define GET_FIND_METHOD(mPtr) \
-  il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::get()
+    il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::get()
 
-static std::vector<Il2CppClass*> GetInterfaces() {
-  return {classof(HMUI::TableView::IDataSource*)};
+static std::vector<Il2CppClass*> GetInterfaces()
+{
+    return {classof(HMUI::TableView::IDataSource*)};
 }
 
 ___DECLARE_TYPE_WRAPPER_INHERITANCE(
@@ -26,13 +27,16 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(
     Il2CppTypeEnum::IL2CPP_TYPE_CLASS, UnityEngine::MonoBehaviour, "QuestUI",
     GetInterfaces(), 0, nullptr,
     DECLARE_INSTANCE_FIELD(Il2CppString*, cellTemplate);
+    DECLARE_INSTANCE_FIELD(Il2CppString*, reuseIdentifier);
     DECLARE_INSTANCE_FIELD(float, cellSize);
     DECLARE_INSTANCE_FIELD(HMUI::TableView*, tableView);
-    DECLARE_INSTANCE_FIELD(bool, clickableCells);;
-    DECLARE_INSTANCE_FIELD(bool, initialized);;
+    DECLARE_INSTANCE_FIELD(bool, clickableCells);
+    DECLARE_INSTANCE_FIELD(bool, initialized);
+    DECLARE_INSTANCE_FIELD(bool, isLoading);
     DECLARE_INSTANCE_FIELD(int, page); DECLARE_INSTANCE_FIELD(int, page2);
 
-    DECLARE_CTOR(ctor); DECLARE_INSTANCE_METHOD(void, DownButtonWasPressed);
+    DECLARE_CTOR(ctor);
+    DECLARE_INSTANCE_METHOD(void, DownButtonWasPressed);
     DECLARE_INSTANCE_METHOD(void, UpButtonWasPressed);
 
     DECLARE_OVERRIDE_METHOD(
@@ -50,5 +54,5 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(
             &HMUI::TableView::IDataSource::NumberOfCells>::get());
 
     public
-    : QuestUI::CustomCellListWrapper* listWrapper = nullptr;
-    custom_types::Helpers::Coroutine Refresh();)
+    : void StartRefresh(bool redownload = false);
+    custom_types::Helpers::Coroutine Refresh(bool redownload = false);)

@@ -1,8 +1,8 @@
 #pragma once
+#include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
+
 #include <functional>
 #include <string>
-
-#include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
 
 namespace ScoreSaberUI::Utils::WebUtils
 {

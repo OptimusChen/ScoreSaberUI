@@ -17,6 +17,7 @@ DEFINE_TYPE(ScoreSaberUI::UI::ViewControllers, FAQViewController);
 
 using namespace ScoreSaberUI;
 using namespace ScoreSaberUI::UI::ViewControllers;
+using namespace ScoreSaberUI::Utils;
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 using namespace QuestUI;

@@ -1,18 +1,21 @@
 #include "UI/ViewControllers/GlobalViewController.hpp"
 
-#include "CustomTypes/Components/CustomCellTableData.hpp"
+#include "CustomTypes/Components/CustomCellListTableData.hpp"
 #include "CustomTypes/Components/PlayerTableCell.hpp"
 #include "GlobalNamespace/SharedCoroutineStarter.hpp"
+#include "HMUI/TableView_ScrollPositionType.hpp"
 #include "ScoreSaberUI.hpp"
+#include "Sprites.hpp"
 #include "UnityEngine/RectOffset.hpp"
 #include "UnityEngine/RectTransform.hpp"
+#include "UnityEngine/Resources.hpp"
+#include "UnityEngine/Sprite.hpp"
 #include "Utils/UIUtils.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
 #include "questui/shared/CustomTypes/Components/List/CustomCellListTableData.hpp"
 #include "questui/shared/CustomTypes/Components/List/CustomCellListWrapper.hpp"
 #include "questui/shared/QuestUI.hpp"
-
 DEFINE_TYPE(ScoreSaberUI::UI::ViewControllers, GlobalViewController);
 
 using namespace ScoreSaberUI::UI::ViewControllers;
@@ -22,6 +25,7 @@ using namespace TMPro;
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 using namespace QuestUI;
+using namespace QuestUI::BeatSaberUI;
 
 custom_types::Helpers::Coroutine WaitForInit(
     SafePtr<ScoreSaberUI::CustomTypes::Components::CustomCellListTableData>
@@ -120,14 +124,10 @@ void GlobalViewController::DidActivate(bool firstActivation,
             scoreScopesHost->GetComponent<LayoutElement*>();
         scoreScopesHostElement->set_preferredWidth(9.0f);
 
-        ScoreSaberUI::CustomTypes::Components::CustomCellListTableData*
-            leaderboard = nullptr;
-
         ImageButton* arrow = UIUtils::CreateImageButton(
             scoreScopesHost->get_gameObject(),
-            BeatSaberUI::FileToSprite(iconPath + "arrow.png"), {0.0f, 25.0f},
-            {9.0f, 9.0f}, [=]()
-            { leaderboard->UpButtonWasPressed(); });
+            Base64ToSprite(carat_up_base64), {0.0f, 25.0f},
+            {9.0f, 9.0f}, std::bind(&GlobalViewController::UpButtonWasPressed, this));
 
         VerticalLayoutGroup* scoreScopes = BeatSaberUI::CreateVerticalLayoutGroup(
             scoreScopesHost->get_transform());
@@ -155,26 +155,30 @@ void GlobalViewController::DidActivate(bool firstActivation,
             imagesGroup->GetComponent<LayoutElement*>();
         imagesGroupElement->set_preferredWidth(4.0f);
         imagesGroupElement->set_preferredHeight(4.0f);
-
+        auto globalIcon = ArrayUtil::First(Resources::FindObjectsOfTypeAll<Sprite*>(), [](auto x)
+                                           { return to_utf8(csstrtostr(x->get_name())) == "GlobalIcon"; });
+        auto playerIcon = ArrayUtil::First(Resources::FindObjectsOfTypeAll<Sprite*>(), [](auto x)
+                                           { return to_utf8(csstrtostr(x->get_name())) == "PlayerIcon"; });
+        auto friendsIcon = ArrayUtil::First(Resources::FindObjectsOfTypeAll<Sprite*>(), [](auto x)
+                                            { return to_utf8(csstrtostr(x->get_name())) == "FriendsIcon"; });
         UIUtils::CreateImageButton(imagesGroup->get_gameObject(),
-                                   ScoreSaber::globalIcon, {0.0f, 0.0f},
+                                   globalIcon, {0.0f, 0.0f},
                                    {4.0f, 4.0f}, []() {});
         UIUtils::CreateImageButton(imagesGroup->get_gameObject(),
-                                   ScoreSaber::playerIcon, {0.0f, 0.0f},
+                                   playerIcon, {0.0f, 0.0f},
                                    {4.0f, 4.0f}, []() {});
         UIUtils::CreateImageButton(imagesGroup->get_gameObject(),
-                                   ScoreSaber::friendsIcon, {0.0f, 0.0f},
+                                   friendsIcon, {0.0f, 0.0f},
                                    {4.0f, 4.0f}, []() {});
         UIUtils::CreateImageButton(
             imagesGroup->get_gameObject(),
-            BeatSaberUI::FileToSprite(iconPath + "country.png"), {0.0f, 0.0f},
+            Base64ToSprite(country_base64), {0.0f, 0.0f},
             {4.0f, 4.0f}, []() {});
 
         ImageButton* downrrow = UIUtils::CreateImageButton(
             scoreScopesHost->get_gameObject(),
-            BeatSaberUI::FileToSprite(iconPath + "arrow_down.png"), {0.0f, 25.0f},
-            {9.0f, 9.0f}, [=]()
-            { leaderboard->DownButtonWasPressed(); });
+            Base64ToSprite(carat_down_base64), {0.0f, 25.0f},
+            {9.0f, 9.0f}, std::bind(&GlobalViewController::DownButtonWasPressed, this));
 
         VerticalLayoutGroup* globalVerticalHost =
             BeatSaberUI::CreateVerticalLayoutGroup(globalHost->get_transform());
@@ -194,19 +198,43 @@ void GlobalViewController::DidActivate(bool firstActivation,
         playersHostElement->set_preferredWidth(105.0f);
         playersHostElement->set_preferredHeight(60.0f);
 
-        leaderboard = BeatSaberUI::CreateCustomSourceList<
+        /*
+        leaderboardList = BeatSaberUI::CreateCustomSourceList<
             ScoreSaberUI::CustomTypes::Components::CustomCellListTableData*>(
             playersHost->get_transform(), nullptr);
-        leaderboard->ctor();
+        */
+
+        auto sizeDelta = Vector2(105.0f, 60.0f);
+        auto anchoredPosition = Vector2(0.0f, 0.0f);
+        playersHost->get_rectTransform()->set_sizeDelta(sizeDelta);
+        playersHost->get_rectTransform()->set_anchoredPosition(anchoredPosition);
+        playersHost->set_childForceExpandHeight(false);
+        playersHost->set_childControlHeight(false);
+        playersHost->set_childScaleHeight(false);
+
+        leaderboardList = CreateCustomSourceList<ScoreSaberUI::CustomTypes::Components::CustomCellListTableData*>(playersHost->get_transform(), Vector2(sizeDelta.x, sizeDelta.y), nullptr);
+        leaderboardList->StartRefresh(true);
+        /*
         GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine(
             reinterpret_cast<System::Collections::IEnumerator*>(
                 custom_types::Helpers::CoroutineHelper::New(
-                    WaitForInit(leaderboard, [=]()
+                    WaitForInit(leaderboardList, [&]()
                                 {
-                                    leaderboard->tableView->ReloadData();
-                                    leaderboard->get_transform()
+                                    leaderboardList->tableView->ReloadData();
+                                    leaderboardList->get_transform()
                                         ->get_parent()
                                         ->SetAsFirstSibling();
                                 }))));
+                                */
     }
+}
+
+void GlobalViewController::UpButtonWasPressed()
+{
+    leaderboardList->UpButtonWasPressed();
+}
+
+void GlobalViewController::DownButtonWasPressed()
+{
+    leaderboardList->DownButtonWasPressed();
 }
