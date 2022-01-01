@@ -1,10 +1,24 @@
-& $PSScriptRoot/build.ps1
-if ($?) {
-    adb push libs/arm64-v8a/libscoresaberui.so /sdcard/Android/data/com.beatgames.beatsaber/files/mods/libscoresaberui.so
-    if ($?) {
-        & $PSScriptRoot/restart-game.ps1
-        if ($args[0] -eq "--log") {
-            & $PSScriptRoot/start-logging.ps1
-        }
-    }
+param (
+    [Parameter(Mandatory=$false)]
+    [Switch]$debug_so,
+    [Parameter(Mandatory=$false)]
+    [Switch]$log
+)
+
+& ./build.ps1
+if (-not ($LastExitCode -eq 0)) {
+    echo "build failed, not copying"
+    exit
+}
+
+if ($debug_so.IsPresent) {
+    & adb push build/debug/libscoresaberbanner.so /sdcard/Android/data/com.beatgames.beatsaber/files/mods/libscoresaberbanner.so
+} else {
+    & adb push build/libscoresaberbanner.so /sdcard/Android/data/com.beatgames.beatsaber/files/mods/libscoresaberbanner.so
+}
+
+& adb shell am force-stop com.beatgames.beatsaber
+& adb shell am start com.beatgames.beatsaber/com.unity3d.player.UnityPlayerActivity
+if ($log.IsPresent) {
+    & ./log.ps1
 }
