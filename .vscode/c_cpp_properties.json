@@ -8,11 +8,13 @@
         "__aarch64__"
       ],
       "includePath": [
-        "${workspaceFolder}/**",
-        "${workspaceFolder}/shared",
+        "${workspaceFolder}/extern/includes/libil2cpp/il2cpp/libil2cpp",
+        "${workspaceFolder}/extern/includes/codegen/include",
+        "${workspaceFolder}/extern/includes",
         "${workspaceFolder}/include",
-        "${workspaceFolder}/extern/**",
-        "${workspaceFolder}/extern/libil2cpp/il2cpp/libil2cpp",
+        "${workspaceFolder}/shared",
+        "${workspaceFolder}",
+        "${default}",
         "C:/Users/derek/Downloads/android-ndk-r23-windows/android-ndk-r23//**"
       ],
       "name": "Quest",
