@@ -47,7 +47,6 @@ custom_types::Helpers::Coroutine GetDocument(
     if (!webRequest->get_isNetworkError())
     {
         // Some of the players have utf16 characters in their names, so parse this as a utf16 document
-        Il2CppString* text = ;
         auto s = std::u16string(csstrtostr(webRequest->get_downloadHandler()->get_text()));
         getLogger()
             .info("Received player objects: %s", s.c_str());
