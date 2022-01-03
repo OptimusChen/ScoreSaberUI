@@ -24,7 +24,7 @@ namespace ScoreSaber::Data
             emplace_back(score.GetObject());
         }
         auto metadataItr = doc.FindMember("metaData");
-        if (!metadataItr->value.IsNull())
+        if (metadataItr->value.IsObject())
         {
             metadata = Metadata(metadataItr->value.GetObject());
         }
@@ -37,7 +37,7 @@ namespace ScoreSaber::Data
             emplace_back(score.GetObject());
         }
         auto metadataItr = doc.FindMember(u"metaData");
-        if (!metadataItr->value.IsNull())
+        if (metadataItr->value.IsObject())
         {
             metadata = Metadata(metadataItr->value.GetObject());
         }
@@ -50,7 +50,7 @@ namespace ScoreSaber::Data
             emplace_back(score.GetObject());
         }
         auto metadataItr = doc.FindMember("metaData");
-        if (!metadataItr->value.IsNull())
+        if (metadataItr->value.IsObject())
         {
             metadata = Metadata(metadataItr->value.GetObject());
         }
@@ -63,7 +63,33 @@ namespace ScoreSaber::Data
             emplace_back(score.GetObject());
         }
         auto metadataItr = doc.FindMember(u"metaData");
-        if (!metadataItr->value.IsNull())
+        if (metadataItr->value.IsObject())
+        {
+            metadata = Metadata(metadataItr->value.GetObject());
+        }
+    }
+
+    ScoreCollection::ScoreCollection(rapidjson::GenericObject<false, rapidjson::Value> doc)
+    {
+        for (auto& score : doc["scores"].GetArray())
+        {
+            emplace_back(score.GetObject());
+        }
+        auto metadataItr = doc.FindMember("metaData");
+        if (metadataItr->value.IsObject())
+        {
+            metadata = Metadata(metadataItr->value.GetObject());
+        }
+    }
+
+    ScoreCollection::ScoreCollection(rapidjson::GenericObject<false, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>> doc)
+    {
+        for (auto& score : doc[u"scores"].GetArray())
+        {
+            emplace_back(score.GetObject());
+        }
+        auto metadataItr = doc.FindMember(u"metaData");
+        if (metadataItr->value.IsObject())
         {
             metadata = Metadata(metadataItr->value.GetObject());
         }

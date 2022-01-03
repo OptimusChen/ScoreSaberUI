@@ -19,6 +19,8 @@ namespace ScoreSaber::Data
         ScoreCollection(const rapidjson::GenericDocument<rapidjson::UTF16<char16_t>>&& doc);
         ScoreCollection(rapidjson::GenericObject<true, rapidjson::Value> doc);
         ScoreCollection(rapidjson::GenericObject<true, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>> doc);
+        ScoreCollection(rapidjson::GenericObject<false, rapidjson::Value> doc);
+        ScoreCollection(rapidjson::GenericObject<false, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>> doc);
 
         std::optional<Metadata> metadata;
     };

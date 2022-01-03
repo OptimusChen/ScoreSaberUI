@@ -24,7 +24,7 @@ namespace ScoreSaber::Data
             emplace_back(playerScore.GetObject());
         }
         auto metadataItr = doc.FindMember("metaData");
-        if (!metadataItr->value.IsNull())
+        if (metadataItr->value.IsObject())
         {
             metadata = Metadata(metadataItr->value.GetObject());
         }
@@ -37,7 +37,7 @@ namespace ScoreSaber::Data
             emplace_back(playerScore.GetObject());
         }
         auto metadataItr = doc.FindMember(u"metaData");
-        if (!metadataItr->value.IsNull())
+        if (metadataItr->value.IsObject())
         {
             metadata = Metadata(metadataItr->value.GetObject());
         }
@@ -50,7 +50,7 @@ namespace ScoreSaber::Data
             emplace_back(playerScore.GetObject());
         }
         auto metadataItr = doc.FindMember("metaData");
-        if (!metadataItr->value.IsNull())
+        if (metadataItr->value.IsObject())
         {
             metadata = Metadata(metadataItr->value.GetObject());
         }
@@ -63,7 +63,7 @@ namespace ScoreSaber::Data
             emplace_back(playerScore.GetObject());
         }
         auto metadataItr = doc.FindMember(u"metaData");
-        if (!metadataItr->value.IsNull())
+        if (metadataItr->value.IsObject())
         {
             metadata = Metadata(metadataItr->value.GetObject());
         }

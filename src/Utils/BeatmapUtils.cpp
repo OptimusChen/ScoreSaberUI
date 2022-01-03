@@ -32,6 +32,8 @@ namespace ScoreSaberUI::Utils
             {
                 maxScore = (blockCount - 13) * 920 + 4715;
             }
+            if (maxScore == 0)
+                return -1;
             return maxScore;
         }
     } // namespace BeatmapUtils

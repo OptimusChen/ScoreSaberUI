@@ -52,6 +52,8 @@
 
 #include "logging.hpp"
 
+#include "Data/ScoreCollection.hpp"
+
 DEFINE_TYPE(ScoreSaberUI::CustomTypes, CustomLeaderboardPlatformHandler);
 
 using namespace GlobalNamespace;
@@ -59,6 +61,7 @@ using namespace ScoreSaberUI::Utils;
 using namespace ScoreSaberUI::Utils::StringUtils;
 using namespace ScoreSaberUI::Utils::BeatmapUtils;
 using namespace ScoreSaberUI::CustomTypes;
+using namespace ScoreSaber;
 
 custom_types::Helpers::Coroutine GetScoresInternal(
     ScoreSaberUI::CustomTypes::CustomLeaderboardPlatformHandler* self,
@@ -72,11 +75,13 @@ custom_types::Helpers::Coroutine GetScoresInternal(
     csHash = csHash->Replace(StrToIl2cppStr("custom_level_"),
                              Il2CppString::_get_Empty());
     std::string hash = Il2cppStrToStr(csHash);
-    std::string url =
-        "https://scoresaber.com/api/leaderboard/by-hash/" + hash + "/" +
-        "scores?difficulty=" + std::to_string(getDiff(beatmap)) +
-        "&page=" + std::to_string(self->page) + "&gameMode=SoloStandard" +
-        "&withMetadata=true";
+    auto set = beatmap->get_parentDifficultyBeatmapSet();
+    auto characteristic = set->get_beatmapCharacteristic();
+    auto gameMode = ::to_utf8(csstrtostr(characteristic->dyn__serializedName()));
+    if (gameMode == "Standard")
+        gameMode = "SoloStandard";
+
+    std::string url = string_format("https://scoresaber.com/api/leaderboard/by-hash/%s/scores?difficulty=%d&page=%d&gameMode=%s", hash.c_str(), getDiff(beatmap), self->page, gameMode.c_str());
     UnityEngine::Networking::UnityWebRequest* webRequest =
         UnityEngine::Networking::UnityWebRequest::Get(StrToIl2cppStr(url));
     INFO("Getting url %s", url.c_str());
@@ -90,55 +95,34 @@ custom_types::Helpers::Coroutine GetScoresInternal(
 
     if (!webRequest->get_isNetworkError())
     {
-        rapidjson::Document doc;
-        std::string s = ::to_utf8(
-            csstrtostr(webRequest->get_downloadHandler()->get_text()));
+        rapidjson::GenericDocument<rapidjson::UTF16<char16_t>> doc;
+        std::u16string s = std::u16string(csstrtostr(webRequest->get_downloadHandler()->get_text()));
         //INFO("Received data: %s", s.c_str());
-        doc.Parse(s.c_str());
+        doc.Parse(s);
         if (doc.GetParseError() == 0)
         {
-            auto errorItr = doc.FindMember("errorMessage");
+            auto errorItr = doc.FindMember(u"errorMessage");
             if (errorItr == doc.MemberEnd())
             {
-                const rapidjson::Value& scoreArray = doc["scores"];
+                // why calculate it every time if the beatmap pointer doesn't change?
+                int maxScore = BeatmapUtils::getMaxScore(beatmap);
 
-                for (int i = 0; i < scoreArray.Size(); i++)
+                const Data::ScoreCollection scoreCollection(doc.GetObject());
+                int length = scoreCollection.size();
+                for (int i = 0; i < length; i++)
                 {
-                    auto score = scoreArray[i].GetObject();
-
-                    auto leaderboardPlayerInfo = score["leaderboardPlayerInfo"].GetObject();
-
-                    int modifiedScore = score["modifiedScore"].GetInt();
-                    int modifiedScoreDouble = score["modifiedScore"].GetDouble();
-                    int rank = score["rank"].GetInt();
-                    double pp = score["pp"].GetDouble();
-
-                    bool ranked = pp > 0.0f;
-
-                    std::string name = std::string(leaderboardPlayerInfo["name"].GetString());
-                    std::string role = "";
-
-                    if (leaderboardPlayerInfo["role"].IsString())
-                    {
-                        role = std::string(leaderboardPlayerInfo["role"].GetString());
-                    }
-
-                    std::string rankedStatus = ranked ? "Ranked" : "Unranked";
-                    self->scoreSaberBanner->set_ranking(rank, pp);
-
-                    self->mapRanked = ranked;
-
-                    double scoreDouble = score["modifiedScore"].GetDouble();
-
-                    scores->Add(PlatformLeaderboardsModel::LeaderboardScore::New_ctor(
-                        modifiedScore, rank,
-                        StrToIl2cppStr(Resize(
-                            Colorize(name, GetRoleColor(role)) + " - (" +
-                                FormatScore(std::to_string(
-                                    scoreDouble / BeatmapUtils::getMaxScore(beatmap))) +
-                                ")" + FormatPP(std::to_string(pp), score),
-                            80)),
-                        StrToIl2cppStr("0"), modifiers));
+                    const Data::Score& score = scoreCollection[i];
+                    auto& leaderboardPlayerInfo = score.leaderboardPlayerInfo;
+                    std::u16string coloredName = Colorize(leaderboardPlayerInfo.name, GetRoleColor(leaderboardPlayerInfo.role));
+                    double scorePercent = (double)score.modifiedScore / (double)maxScore;
+                    std::string scoreString = std::to_string(scorePercent);
+                    std::u16string formattedScore = to_utf16(FormatScore(scoreString));
+                    std::u16string formattedPP = FormatPP(score);
+                    std::u16string result = Resize(coloredName + formattedScore + formattedPP, 80);
+                    scores->Add(PlatformLeaderboardsModel::LeaderboardScore::New_ctor(score.modifiedScore, score.rank,
+                                                                                      StrToIl2cppStr(result),
+                                                                                      StrToIl2cppStr("0"), modifiers));
+                    self->mapRanked = score.pp > 0.0f;
                 }
                 if (scores->size == 0)
                 {
