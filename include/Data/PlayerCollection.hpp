@@ -6,7 +6,7 @@ struct Il2CppString;
 
 namespace ScoreSaber::Data
 {
-    struct PlayerCollection
+    struct PlayerCollection : std::vector<Player>
     {
         PlayerCollection();
         PlayerCollection(Il2CppString* string);
@@ -17,7 +17,6 @@ namespace ScoreSaber::Data
         PlayerCollection(rapidjson::GenericObject<true, rapidjson::Value> doc);
         PlayerCollection(rapidjson::GenericObject<true, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>> doc);
 
-        std::vector<Player> players;
         std::optional<Metadata> metadata;
     };
 }

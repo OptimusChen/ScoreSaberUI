@@ -1,8 +1,9 @@
 #include "Data/Player.hpp"
 #include "beatsaber-hook/shared/utils/utils.h"
+#include <sstream>
 namespace ScoreSaber::Data
 {
-    Player::Player(rapidjson::Value& value)
+    Player::Player(const rapidjson::Value&& value)
     {
         id = value["id"].GetString();
         name = to_utf16(value["name"].GetString());
@@ -11,16 +12,23 @@ namespace ScoreSaber::Data
         pp = value["pp"].GetDouble();
         rank = value["rank"].GetInt();
         countryRank = value["countryRank"].GetInt();
-        role = value["role"].GetString();
+        auto roleItr = value.FindMember("role");
+        if (roleItr != value.MemberEnd() && roleItr->value.IsString())
+            role = std::string(roleItr->value.GetString());
         auto badgesItr = value.FindMember("badges");
         if (!badgesItr->value.IsNull() && badgesItr->value.IsArray())
             for (auto& badge : badgesItr->value.GetArray())
-                badges.emplace_back(badge);
-        histories = value["histories"].GetString();
+                badges.emplace_back(badge.GetObject());
+        std::string parsed, histories = std::string(value["histories"].GetString());
+        std::stringstream s(histories);
+
+        while (std::getline(s, parsed, ','))
+            this->histories.emplace_back(atoi(parsed.c_str()));
+
         auto scoreStatsItr = value.FindMember("scoreStats");
         if (!scoreStatsItr->value.IsNull())
         {
-            scoreStats = std::make_optional(ScoreStats(scoreStatsItr->value));
+            scoreStats = std::make_optional(ScoreStats(scoreStatsItr->value.GetObject()));
         }
         else
         {
@@ -31,7 +39,7 @@ namespace ScoreSaber::Data
         inactive = value["inactive"].GetBool();
     }
 
-    Player::Player(rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& value)
+    Player::Player(const rapidjson::GenericValue<rapidjson::UTF16<char16_t>>&& value)
     {
         id = to_utf8(value[u"id"].GetString());
         name = std::u16string(value[u"name"].GetString());
@@ -40,16 +48,22 @@ namespace ScoreSaber::Data
         pp = value[u"pp"].GetDouble();
         rank = value[u"rank"].GetInt();
         countryRank = value[u"countryRank"].GetInt();
-        role = to_utf8(value[u"role"].GetString());
+        auto roleItr = value.FindMember(u"role");
+        if (roleItr != value.MemberEnd() && roleItr->value.IsString())
+            role = to_utf8(roleItr->value.GetString());
         auto badgesItr = value.FindMember(u"badges");
         if (!badgesItr->value.IsNull() && badgesItr->value.IsArray())
             for (auto& badge : badgesItr->value.GetArray())
-                badges.emplace_back(badge);
-        histories = to_utf8(value[u"histories"].GetString());
+                badges.emplace_back(badge.GetObject());
+        std::string parsed, histories = ::to_utf8(value[u"histories"].GetString());
+        std::stringstream s(histories);
+
+        while (std::getline(s, parsed, ','))
+            this->histories.emplace_back(atoi(parsed.c_str()));
         auto scoreStatsItr = value.FindMember(u"scoreStats");
         if (!scoreStatsItr->value.IsNull())
         {
-            scoreStats = std::make_optional(ScoreStats(scoreStatsItr->value));
+            scoreStats = std::make_optional(ScoreStats(scoreStatsItr->value.GetObject()));
         }
         else
         {
@@ -69,12 +83,19 @@ namespace ScoreSaber::Data
         pp = value["pp"].GetDouble();
         rank = value["rank"].GetInt();
         countryRank = value["countryRank"].GetInt();
-        role = value["role"].GetString();
+        auto roleItr = value.FindMember("role");
+        if (roleItr != value.MemberEnd() && roleItr->value.IsString())
+            role = std::string(roleItr->value.GetString());
         auto badgesItr = value.FindMember("badges");
         if (!badgesItr->value.IsNull() && badgesItr->value.IsArray())
             for (auto& badge : badgesItr->value.GetArray())
                 badges.emplace_back(badge.GetObject());
-        histories = value["histories"].GetString();
+        std::string parsed, histories = std::string(value["histories"].GetString());
+        std::stringstream s(histories);
+
+        while (std::getline(s, parsed, ','))
+            this->histories.emplace_back(atoi(parsed.c_str()));
+
         auto scoreStatsItr = value.FindMember("scoreStats");
         if (!scoreStatsItr->value.IsNull())
         {
@@ -98,14 +119,20 @@ namespace ScoreSaber::Data
         pp = value[u"pp"].GetDouble();
         rank = value[u"rank"].GetInt();
         countryRank = value[u"countryRank"].GetInt();
-        role = to_utf8(value[u"role"].GetString());
+        auto roleItr = value.FindMember(u"role");
+        if (roleItr != value.MemberEnd() && roleItr->value.IsString())
+            role = to_utf8(roleItr->value.GetString());
         auto badgesItr = value.FindMember(u"badges");
         if (!badgesItr->value.IsNull() && badgesItr->value.IsArray())
             for (auto& badge : badgesItr->value.GetArray())
                 badges.emplace_back(badge.GetObject());
-        histories = to_utf8(value[u"histories"].GetString());
+        std::string parsed, histories = ::to_utf8(value[u"histories"].GetString());
+        std::stringstream s(histories);
+
+        while (std::getline(s, parsed, ','))
+            this->histories.emplace_back(atoi(parsed.c_str()));
         auto scoreStatsItr = value.FindMember(u"scoreStats");
-        if (!scoreStatsItr->value.IsNull())
+        if (scoreStatsItr != value.MemberEnd() && !scoreStatsItr->value.IsNull())
         {
             scoreStats = std::make_optional(ScoreStats(scoreStatsItr->value.GetObject()));
         }

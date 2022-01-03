@@ -5,8 +5,8 @@ namespace ScoreSaber::Data
 {
     struct Metadata
     {
-        Metadata(rapidjson::Value& value);
-        Metadata(rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& value);
+        Metadata(const rapidjson::Value&& value);
+        Metadata(const rapidjson::GenericValue<rapidjson::UTF16<char16_t>>&& value);
         Metadata(rapidjson::GenericObject<true, rapidjson::Value> value);
         Metadata(rapidjson::GenericObject<true, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>> value);
 

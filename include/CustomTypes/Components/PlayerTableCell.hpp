@@ -2,11 +2,14 @@
 
 #include "CustomTypes/Components/CustomCellListTableData.hpp"
 #include "CustomTypes/Components/ImageButton.hpp"
+#include "Data/Player.hpp"
+
 #include "HMUI/ImageView.hpp"
 #include "HMUI/TableCell.hpp"
 #include "HMUI/TableView.hpp"
 #include "HMUI/TableView_IDataSource.hpp"
 #include "TMPro/TextMeshProUGUI.hpp"
+#include "UnityEngine/Coroutine.hpp"
 #include "UnityEngine/MonoBehaviour.hpp"
 #include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
 #include "custom-types/shared/macros.hpp"
@@ -28,6 +31,8 @@ DECLARE_CLASS_CODEGEN(
     DECLARE_INSTANCE_FIELD(HMUI::ImageView*, flag);
     DECLARE_INSTANCE_FIELD(HMUI::ImageView*, profile);
     DECLARE_INSTANCE_FIELD(QuestUI::Backgroundable*, bg);
+    DECLARE_INSTANCE_FIELD(UnityEngine::Coroutine*, profileRoutine);
+    DECLARE_INSTANCE_FIELD(UnityEngine::Coroutine*, flagRoutine);
 
     DECLARE_CTOR(ctor);
 
@@ -35,7 +40,8 @@ DECLARE_CLASS_CODEGEN(
     :
 
     static PlayerTableCell * CreateCell();
-    using GenericObject = rapidjson::GenericObject<true, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>>;
-    void Refresh(GenericObject players, ScoreSaberUI::CustomTypes::Components::CustomCellListTableData::LeaderboardType leaderboardType);
+    void Refresh(ScoreSaber::Data::Player& player, ScoreSaberUI::CustomTypes::Components::CustomCellListTableData::LeaderboardType leaderboardType);
+    void stopProfileRoutine();
+    void stopFlagRoutine();
 
 )

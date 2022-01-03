@@ -6,13 +6,13 @@ namespace ScoreSaber::Data
 {
     struct ScoreStats
     {
-        ScoreStats(rapidjson::Value& value);
-        ScoreStats(rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& value);
+        ScoreStats(const rapidjson::Value&& value);
+        ScoreStats(const rapidjson::GenericValue<rapidjson::UTF16<char16_t>>&& value);
         ScoreStats(rapidjson::GenericObject<true, rapidjson::Value> value);
         ScoreStats(rapidjson::GenericObject<true, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>> value);
 
-        int totalScore;
-        int totalRankedScore;
+        long totalScore;
+        long totalRankedScore;
         double averageRankedAccuracy;
         int totalPlayCount;
         int rankedPlayCount;

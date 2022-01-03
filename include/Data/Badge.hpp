@@ -6,8 +6,8 @@ namespace ScoreSaber::Data
 {
     struct Badge
     {
-        Badge(rapidjson::Value& value);
-        Badge(rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& value);
+        Badge(const rapidjson::Value&& value);
+        Badge(const rapidjson::GenericValue<rapidjson::UTF16<char16_t>>&& value);
         Badge(rapidjson::GenericObject<true, rapidjson::Value> value);
         Badge(rapidjson::GenericObject<true, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>> value);
 

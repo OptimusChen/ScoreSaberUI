@@ -2,14 +2,14 @@
 
 namespace ScoreSaber::Data
 {
-    Metadata::Metadata(rapidjson::Value& value)
+    Metadata::Metadata(const rapidjson::Value&& value)
     {
         total = value["total"].GetInt();
         page = value["page"].GetInt();
         itemsPerPage = value["itemsPerPage"].GetInt();
     }
 
-    Metadata::Metadata(rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& value)
+    Metadata::Metadata(const rapidjson::GenericValue<rapidjson::UTF16<char16_t>>&& value)
     {
         total = value[u"total"].GetInt();
         page = value[u"page"].GetInt();

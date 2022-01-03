@@ -1,46 +1,14 @@
-
 {
-    "_QPVersion": "0.1.1",
-    "name": "${mod_name}",
-    "id": "${mod_id}",
-    "author": "Optimus, RedBrumbler",
-    "version": "${version}",
-    "coverImage": "logo.jpg",
-    "packageId": "com.beatgames.beatsaber",
-    "packageVersion": "1.17.1",
-    "description": "ScoreSaber UI implementation for the Oculus Quest",
-    "modFiles": [
-    ],
-    "libraryFiles": [
-    ],
-    "fileCopies": [
-        {
-            "name": "arrow.png",
-            "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/ScoreSaberUI/Icons/arrow.png"
-          },
-          {
-            "name": "arrow_down.png",
-            "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/ScoreSaberUI/Icons/arrow_down.png"
-          },
-          {
-            "name": "arrow_downactive.png",
-            "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/ScoreSaberUI/Icons/arrow_downactive.png"
-          },
-          {
-            "name": "arrowactive.png",
-            "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/ScoreSaberUI/Icons/arrowactive.png"
-          },
-          {
-            "name": "scoresaber.png",
-            "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/ScoreSaberUI/Icons/scoresaber.png"
-          },
-          {
-            "name": "bsmg.jpg",
-            "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/ScoreSaberUI/Icons/bsmg.jpg"
-          },
-          {
-            "name": "country.png",
-            "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/ScoreSaberUI/Icons/country.png"
-          }
-    ]
+  "_QPVersion": "0.1.1",
+  "name": "${mod_name}",
+  "id": "${mod_id}",
+  "author": "Optimus, RedBrumbler",
+  "version": "${version}",
+  "coverImage": "logo.jpg",
+  "packageId": "com.beatgames.beatsaber",
+  "packageVersion": "1.17.1",
+  "description": "ScoreSaber UI implementation for the Oculus Quest",
+  "modFiles": [],
+  "libraryFiles": [],
+  "fileCopies": []
 }

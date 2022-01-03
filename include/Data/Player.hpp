@@ -12,8 +12,8 @@ namespace ScoreSaber::Data
 {
     struct Player
     {
-        Player(rapidjson::Value& value);
-        Player(rapidjson::GenericValue<rapidjson::UTF16<char16_t>>& value);
+        Player(const rapidjson::Value&& value);
+        Player(const rapidjson::GenericValue<rapidjson::UTF16<char16_t>>&& value);
         Player(rapidjson::GenericObject<true, rapidjson::Value> value);
         Player(rapidjson::GenericObject<true, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>> value);
 
@@ -26,7 +26,7 @@ namespace ScoreSaber::Data
         int countryRank;
         std::string role;
         std::vector<Badge> badges;
-        std::string histories;
+        std::vector<int> histories;
         std::optional<::ScoreSaber::Data::ScoreStats> scoreStats;
         int permissions;
         bool banned;

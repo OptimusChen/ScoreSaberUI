@@ -17,6 +17,8 @@
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
 #include "questui/shared/QuestUI.hpp"
 
+#include "Data/PlayerCollection.hpp"
+
 DEFINE_TYPE(ScoreSaberUI::CustomTypes::Components, CustomCellListTableData);
 
 using namespace ScoreSaberUI::Utils;
@@ -24,16 +26,14 @@ using namespace ScoreSaberUI::CustomTypes::Components;
 using namespace UnityEngine::UI;
 using namespace QuestUI;
 using namespace TMPro;
+using namespace ScoreSaber;
 
 #define BeginCoroutine(method)                                               \
     GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine( \
         reinterpret_cast<System::Collections::IEnumerator*>(                 \
             custom_types::Helpers::CoroutineHelper::New(method)));
 
-using Encoding = rapidjson::UTF16<char16_t>;
-using Value = rapidjson::GenericValue<Encoding>;
-using Document = rapidjson::GenericDocument<Encoding>;
-Document document;
+Data::PlayerCollection playerCollection;
 
 custom_types::Helpers::Coroutine GetDocument(
     ScoreSaberUI::CustomTypes::Components::CustomCellListTableData* self)
@@ -48,9 +48,8 @@ custom_types::Helpers::Coroutine GetDocument(
     {
         // Some of the players have utf16 characters in their names, so parse this as a utf16 document
         auto s = std::u16string(csstrtostr(webRequest->get_downloadHandler()->get_text()));
-        getLogger()
-            .info("Received player objects: %s", s.c_str());
-        document.Parse(s);
+        // implicit constructor poggers
+        playerCollection = webRequest->get_downloadHandler()->get_text();
         self->initialized = true;
     }
     co_return;
@@ -74,7 +73,8 @@ namespace ScoreSaberUI::CustomTypes::Components
 
     int CustomCellListTableData::NumberOfCells()
     {
-        return 5;
+        int size = playerCollection.size();
+        return size < 5 ? size : 5;
     }
 
     void CustomCellListTableData::set_leaderboardType(LeaderboardType type)
@@ -259,11 +259,9 @@ namespace ScoreSaberUI::CustomTypes::Components
         playerCell->set_reuseIdentifier(reuseIdentifier);
         if (initialized)
         {
-            const Value& players = document[u"players"];
             int playerIDX = (page2 * 5) + idx;
             INFO("Getting player %d", playerIDX);
-            auto player = players.GetArray()[playerIDX].GetObject();
-            playerCell->Refresh(player, leaderboardType);
+            playerCell->Refresh(playerCollection[playerIDX], leaderboardType);
         }
         return playerCell;
     }

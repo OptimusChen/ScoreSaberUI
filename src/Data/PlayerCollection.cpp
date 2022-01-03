@@ -21,7 +21,7 @@ namespace ScoreSaber::Data
     {
         for (auto& player : doc["players"].GetArray())
         {
-            players.emplace_back(player.GetObject());
+            emplace_back(player.GetObject());
         }
         auto metadataItr = doc.FindMember("metaData");
         if (!metadataItr->value.IsNull())
@@ -34,7 +34,7 @@ namespace ScoreSaber::Data
     {
         for (auto& player : doc[u"players"].GetArray())
         {
-            players.emplace_back(player.GetObject());
+            emplace_back(player.GetObject());
         }
         auto metadataItr = doc.FindMember(u"metaData");
         if (!metadataItr->value.IsNull())
@@ -47,7 +47,7 @@ namespace ScoreSaber::Data
     {
         for (auto& player : doc["players"].GetArray())
         {
-            players.emplace_back(player.GetObject());
+            emplace_back(player.GetObject());
         }
         auto metadataItr = doc.FindMember("metaData");
         if (!metadataItr->value.IsNull())
@@ -60,7 +60,7 @@ namespace ScoreSaber::Data
     {
         for (auto& player : doc[u"players"].GetArray())
         {
-            players.emplace_back(player.GetObject());
+            emplace_back(player.GetObject());
         }
         auto metadataItr = doc.FindMember(u"metaData");
         if (!metadataItr->value.IsNull())
@@ -76,5 +76,4 @@ namespace ScoreSaber::Data
     PlayerCollection::PlayerCollection(std::u16string_view string) : PlayerCollection(getdoc(string)){};
 
     PlayerCollection::PlayerCollection(){};
-
 }

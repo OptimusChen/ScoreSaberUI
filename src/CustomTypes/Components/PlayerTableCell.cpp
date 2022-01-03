@@ -30,10 +30,6 @@ using namespace QuestUI;
 using namespace QuestUI::BeatSaberUI;
 using namespace TMPro;
 
-using Encoding = rapidjson::UTF16<char16_t>;
-using Value = rapidjson::GenericValue<Encoding>;
-using Document = rapidjson::GenericDocument<Encoding>;
-
 using LeaderboardType = ScoreSaberUI::CustomTypes::Components::CustomCellListTableData::LeaderboardType;
 
 #define BeginCoroutine(method)                                               \
@@ -79,149 +75,74 @@ std::string flag_url(std::string_view COUNTRY)
     return url;
 }
 
-void PlayerTableCell::Refresh(
-    GenericObject player, LeaderboardType leaderboardType)
+void PlayerTableCell::Refresh(ScoreSaber::Data::Player& player, LeaderboardType leaderboardType)
 {
-    this->StopAllCoroutines();
-    std::string iconPath =
-        "/sdcard/ModData/com.beatgames.beatsaber/"
-        "Mods/ScoreSaberUI/Icons/";
-    auto profilePictureItr = player.FindMember(u"profilePicture");
-    if (profilePictureItr != player.MemberEnd() && profilePictureItr->value.IsString())
+    stopProfileRoutine();
+    stopFlagRoutine();
+
+    INFO("Getting profile picture @ %s", player.profilePicture.c_str());
+    profile->set_sprite(Base64ToSprite(oculus_base64));
+
+    // if it ends with oculus.png then there is no reason to redownload the image, so let's not redownload it :)
+    if (!player.profilePicture.ends_with("oculus.png"))
     {
-        std::string profilePictureURL = ::to_utf8(profilePictureItr->value.GetString());
-        INFO("Getting profile picture @ %s", profilePictureURL.c_str());
-        profile->set_sprite(Base64ToSprite(oculus_base64));
-        // if it ends with oculus.png then there is no reason to redownload the image, so let's not redownload it :)
-        if (!profilePictureURL.ends_with("oculus.png"))
-        {
-            BeginCoroutine(WaitForImageDownload(profilePictureURL, profile));
-        }
-        /*
-        WebUtils::GetAsync(profilePictureURL, 64,
-                           [=](long httpCode, std::string data)
-                           {
-                               if (httpCode == 200)
-                               {
-                                   std::vector<uint8_t> bytes(data.begin(), data.end());
-                                   MainThreadScheduler::Schedule([=]()
-                                                                 {
-                                                                     getLogger().info("test9");
-                                                                     Sprite* profilePicture =
-                                                                         BeatSaberUI::VectorToSprite(bytes);
-                                                                     profile->set_sprite(profilePicture);
-                                                                     getLogger().info("test10");
-                                                                 });
-                               };
-                           });
-                           */
+        profileRoutine = BeginCoroutine(WaitForImageDownload(player.profilePicture, profile));
     }
 
-    auto nameItr = player.FindMember(u"name");
-    if (nameItr != player.MemberEnd() && nameItr->value.IsString())
-    {
-        std::u16string name = nameItr->value.GetString();
-        INFO("Setting playername %s", ::to_utf8(name).c_str());
-        this->name->set_text(il2cpp_utils::newcsstr(name));
-    }
+    INFO("Setting playername %s", ::to_utf8(player.name).c_str());
+    this->name->set_text(il2cpp_utils::newcsstr(player.name));
 
     if (leaderboardType == LeaderboardType::Global || leaderboardType == LeaderboardType::AroundYou)
     {
-        auto rankItr = player.FindMember(u"rank");
-        if (rankItr != player.MemberEnd() && rankItr->value.IsInt())
-        {
-            int rank = rankItr->value.GetInt();
-            INFO("Setting rank %d", rank);
-            this->rank->set_text(StrToIl2cppStr(string_format("#%d", rank)));
-        }
+        INFO("Setting rank %d", player.rank);
+        this->rank->set_text(StrToIl2cppStr(string_format("#%d", player.rank)));
     }
     else
     {
-        auto rankItr = player.FindMember(u"rank");
-        auto countryRankItr = player.FindMember(u"countryRank");
-        if (rankItr != player.MemberEnd() && rankItr->value.IsInt() && countryRankItr != player.MemberEnd() && countryRankItr->value.IsInt())
-        {
-            int rank = rankItr->value.GetInt();
-            int countryRank = countryRankItr->value.GetInt();
-            INFO("Setting rank %d, (%d)", countryRank, rank);
-            this->rank->set_text(StrToIl2cppStr(string_format("#%d (#%d)", countryRank, rank)));
-        }
+        INFO("Setting rank %d, (%d)", player.countryRank, player.rank);
+        this->rank->set_text(StrToIl2cppStr(string_format("#%d (#%d)", player.countryRank, player.rank)));
     }
 
-    auto ppItr = player.FindMember(u"pp");
-    if (ppItr != player.MemberEnd() && ppItr->value.IsDouble())
+    INFO("Setting pp %.2f", player.pp);
+    this->pp->set_text(StrToIl2cppStr(string_format("<color=#6872e5>%.0fpp</color>", player.pp)));
+
+    INFO("Setting country %s", player.country.c_str());
+    flag->set_sprite(Base64ToSprite(country_base64));
+    flagRoutine = BeginCoroutine(WaitForImageDownload(flag_url(player.country), flag));
+    this->country->set_text(StrToIl2cppStr(player.country));
+
+    auto& histories = player.histories;
+    auto length = histories.size();
+    int weeklyChange;
+    if (length == 0)
     {
-        double pp = ppItr->value.GetDouble();
-        INFO("Setting pp %.2f", pp);
-        this->pp->set_text(StrToIl2cppStr(string_format("<color=#6872e5>%.0fpp</color>", pp)));
+        weeklyChange = 0;
+    }
+    else if (length < 8)
+    {
+        // if we have less than a week of history, the history is just first minus last
+        weeklyChange = histories[0] - histories[length - 1];
+    }
+    else
+    {
+        weeklyChange = histories[length - 8] -
+                       histories[length - 1];
     }
 
-    auto countryItr = player.FindMember(u"country");
-    if (countryItr != player.MemberEnd() && countryItr->value.IsString())
+    std::string result;
+    if (weeklyChange > 0)
     {
-        std::string country = ::to_utf8(countryItr->value.GetString());
-        INFO("Setting country %s", country.c_str());
-        flag->set_sprite(Base64ToSprite(country_base64));
-        BeginCoroutine(WaitForImageDownload(flag_url(country), flag));
-        /*
-        WebUtils::GetAsync(flag_url(country), 64,
-                           [=](long httpCode, std::string data)
-                           {
-                               if (httpCode == 200)
-                               {
-                                   std::vector<uint8_t> bytes(data.begin(), data.end());
-                                   MainThreadScheduler::Schedule([=]()
-                                                                 {
-                                                                     getLogger().info("test11");
-                                                                     Sprite* flagPicture =
-                                                                         BeatSaberUI::VectorToSprite(bytes);
-                                                                     flag->set_sprite(flagPicture);
-                                                                     getLogger().info("test12");
-                                                                 });
-                               };
-                           });
-                           */
-        this->country->set_text(StrToIl2cppStr(country));
+        result = string_format("<color=green>+%d</color>", weeklyChange);
     }
-
-    auto historiesItr = player.FindMember(u"histories");
-    if (historiesItr != player.MemberEnd() && historiesItr->value.IsString())
+    else if (weeklyChange < 0)
     {
-        ::Array<Il2CppString*>* histories =
-            il2cpp_utils::newcsstr(historiesItr->value.GetString())->Split(',');
-        auto length = histories->Length();
-        int weeklyChange;
-        if (length < 48)
-        {
-            if (length > 7)
-                weeklyChange = stof(StringUtils::Il2cppStrToStr(histories->get(length - 8))) -
-                               stof(StringUtils::Il2cppStrToStr(histories->get(length - 1)));
-            else if (length != 0)
-                weeklyChange = stof(StringUtils::Il2cppStrToStr(histories->get(0))) -
-                               stof(StringUtils::Il2cppStrToStr(histories->get(length - 1)));
-            else
-                weeklyChange = 0;
-        }
-        else
-        {
-            weeklyChange = stof(StringUtils::Il2cppStrToStr(histories->get(41))) -
-                           stof(StringUtils::Il2cppStrToStr(histories->get(48)));
-        }
-        std::string result;
-        if (weeklyChange > 0)
-        {
-            result = string_format("<color=green>+%d</color>", weeklyChange);
-        }
-        else if (weeklyChange < 0)
-        {
-            result = string_format("<color=red>%d</color>", weeklyChange);
-        }
-        else
-        {
-            result = string_format("%d", weeklyChange);
-        }
-        weekly->set_text(StrToIl2cppStr(result));
+        result = string_format("<color=red>%d</color>", weeklyChange);
     }
+    else
+    {
+        result = string_format("%d", weeklyChange);
+    }
+    weekly->set_text(StrToIl2cppStr(result));
 }
 
 PlayerTableCell* PlayerTableCell::CreateCell()
@@ -285,4 +206,18 @@ PlayerTableCell* PlayerTableCell::CreateCell()
     playerCell->weekly->set_alignment(TextAlignmentOptions::Right);
     playerCell->weekly->set_fontSize(5.0f);
     return playerCell;
+}
+
+void PlayerTableCell::stopProfileRoutine()
+{
+    if (profileRoutine)
+        GlobalNamespace::SharedCoroutineStarter::get_instance()->StopCoroutine(profileRoutine);
+    profileRoutine = nullptr;
+}
+
+void PlayerTableCell::stopFlagRoutine()
+{
+    if (flagRoutine)
+        GlobalNamespace::SharedCoroutineStarter::get_instance()->StopCoroutine(flagRoutine);
+    flagRoutine = nullptr;
 }
