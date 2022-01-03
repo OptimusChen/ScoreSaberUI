@@ -1,10 +1,16 @@
 #include "CustomTypes/Components/PlayerTableCell.hpp"
 
 #include "CustomTypes/Components/ImageButton.hpp"
+#include "GlobalNamespace/SharedCoroutineStarter.hpp"
 #include "HMUI/ImageView.hpp"
 #include "HMUI/Touchable.hpp"
 #include "Sprites.hpp"
+#include "UnityEngine/Networking/DownloadHandlerTexture.hpp"
+#include "UnityEngine/Networking/UnityWebRequest.hpp"
+#include "UnityEngine/Networking/UnityWebRequestTexture.hpp"
 #include "UnityEngine/Sprite.hpp"
+#include "UnityEngine/SpriteMeshType.hpp"
+#include "UnityEngine/Texture2D.hpp"
 #include "Utils/StringUtils.hpp"
 #include "Utils/WebUtils.hpp"
 #include "logging.hpp"
@@ -23,6 +29,22 @@ using namespace UnityEngine::UI;
 using namespace QuestUI;
 using namespace QuestUI::BeatSaberUI;
 using namespace TMPro;
+
+#define BeginCoroutine(method)                                               \
+    GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine( \
+        reinterpret_cast<System::Collections::IEnumerator*>(                 \
+            custom_types::Helpers::CoroutineHelper::New(method)));
+
+custom_types::Helpers::Coroutine WaitForImageDownload(std::string url, HMUI::ImageView* out)
+{
+    UnityEngine::Networking::UnityWebRequest* www = UnityEngine::Networking::UnityWebRequestTexture::GetTexture(il2cpp_utils::newcsstr(url));
+    co_yield reinterpret_cast<System::Collections::IEnumerator*>(www->SendWebRequest());
+    auto downloadHandlerTexture = reinterpret_cast<UnityEngine::Networking::DownloadHandlerTexture*>(www->get_downloadHandler());
+    auto texture = downloadHandlerTexture->get_texture();
+    auto sprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)texture->get_width(), (float)texture->get_height()), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
+    out->set_sprite(sprite);
+    co_return;
+}
 
 void PlayerTableCell::ctor() {}
 
@@ -54,6 +76,7 @@ std::string flag_url(std::string_view COUNTRY)
 void PlayerTableCell::Refresh(
     rapidjson::GenericObject<true, rapidjson::Value> player)
 {
+    this->StopAllCoroutines();
     std::string iconPath =
         "/sdcard/ModData/com.beatgames.beatsaber/"
         "Mods/ScoreSaberUI/Icons/";
@@ -62,6 +85,9 @@ void PlayerTableCell::Refresh(
     {
         std::string profilePictureURL = profilePictureItr->value.GetString();
         INFO("Getting profile picture @ %s", profilePictureURL.c_str());
+        profile->set_sprite(Base64ToSprite(oculus_base64));
+        BeginCoroutine(WaitForImageDownload(profilePictureURL, profile));
+        /*
         WebUtils::GetAsync(profilePictureURL, 64,
                            [=](long httpCode, std::string data)
                            {
@@ -78,6 +104,7 @@ void PlayerTableCell::Refresh(
                                                                  });
                                };
                            });
+                           */
     }
 
     auto nameItr = player.FindMember("name");
@@ -109,6 +136,9 @@ void PlayerTableCell::Refresh(
     {
         std::string country = countryItr->value.GetString();
         INFO("Setting country %s", country.c_str());
+        flag->set_sprite(Base64ToSprite(country_base64));
+        BeginCoroutine(WaitForImageDownload(flag_url(country), flag));
+        /*
         WebUtils::GetAsync(flag_url(country), 64,
                            [=](long httpCode, std::string data)
                            {
@@ -125,6 +155,7 @@ void PlayerTableCell::Refresh(
                                                                  });
                                };
                            });
+                           */
         this->country->set_text(StrToIl2cppStr(country));
     }
 
