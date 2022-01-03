@@ -30,10 +30,6 @@ namespace ScoreSaber::Data
         {
             scoreStats = std::make_optional(ScoreStats(scoreStatsItr->value.GetObject()));
         }
-        else
-        {
-            scoreStats = std::move(std::nullopt);
-        }
         permissions = value["permissions"].GetInt();
         banned = value["banned"].GetBool();
         inactive = value["inactive"].GetBool();
@@ -64,10 +60,6 @@ namespace ScoreSaber::Data
         if (!scoreStatsItr->value.IsNull())
         {
             scoreStats = std::make_optional(ScoreStats(scoreStatsItr->value.GetObject()));
-        }
-        else
-        {
-            scoreStats = std::move(std::nullopt);
         }
         permissions = value[u"permissions"].GetInt();
         banned = value[u"banned"].GetBool();
@@ -101,10 +93,6 @@ namespace ScoreSaber::Data
         {
             scoreStats = std::make_optional(ScoreStats(scoreStatsItr->value.GetObject()));
         }
-        else
-        {
-            scoreStats = std::move(std::nullopt);
-        }
         permissions = value["permissions"].GetInt();
         banned = value["banned"].GetBool();
         inactive = value["inactive"].GetBool();
@@ -135,10 +123,6 @@ namespace ScoreSaber::Data
         if (scoreStatsItr != value.MemberEnd() && !scoreStatsItr->value.IsNull())
         {
             scoreStats = std::make_optional(ScoreStats(scoreStatsItr->value.GetObject()));
-        }
-        else
-        {
-            scoreStats = std::move(std::nullopt);
         }
         permissions = value[u"permissions"].GetInt();
         banned = value[u"banned"].GetBool();
