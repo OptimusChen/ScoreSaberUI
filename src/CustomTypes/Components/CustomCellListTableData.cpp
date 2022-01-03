@@ -30,203 +30,242 @@ using namespace TMPro;
         reinterpret_cast<System::Collections::IEnumerator*>(                 \
             custom_types::Helpers::CoroutineHelper::New(method)));
 
-float ScoreSaberUI::CustomTypes::Components::CustomCellListTableData::
-    CellSize()
-{
-    return 12.0f;
-}
-int ScoreSaberUI::CustomTypes::Components::CustomCellListTableData::
-    NumberOfCells()
-{
-    return 5;
-}
-
-rapidjson::Document document;
+using Encoding = rapidjson::UTF16<char16_t>;
+using Value = rapidjson::GenericValue<Encoding>;
+using Document = rapidjson::GenericDocument<Encoding>;
+Document document;
 
 custom_types::Helpers::Coroutine GetDocument(
     ScoreSaberUI::CustomTypes::Components::CustomCellListTableData* self)
 {
+    std::string url = self->get_leaderboardURL();
+    INFO("Getting player data from url %s", url.c_str());
     UnityEngine::Networking::UnityWebRequest* webRequest =
-        UnityEngine::Networking::UnityWebRequest::Get(StringUtils::StrToIl2cppStr(
-            "https://scoresaber.com/api/players?page=" +
-            std::to_string(self->page) + "&withMetadata=false"));
+        UnityEngine::Networking::UnityWebRequest::Get(StringUtils::StrToIl2cppStr(url));
     co_yield reinterpret_cast<System::Collections::IEnumerator*>(
         CRASH_UNLESS(webRequest->SendWebRequest()));
     if (!webRequest->get_isNetworkError())
     {
-        std::string s = StringUtils::to_utf8(
-            csstrtostr(webRequest->get_downloadHandler()->get_text()));
-        getLogger().info("Received player objects: %s", s.c_str());
+        // Some of the players have utf16 characters in their names, so parse this as a utf16 document
+        Il2CppString* text = ;
+        auto s = std::u16string(csstrtostr(webRequest->get_downloadHandler()->get_text()));
+        getLogger()
+            .info("Received player objects: %s", s.c_str());
         document.Parse(s);
         self->initialized = true;
     }
     co_return;
 }
 
-void ScoreSaberUI::CustomTypes::Components::CustomCellListTableData::ctor()
+namespace ScoreSaberUI::CustomTypes::Components
 {
-    page = 1;
-    page2 = 0;
-    reuseIdentifier = il2cpp_utils::newcsstr("CustomPlayerCellList");
-}
-
-void ScoreSaberUI::CustomTypes::Components::CustomCellListTableData::
-    DownButtonWasPressed()
-{
-    if (isLoading)
-        return;
-    INFO("Before page: %d, subpage: %d", page, page2);
-    page2++;
-    if (page2 > 9)
+    void CustomCellListTableData::ctor()
     {
-        // we went out of bounds for this page, get page changed!
-        page++;
-        page2 = 0;
-        GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine(
-            reinterpret_cast<System::Collections::IEnumerator*>(
-                custom_types::Helpers::CoroutineHelper::New(Refresh(true))));
-    }
-    else
-    {
-        GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine(
-            reinterpret_cast<System::Collections::IEnumerator*>(
-                custom_types::Helpers::CoroutineHelper::New(Refresh())));
-    }
-    INFO("After page: %d, subpage: %d", page, page2);
-}
-
-void ScoreSaberUI::CustomTypes::Components::CustomCellListTableData::
-    UpButtonWasPressed()
-{
-    if (isLoading)
-        return;
-    INFO("Before page: %d, subpage: %d", page, page2);
-    // on up press:
-    // page controls the SS page,
-    // page2 controls locally the 5 people we see within the 50 we get on a page
-    page2--;
-    if (page2 >= 0)
-    {
-        GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine(
-            reinterpret_cast<System::Collections::IEnumerator*>(
-                custom_types::Helpers::CoroutineHelper::New(Refresh())));
-        INFO("After page: %d, subpage: %d", page, page2);
-        return;
-    }
-
-    page--;
-    if (page < 1)
-    {
-        // we went over the top of the first page, this means we went too far, revert changes
         page = 1;
         page2 = 0;
+        reuseIdentifier = il2cpp_utils::newcsstr("CustomPlayerCellList");
+        myCountry = "NL";
+        leaderboardType = Global;
     }
-    else
+
+    float CustomCellListTableData::CellSize()
     {
-        // page could be lowered, so we start at the bottom of of this new page
-        page2 = 9; // end of page of 50 = page2 * 5 = 45 + the 5 we can see now
-        GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine(
-            reinterpret_cast<System::Collections::IEnumerator*>(
-                custom_types::Helpers::CoroutineHelper::New(Refresh(true))));
+        return 12.0f;
     }
-    /*
+
+    int CustomCellListTableData::NumberOfCells()
+    {
+        return 5;
+    }
+
+    void CustomCellListTableData::set_leaderboardType(LeaderboardType type)
+    {
+        // if the new type is the same as the old type
+        bool sameType = leaderboardType == type;
+        bool wasPage1 = page == 1;
+        leaderboardType = type;
+        // scroll back to top always
+        page = 1;
+        page2 = 0;
+        // refresh the content only if we were not on page one, or if the new type is different from the old one
+        StartRefresh(!wasPage1 || !sameType);
+    }
+
+    std::string CustomCellListTableData::get_leaderboardURL()
+    {
+        switch (leaderboardType)
+        {
+        default:
+            [[fallthrough]];
+        case LeaderboardType::Global:
+            // Global leaderboard
+            return string_format("https://scoresaber.com/api/players?page=%d&withMetadata=false", page);
+            break;
+        case LeaderboardType::AroundYou:
+            // Not sure how to implement rn, just use Global for now
+            return string_format("https://scoresaber.com/api/players?page=%d&withMetadata=false", page);
+            break;
+        case LeaderboardType::Friends:
+            // Friends is not possible on quest? just use country for now until we decide what to do
+            return string_format("https://scoresaber.com/api/players?page=%d&countries=%s&withMetadata=false", page, myCountry.c_str());
+            break;
+        case LeaderboardType::Country:
+            // Country is country filter lets gooo
+            return string_format("https://scoresaber.com/api/players?page=%d&countries=%s&withMetadata=false", page, myCountry.c_str());
+            break;
+        }
+    }
+
+    void CustomCellListTableData::
+        DownButtonWasPressed()
+    {
+        if (isLoading)
+            return;
+        INFO("Before page: %d, subpage: %d", page, page2);
+        page2++;
+        if (page2 > 9)
+        {
+            // we went out of bounds for this page, get page changed!
+            page++;
+            page2 = 0;
+            StartRefresh(true);
+        }
+        else
+        {
+            StartRefresh();
+        }
+        INFO("After page: %d, subpage: %d", page, page2);
+    }
+
+    void CustomCellListTableData::
+        UpButtonWasPressed()
+    {
+        if (isLoading)
+            return;
+        INFO("Before page: %d, subpage: %d", page, page2);
+        // on up press:
+        // page controls the SS page,
+        // page2 controls locally the 5 people we see within the 50 we get on a page
+        page2--;
+        if (page2 >= 0)
+        {
+            StartRefresh();
+            INFO("After page: %d, subpage: %d", page, page2);
+            return;
+        }
+
+        page--;
+        if (page < 1)
+        {
+            // we went over the top of the first page, this means we went too far, revert changes
+            page = 1;
+            page2 = 0;
+        }
+        else
+        {
+            // page could be lowered, so we start at the bottom of of this new page
+            page2 = 9; // end of page of 50 = page2 * 5 = 45 + the 5 we can see now
+            StartRefresh(true);
+        }
+        /*
     else
     {
         // we could lower page 2 without entering a new SS page, we can refresh normally
     }
     */
-    INFO("After page: %d, subpage: %d", page, page2);
-}
-
-void ScoreSaberUI::CustomTypes::Components::CustomCellListTableData::StartRefresh(bool redownload)
-{
-    if (isLoading)
-        return;
-    GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine(
-        reinterpret_cast<System::Collections::IEnumerator*>(
-            custom_types::Helpers::CoroutineHelper::New(Refresh(redownload))));
-}
-
-/// really just here because of the way it reloads twice by doing ReloadData and then RefreshCells(true, true), now it's combined
-void ReloadTableViewData(HMUI::TableView* self)
-{
-    if (!self->dyn__isInitialized())
-    {
-        self->LazyInit();
-    }
-    auto visibleCells = self->dyn__visibleCells();
-    int length = visibleCells->get_Count();
-    for (int i = 0; i < length; i++)
-    {
-        auto tableCell = visibleCells->get_Item(i);
-        tableCell->get_gameObject()->SetActive(false);
-        self->AddCellToReusableCells(tableCell);
-    }
-    self->visibleCells->Clear();
-    if (self->dyn__dataSource() != nullptr)
-    {
-        self->dyn__numberOfCells() = self->dyn__dataSource()->NumberOfCells();
-        self->dyn__cellSize() = self->dyn__dataSource()->CellSize();
-    }
-    else
-    {
-        self->dyn__numberOfCells() = 0;
-        self->dyn__cellSize() = 1.0f;
+        INFO("After page: %d, subpage: %d", page, page2);
     }
 
-    self->dyn__scrollView()->dyn__fixedCellSize() = self->dyn__cellSize();
-    self->RefreshContentSize();
-    if (!self->get_gameObject()->get_activeInHierarchy())
+    void CustomCellListTableData::StartRefresh(bool redownload)
     {
-        self->dyn__refreshCellsOnEnable() = true;
-    }
-    else
-    {
-        self->RefreshCells(true, true);
+        if (isLoading)
+            return;
+        GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine(
+            reinterpret_cast<System::Collections::IEnumerator*>(
+                custom_types::Helpers::CoroutineHelper::New(Refresh(redownload))));
     }
 
-    if (self->dyn_didReloadDataEvent())
-        self->dyn_didReloadDataEvent()->Invoke(self);
-}
-
-custom_types::Helpers::Coroutine
-ScoreSaberUI::CustomTypes::Components::CustomCellListTableData::Refresh(bool redownload)
-{
-    isLoading = true;
-    if (redownload)
+    /// really just here because of the way it reloads twice by doing ReloadData and then RefreshCells(true, true), now it's combined
+    void ReloadTableViewData(HMUI::TableView* self)
     {
-        co_yield reinterpret_cast<System::Collections::IEnumerator*>(
-            custom_types::Helpers::CoroutineHelper::New(GetDocument(this)));
+        if (!self->dyn__isInitialized())
+        {
+            self->LazyInit();
+        }
+        auto visibleCells = self->dyn__visibleCells();
+        int length = visibleCells->get_Count();
+        for (int i = 0; i < length; i++)
+        {
+            auto tableCell = visibleCells->get_Item(i);
+            tableCell->get_gameObject()->SetActive(false);
+            self->AddCellToReusableCells(tableCell);
+        }
+        self->visibleCells->Clear();
+        if (self->dyn__dataSource() != nullptr)
+        {
+            self->dyn__numberOfCells() = self->dyn__dataSource()->NumberOfCells();
+            self->dyn__cellSize() = self->dyn__dataSource()->CellSize();
+        }
+        else
+        {
+            self->dyn__numberOfCells() = 0;
+            self->dyn__cellSize() = 1.0f;
+        }
+
+        self->dyn__scrollView()->dyn__fixedCellSize() = self->dyn__cellSize();
+        self->RefreshContentSize();
+        if (!self->get_gameObject()->get_activeInHierarchy())
+        {
+            self->dyn__refreshCellsOnEnable() = true;
+        }
+        else
+        {
+            self->RefreshCells(true, true);
+        }
+
+        if (self->dyn_didReloadDataEvent())
+            self->dyn_didReloadDataEvent()->Invoke(self);
     }
-    //co_yield reinterpret_cast<System::Collections::IEnumerator*>(
-    //    CRASH_UNLESS(WaitForSeconds::New_ctor(2.0f)));
-    ReloadTableViewData(tableView);
-    //tableView->RefreshCells(true, true);
-    isLoading = false;
-    co_return;
-}
 
-HMUI::TableCell*
-ScoreSaberUI::CustomTypes::Components::CustomCellListTableData::CellForIdx(
-    HMUI::TableView* tableView, int idx)
-{
-    PlayerTableCell* playerCell = reinterpret_cast<PlayerTableCell*>(
-        tableView->DequeueReusableCellForIdentifier(reuseIdentifier));
-
-    if (!playerCell)
+    custom_types::Helpers::Coroutine
+    CustomCellListTableData::Refresh(bool redownload)
     {
-        playerCell = PlayerTableCell::CreateCell();
-        //playerCell->get_transform()->SetParent(tableView->get_transform()->GetChild(0)->GetChild(0), false);
+        isLoading = true;
+        if (redownload || !initialized)
+        {
+            co_yield reinterpret_cast<System::Collections::IEnumerator*>(
+                custom_types::Helpers::CoroutineHelper::New(GetDocument(this)));
+        }
+        //co_yield reinterpret_cast<System::Collections::IEnumerator*>(
+        //    CRASH_UNLESS(WaitForSeconds::New_ctor(2.0f)));
+        ReloadTableViewData(tableView);
+        //tableView->RefreshCells(true, true);
+        isLoading = false;
+        co_return;
     }
 
-    playerCell->set_reuseIdentifier(reuseIdentifier);
-    if (initialized)
+    HMUI::TableCell*
+    CustomCellListTableData::CellForIdx(
+        HMUI::TableView* tableView, int idx)
     {
-        const rapidjson::Value& players = document["players"];
-        int playerIDX = (page2 * 5) + idx;
-        INFO("Getting player %d", playerIDX);
-        auto player = players.GetArray()[playerIDX].GetObject();
-        playerCell->Refresh(player);
+        PlayerTableCell* playerCell = reinterpret_cast<PlayerTableCell*>(
+            tableView->DequeueReusableCellForIdentifier(reuseIdentifier));
+
+        if (!playerCell)
+        {
+            playerCell = PlayerTableCell::CreateCell();
+            //playerCell->get_transform()->SetParent(tableView->get_transform()->GetChild(0)->GetChild(0), false);
+        }
+
+        playerCell->set_reuseIdentifier(reuseIdentifier);
+        if (initialized)
+        {
+            const Value& players = document[u"players"];
+            int playerIDX = (page2 * 5) + idx;
+            INFO("Getting player %d", playerIDX);
+            auto player = players.GetArray()[playerIDX].GetObject();
+            playerCell->Refresh(player, leaderboardType);
+        }
+        return playerCell;
     }
-    return playerCell;
 }

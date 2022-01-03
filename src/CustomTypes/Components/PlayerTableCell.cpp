@@ -30,6 +30,12 @@ using namespace QuestUI;
 using namespace QuestUI::BeatSaberUI;
 using namespace TMPro;
 
+using Encoding = rapidjson::UTF16<char16_t>;
+using Value = rapidjson::GenericValue<Encoding>;
+using Document = rapidjson::GenericDocument<Encoding>;
+
+using LeaderboardType = ScoreSaberUI::CustomTypes::Components::CustomCellListTableData::LeaderboardType;
+
 #define BeginCoroutine(method)                                               \
     GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine( \
         reinterpret_cast<System::Collections::IEnumerator*>(                 \
@@ -74,16 +80,16 @@ std::string flag_url(std::string_view COUNTRY)
 }
 
 void PlayerTableCell::Refresh(
-    rapidjson::GenericObject<true, rapidjson::Value> player)
+    GenericObject player, LeaderboardType leaderboardType)
 {
     this->StopAllCoroutines();
     std::string iconPath =
         "/sdcard/ModData/com.beatgames.beatsaber/"
         "Mods/ScoreSaberUI/Icons/";
-    auto profilePictureItr = player.FindMember("profilePicture");
+    auto profilePictureItr = player.FindMember(u"profilePicture");
     if (profilePictureItr != player.MemberEnd() && profilePictureItr->value.IsString())
     {
-        std::string profilePictureURL = profilePictureItr->value.GetString();
+        std::string profilePictureURL = ::to_utf8(profilePictureItr->value.GetString());
         INFO("Getting profile picture @ %s", profilePictureURL.c_str());
         profile->set_sprite(Base64ToSprite(oculus_base64));
         // if it ends with oculus.png then there is no reason to redownload the image, so let's not redownload it :)
@@ -111,34 +117,49 @@ void PlayerTableCell::Refresh(
                            */
     }
 
-    auto nameItr = player.FindMember("name");
+    auto nameItr = player.FindMember(u"name");
     if (nameItr != player.MemberEnd() && nameItr->value.IsString())
     {
-        std::string name = nameItr->value.GetString();
-        INFO("Setting playername %s", name.c_str());
-        this->name->set_text(StrToIl2cppStr(name));
+        std::u16string name = nameItr->value.GetString();
+        INFO("Setting playername %s", ::to_utf8(name).c_str());
+        this->name->set_text(il2cpp_utils::newcsstr(name));
     }
 
-    auto rankItr = player.FindMember("rank");
-    if (rankItr != player.MemberEnd() && rankItr->value.IsInt())
+    if (leaderboardType == LeaderboardType::Global || leaderboardType == LeaderboardType::AroundYou)
     {
-        int rank = rankItr->value.GetInt();
-        INFO("Setting rank %d", rank);
-        this->rank->set_text(StrToIl2cppStr(string_format("#%d", rank)));
+        auto rankItr = player.FindMember(u"rank");
+        if (rankItr != player.MemberEnd() && rankItr->value.IsInt())
+        {
+            int rank = rankItr->value.GetInt();
+            INFO("Setting rank %d", rank);
+            this->rank->set_text(StrToIl2cppStr(string_format("#%d", rank)));
+        }
+    }
+    else
+    {
+        auto rankItr = player.FindMember(u"rank");
+        auto countryRankItr = player.FindMember(u"countryRank");
+        if (rankItr != player.MemberEnd() && rankItr->value.IsInt() && countryRankItr != player.MemberEnd() && countryRankItr->value.IsInt())
+        {
+            int rank = rankItr->value.GetInt();
+            int countryRank = countryRankItr->value.GetInt();
+            INFO("Setting rank %d, (%d)", countryRank, rank);
+            this->rank->set_text(StrToIl2cppStr(string_format("#%d (#%d)", countryRank, rank)));
+        }
     }
 
-    auto ppItr = player.FindMember("pp");
+    auto ppItr = player.FindMember(u"pp");
     if (ppItr != player.MemberEnd() && ppItr->value.IsDouble())
     {
         double pp = ppItr->value.GetDouble();
         INFO("Setting pp %.2f", pp);
-        this->pp->set_text(StrToIl2cppStr(string_format("<color=#6872e5>%.0fpp<color>", pp)));
+        this->pp->set_text(StrToIl2cppStr(string_format("<color=#6872e5>%.0fpp</color>", pp)));
     }
 
-    auto countryItr = player.FindMember("country");
+    auto countryItr = player.FindMember(u"country");
     if (countryItr != player.MemberEnd() && countryItr->value.IsString())
     {
-        std::string country = countryItr->value.GetString();
+        std::string country = ::to_utf8(countryItr->value.GetString());
         INFO("Setting country %s", country.c_str());
         flag->set_sprite(Base64ToSprite(country_base64));
         BeginCoroutine(WaitForImageDownload(flag_url(country), flag));
@@ -163,11 +184,11 @@ void PlayerTableCell::Refresh(
         this->country->set_text(StrToIl2cppStr(country));
     }
 
-    auto historiesItr = player.FindMember("histories");
+    auto historiesItr = player.FindMember(u"histories");
     if (historiesItr != player.MemberEnd() && historiesItr->value.IsString())
     {
         ::Array<Il2CppString*>* histories =
-            StringUtils::StrToIl2cppStr(player["histories"].GetString())->Split(',');
+            il2cpp_utils::newcsstr(historiesItr->value.GetString())->Split(',');
         auto length = histories->Length();
         int weeklyChange;
         if (length < 48)

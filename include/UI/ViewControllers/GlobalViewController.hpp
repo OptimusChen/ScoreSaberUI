@@ -21,5 +21,6 @@ DECLARE_CLASS_CODEGEN(
     void OpenMoreInfoModal();
     void UpButtonWasPressed();
     void DownButtonWasPressed();
+    void FilterWasClicked(ScoreSaberUI::CustomTypes::Components::CustomCellListTableData::LeaderboardType type);
 
 );

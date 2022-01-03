@@ -1,5 +1,6 @@
 #pragma once
 
+#include "CustomTypes/Components/CustomCellListTableData.hpp"
 #include "CustomTypes/Components/ImageButton.hpp"
 #include "HMUI/ImageView.hpp"
 #include "HMUI/TableCell.hpp"
@@ -34,4 +35,7 @@ DECLARE_CLASS_CODEGEN(
     :
 
     static PlayerTableCell * CreateCell();
-    void Refresh(rapidjson::GenericObject<true, rapidjson::Value> players);)
+    using GenericObject = rapidjson::GenericObject<true, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>>;
+    void Refresh(GenericObject players, ScoreSaberUI::CustomTypes::Components::CustomCellListTableData::LeaderboardType leaderboardType);
+
+)

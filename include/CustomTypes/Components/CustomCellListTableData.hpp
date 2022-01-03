@@ -54,5 +54,17 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(
             &HMUI::TableView::IDataSource::NumberOfCells>::get());
 
     public
-    : void StartRefresh(bool redownload = false);
+    :
+
+    enum LeaderboardType{
+        Global,
+        AroundYou,
+        Friends,
+        Country};
+
+    std::string myCountry = "US";
+    LeaderboardType leaderboardType = Global;
+    void set_leaderboardType(LeaderboardType type);
+    std::string get_leaderboardURL();
+    void StartRefresh(bool redownload = false);
     custom_types::Helpers::Coroutine Refresh(bool redownload = false);)

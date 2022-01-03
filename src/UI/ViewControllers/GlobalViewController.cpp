@@ -202,17 +202,17 @@ void GlobalViewController::DidActivate(bool firstActivation,
                                             { return to_utf8(csstrtostr(x->get_name())) == "FriendsIcon"; });
         UIUtils::CreateImageButton(imagesGroup->get_gameObject(),
                                    globalIcon, {0.0f, 0.0f},
-                                   {4.0f, 4.0f}, []() {});
+                                   {4.0f, 4.0f}, std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaberUI::CustomTypes::Components::CustomCellListTableData::LeaderboardType::Global));
         UIUtils::CreateImageButton(imagesGroup->get_gameObject(),
                                    playerIcon, {0.0f, 0.0f},
-                                   {4.0f, 4.0f}, []() {});
+                                   {4.0f, 4.0f}, std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaberUI::CustomTypes::Components::CustomCellListTableData::LeaderboardType::AroundYou));
         UIUtils::CreateImageButton(imagesGroup->get_gameObject(),
                                    friendsIcon, {0.0f, 0.0f},
-                                   {4.0f, 4.0f}, []() {});
+                                   {4.0f, 4.0f}, std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaberUI::CustomTypes::Components::CustomCellListTableData::LeaderboardType::Friends));
         UIUtils::CreateImageButton(
             imagesGroup->get_gameObject(),
             Base64ToSprite(country_base64), {0.0f, 0.0f},
-            {4.0f, 4.0f}, []() {});
+            {4.0f, 4.0f}, std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaberUI::CustomTypes::Components::CustomCellListTableData::LeaderboardType::Country));
 
         ImageButton* downrrow = UIUtils::CreateImageButton(
             scoreScopesHost->get_gameObject(),
@@ -322,4 +322,9 @@ void GlobalViewController::OpenMoreInfoModal()
             { Application::OpenURL(il2cpp_utils::newcsstr("http://bit.ly/2X8Anko")); });
     }
     moreInfoModal->Show(true, true, nullptr);
+}
+
+void GlobalViewController::FilterWasClicked(ScoreSaberUI::CustomTypes::Components::CustomCellListTableData::LeaderboardType type)
+{
+    leaderboardList->set_leaderboardType(type);
 }
