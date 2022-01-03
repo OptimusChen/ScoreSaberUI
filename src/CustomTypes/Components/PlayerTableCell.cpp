@@ -86,7 +86,11 @@ void PlayerTableCell::Refresh(
         std::string profilePictureURL = profilePictureItr->value.GetString();
         INFO("Getting profile picture @ %s", profilePictureURL.c_str());
         profile->set_sprite(Base64ToSprite(oculus_base64));
-        BeginCoroutine(WaitForImageDownload(profilePictureURL, profile));
+        // if it ends with oculus.png then there is no reason to redownload the image, so let's not redownload it :)
+        if (!profilePictureURL.ends_with("oculus.png"))
+        {
+            BeginCoroutine(WaitForImageDownload(profilePictureURL, profile));
+        }
         /*
         WebUtils::GetAsync(profilePictureURL, 64,
                            [=](long httpCode, std::string data)
