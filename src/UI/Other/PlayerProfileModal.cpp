@@ -86,18 +86,16 @@ namespace ScoreSaber::UI
         // TODO: Add actual placeholder
         auto pfpHorizontal = CreateHorizontalLayoutGroup(pfpVertical->get_transform());
         SetPreferredSize(pfpHorizontal, WIDTH * 0.4f, WIDTH * 0.4f);
-        auto pfpTex = Texture2D::get_whiteTexture();
-        auto pfpSprite = Sprite::Create(pfpTex, Rect(0.0f, 0.0f, (float)pfpTex->get_width(), (float)pfpTex->get_height()), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
-
-        pfpImage = CreateImage(pfpHorizontal->get_transform(), pfpSprite, Vector2(0, 0), Vector2(0, 0));
+        auto oculusSprite = Base64ToSprite(oculus_base64);
+        pfpImage = CreateImage(pfpHorizontal->get_transform(), oculusSprite, Vector2(0, 0), Vector2(0, 0));
         SetPreferredSize(pfpImage, WIDTH * 0.4f, WIDTH * 0.4f);
 
         badgeHorizontal = CreateHorizontalLayoutGroup(pfpVertical->get_transform());
         badgeHorizontal->set_spacing(1.0f);
-        AddBadge(pfpSprite);
-        AddBadge(pfpSprite);
-        AddBadge(pfpSprite);
-        AddBadge(pfpSprite);
+        AddBadge(oculusSprite);
+        AddBadge(oculusSprite);
+        AddBadge(oculusSprite);
+        AddBadge(oculusSprite);
         // seperator setup
         auto texture = Texture2D::get_whiteTexture();
         auto seperatorSprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)texture->get_width(), (float)texture->get_height()), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
