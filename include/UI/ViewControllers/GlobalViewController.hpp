@@ -1,7 +1,9 @@
 #pragma once
 #include "CustomTypes/Components/CustomCellListTableData.hpp"
+
 #include "HMUI/ModalView.hpp"
 #include "HMUI/ViewController.hpp"
+#include "UI/Other/PlayerProfileModal.hpp"
 #include "custom-types/shared/macros.hpp"
 
 DECLARE_CLASS_CODEGEN(
@@ -15,6 +17,7 @@ DECLARE_CLASS_CODEGEN(
                             bool screenSystemEnabling);
     DECLARE_INSTANCE_FIELD(ScoreSaberUI::CustomTypes::Components::CustomCellListTableData*, leaderboardList);
     DECLARE_INSTANCE_FIELD(HMUI::ModalView*, moreInfoModal);
+    DECLARE_INSTANCE_FIELD(ScoreSaber::UI::PlayerProfileModal*, playerProfileModal);
     DECLARE_INSTANCE_FIELD(UnityEngine::GameObject*, loadingIndicator);
     void set_loading(bool value);
     private

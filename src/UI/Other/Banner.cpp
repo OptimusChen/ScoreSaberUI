@@ -173,7 +173,7 @@ namespace ScoreSaber::UI
     {
         // just make sure to have this actually assigned
         if (playerProfileModal && Object::IsNativeObjectAlive(playerProfileModal))
-            playerProfileModal->Show();
+            playerProfileModal->Show("");
     }
 
     void Banner::OpenSongInBrowser()

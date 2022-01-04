@@ -3,6 +3,7 @@
 #include "CustomTypes/Components/CustomCellListTableData.hpp"
 #include "CustomTypes/Components/ImageButton.hpp"
 #include "Data/Player.hpp"
+#include "UI/Other/PlayerProfileModal.hpp"
 
 #include "HMUI/ImageView.hpp"
 #include "HMUI/TableCell.hpp"
@@ -33,15 +34,17 @@ DECLARE_CLASS_CODEGEN(
     DECLARE_INSTANCE_FIELD(QuestUI::Backgroundable*, bg);
     DECLARE_INSTANCE_FIELD(UnityEngine::Coroutine*, profileRoutine);
     DECLARE_INSTANCE_FIELD(UnityEngine::Coroutine*, flagRoutine);
+    DECLARE_INSTANCE_FIELD(ScoreSaber::UI::PlayerProfileModal*, playerProfileModal);
 
     DECLARE_CTOR(ctor);
 
     public
     :
-
+    std::string playerId;
     static PlayerTableCell * CreateCell();
     void Refresh(ScoreSaber::Data::Player& player, ScoreSaberUI::CustomTypes::Components::CustomCellListTableData::LeaderboardType leaderboardType);
     void stopProfileRoutine();
     void stopFlagRoutine();
+    void OpenPlayerProfileModal();
 
 )

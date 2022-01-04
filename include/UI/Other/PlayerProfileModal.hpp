@@ -6,8 +6,14 @@
 #include "UnityEngine/MonoBehaviour.hpp"
 #include "UnityEngine/Transform.hpp"
 #include "UnityEngine/UI/HorizontalLayoutGroup.hpp"
+#include "custom-types/shared/coroutine.hpp"
 #include "custom-types/shared/macros.hpp"
 #include <string_view>
+
+#include "UnityEngine/Coroutine.hpp"
+
+#include "Data/Badge.hpp"
+#include "Data/Player.hpp"
 
 DECLARE_CLASS_CODEGEN(ScoreSaber::UI, PlayerProfileModal, UnityEngine::MonoBehaviour,
                       DECLARE_INSTANCE_FIELD(HMUI::ModalView*, modal);
@@ -18,21 +24,30 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::UI, PlayerProfileModal, UnityEngine::MonoBehav
                       DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, performancePoints);
                       DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, averageRankedAccuracy);
                       DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, totalScore);
+                      DECLARE_INSTANCE_FIELD(UnityEngine::Coroutine*, profileRoutine);
+                      DECLARE_INSTANCE_FIELD(List<UnityEngine::Coroutine*>*, badgeRoutines);
 
                       public
                       :
 
                       static ScoreSaber::UI::PlayerProfileModal * Create(UnityEngine::Transform * parent);
-                      void Show();
+                      void Show(std::string playerId);
+
+                      void Hide();
                       void Setup();
-                      void set_player(std::string_view playername);
-                      void set_header(std::string_view header);
+                      void set_player(std::u16string_view playername);
+                      void set_header(std::u16string_view header);
                       void set_globalRanking(int globalRanking);
                       void set_performancePoints(float performancePoints);
                       void set_averageRankedAccuracy(float averageRankedAccuracy);
                       void set_totalScore(long totalScore);
                       void set_pfp(UnityEngine::Sprite* pfp);
                       void ClearBadges();
-                      void AddBadge(UnityEngine::Sprite* badge);
+                      void AddBadge(ScoreSaber::Data::Badge& badge);
+
+                      custom_types::Helpers::Coroutine FetchPlayerData(std::string playerId);
+                      void SetPlayerData(ScoreSaber::Data::Player& player);
+                      void stopProfileRoutine();
+                      void stopBadgeRoutines();
 
 )

@@ -268,18 +268,9 @@ void GlobalViewController::DidActivate(bool firstActivation,
         leaderboardList = CreateCustomSourceList<ScoreSaberUI::CustomTypes::Components::CustomCellListTableData*>(playersHost->get_transform(), Vector2(sizeDelta.x, sizeDelta.y), nullptr);
         leaderboardList->globalViewController = this;
         leaderboardList->StartRefresh(true);
-        /*
-        GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine(
-            reinterpret_cast<System::Collections::IEnumerator*>(
-                custom_types::Helpers::CoroutineHelper::New(
-                    WaitForInit(leaderboardList, [&]()
-                                {
-                                    leaderboardList->tableView->ReloadData();
-                                    leaderboardList->get_transform()
-                                        ->get_parent()
-                                        ->SetAsFirstSibling();
-                                }))));
-                                */
+
+        playerProfileModal = ::ScoreSaber::UI::PlayerProfileModal::Create(get_transform());
+        leaderboardList->playerProfileModal = playerProfileModal;
     }
 }
 void GlobalViewController::set_loading(bool value)

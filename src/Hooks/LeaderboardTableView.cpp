@@ -1,10 +1,10 @@
+#include "ScoreSaberUI.hpp"
 #include "hooks.hpp"
 
 #include "GlobalNamespace/LeaderboardTableCell.hpp"
 #include "GlobalNamespace/LeaderboardTableView.hpp"
 #include "HMUI/TableCell.hpp"
 #include "HMUI/TableView.hpp"
-#include "ScoreSaberUI.hpp"
 #include "TMPro/TextMeshPro.hpp"
 #include "TMPro/TextMeshProUGUI.hpp"
 #include "UnityEngine/UI/CanvasUpdate.hpp"

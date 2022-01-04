@@ -1,4 +1,7 @@
+#include "Utils/StringUtils.hpp"
+
 #include "CustomTypes/CustomLeaderboardPlatformHandler.hpp"
+#include "Utils/BeatmapUtils.hpp"
 
 #include <chrono>
 #include <codecvt>
@@ -39,9 +42,6 @@
 #include "UnityEngine/Networking/DownloadHandler.hpp"
 #include "UnityEngine/Networking/UnityWebRequest.hpp"
 #include "UnityEngine/WaitForSeconds.hpp"
-
-#include "Utils/BeatmapUtils.hpp"
-#include "Utils/StringUtils.hpp"
 
 #include "beatsaber-hook/shared/config/config-utils.hpp"
 #include "beatsaber-hook/shared/rapidjson/include/rapidjson/error/en.h"
@@ -99,7 +99,7 @@ custom_types::Helpers::Coroutine GetScoresInternal(
         rapidjson::GenericDocument<rapidjson::UTF16<char16_t>> doc;
         std::u16string s = std::u16string(csstrtostr(webRequest->get_downloadHandler()->get_text()));
         //INFO("Received data: %s", s.c_str());
-        doc.Parse(s);
+        doc.Parse(s.c_str());
         if (doc.GetParseError() == 0)
         {
             auto errorItr = doc.FindMember(u"errorMessage");

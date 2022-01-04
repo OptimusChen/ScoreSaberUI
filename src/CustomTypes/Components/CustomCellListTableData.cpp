@@ -258,6 +258,7 @@ namespace ScoreSaberUI::CustomTypes::Components
         if (!playerCell)
         {
             playerCell = PlayerTableCell::CreateCell();
+            playerCell->playerProfileModal = playerProfileModal;
             //playerCell->get_transform()->SetParent(tableView->get_transform()->GetChild(0)->GetChild(0), false);
         }
 

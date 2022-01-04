@@ -1,11 +1,12 @@
 #pragma once
-
+#include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
+ 
 #include "HMUI/TableCell.hpp"
 #include "HMUI/TableView.hpp"
 #include "HMUI/TableView_IDataSource.hpp"
 #include "HMUI/ViewController.hpp"
+#include "UI/Other/PlayerProfileModal.hpp"
 #include "UnityEngine/MonoBehaviour.hpp"
-#include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
 #include "custom-types/shared/coroutine.hpp"
 #include "custom-types/shared/macros.hpp"
 #include "custom-types/shared/types.hpp"
@@ -14,7 +15,6 @@
 #include "questui/shared/CustomTypes/Components/List/CustomCellListWrapper.hpp"
 #include "questui/shared/CustomTypes/Components/List/QuestUITableView.hpp"
 #include "questui/shared/CustomTypes/Components/SegmentedControl/CustomTextSegmentedControlData.hpp"
-
 #define GET_FIND_METHOD(mPtr) \
     il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::get()
 
@@ -37,6 +37,7 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(
     DECLARE_INSTANCE_FIELD(int, page2);
     DECLARE_INSTANCE_FIELD(Il2CppString*, cellTemplate);
     DECLARE_INSTANCE_FIELD(HMUI::ViewController*, globalViewController);
+    DECLARE_INSTANCE_FIELD(ScoreSaber::UI::PlayerProfileModal*, playerProfileModal);
 
     DECLARE_CTOR(ctor);
     DECLARE_INSTANCE_METHOD(void, DownButtonWasPressed);

@@ -12,6 +12,7 @@
 #include "UnityEngine/SpriteMeshType.hpp"
 #include "UnityEngine/Texture2D.hpp"
 #include "Utils/StringUtils.hpp"
+#include "Utils/UIUtils.hpp"
 #include "Utils/WebUtils.hpp"
 #include "logging.hpp"
 #include "main.hpp"
@@ -37,7 +38,7 @@ using LeaderboardType = ScoreSaberUI::CustomTypes::Components::CustomCellListTab
         reinterpret_cast<System::Collections::IEnumerator*>(                 \
             custom_types::Helpers::CoroutineHelper::New(method)));
 
-custom_types::Helpers::Coroutine WaitForImageDownload(std::string url, HMUI::ImageView* out)
+static custom_types::Helpers::Coroutine WaitForImageDownload(std::string url, HMUI::ImageView* out)
 {
     UnityEngine::Networking::UnityWebRequest* www = UnityEngine::Networking::UnityWebRequestTexture::GetTexture(il2cpp_utils::newcsstr(url));
     co_yield reinterpret_cast<System::Collections::IEnumerator*>(www->SendWebRequest());
@@ -143,6 +144,8 @@ void PlayerTableCell::Refresh(ScoreSaber::Data::Player& player, LeaderboardType 
         result = string_format("%d", weeklyChange);
     }
     weekly->set_text(StrToIl2cppStr(result));
+
+    playerId = player.id;
 }
 
 PlayerTableCell* PlayerTableCell::CreateCell()
@@ -165,14 +168,14 @@ PlayerTableCell* PlayerTableCell::CreateCell()
 
     Transform* t = playerCell->get_transform();
 
-    playerCell->profile = BeatSaberUI::CreateImage(
+    playerCell->profile = UIUtils::CreateClickableImage(
         CreateHost(t, {-45.0f, 0.0f}, {10.0f, 10.0f})->get_transform(),
         Base64ToSprite(oculus_base64), {0.0f, 0.0f},
-        {10.0f, 10.0f});
+        {10.0f, 10.0f}, std::bind(&PlayerTableCell::OpenPlayerProfileModal, playerCell));
 
-    playerCell->name = BeatSaberUI::CreateText(
+    playerCell->name = UIUtils::CreateClickableText(
         CreateHost(t, {-11.0f, 2.8f}, {55.0f, 8.0f})->get_transform(),
-        "Username", false, {0.0f, 0.0f});
+        u"Username", {0.0f, 0.0f}, {0.0f, 0.0f}, std::bind(&PlayerTableCell::OpenPlayerProfileModal, playerCell));
     playerCell->name->set_overflowMode(TextOverflowModes::Ellipsis);
     playerCell->name->set_alignment(TextAlignmentOptions::Left);
     playerCell->name->set_fontSize(5.0f);
@@ -205,6 +208,7 @@ PlayerTableCell* PlayerTableCell::CreateCell()
         {0.0f, 0.0f});
     playerCell->weekly->set_alignment(TextAlignmentOptions::Right);
     playerCell->weekly->set_fontSize(5.0f);
+
     return playerCell;
 }
 
@@ -220,4 +224,12 @@ void PlayerTableCell::stopFlagRoutine()
     if (flagRoutine)
         GlobalNamespace::SharedCoroutineStarter::get_instance()->StopCoroutine(flagRoutine);
     flagRoutine = nullptr;
+}
+
+void PlayerTableCell::OpenPlayerProfileModal()
+{
+    if (playerProfileModal)
+    {
+        playerProfileModal->Show(playerId);
+    }
 }
