@@ -108,7 +108,7 @@ namespace ScoreSaber::UI::Other
 
     void ScoreInfoModal::set_combo(int combo)
     {
-        this->combo->set_text(il2cpp_utils::newcsstr(string_format("<color=#6F6F6F>Combo:</color> %d", combo))));
+        this->combo->set_text(il2cpp_utils::newcsstr(string_format("<color=#6F6F6F>Combo:</color> %d", combo)));
     }
 
     void ScoreInfoModal::set_fullCombo(bool value)
