@@ -18,6 +18,7 @@
 #include "questui/shared/QuestUI.hpp"
 
 #include "Data/PlayerCollection.hpp"
+#include "UI/ViewControllers/GlobalViewController.hpp"
 
 DEFINE_TYPE(ScoreSaberUI::CustomTypes::Components, CustomCellListTableData);
 
@@ -73,7 +74,8 @@ namespace ScoreSaberUI::CustomTypes::Components
 
     int CustomCellListTableData::NumberOfCells()
     {
-        int size = playerCollection.size();
+        // if we have less than 50 players in the playerCollection for SOME reason, this will make sure that if we reach the end of the list it won't overextend
+        int size = playerCollection.size() - (page2 * 5);
         return size < 5 ? size : 5;
     }
 
@@ -232,14 +234,17 @@ namespace ScoreSaberUI::CustomTypes::Components
         isLoading = true;
         if (redownload || !initialized)
         {
+            playerCollection.clear();
+            ReloadTableViewData(tableView);
+            reinterpret_cast<ScoreSaberUI::UI::ViewControllers::GlobalViewController*>(globalViewController)->set_loading(true);
             co_yield reinterpret_cast<System::Collections::IEnumerator*>(
                 custom_types::Helpers::CoroutineHelper::New(GetDocument(this)));
         }
         //co_yield reinterpret_cast<System::Collections::IEnumerator*>(
         //    CRASH_UNLESS(WaitForSeconds::New_ctor(2.0f)));
         ReloadTableViewData(tableView);
-        //tableView->RefreshCells(true, true);
         isLoading = false;
+        reinterpret_cast<ScoreSaberUI::UI::ViewControllers::GlobalViewController*>(globalViewController)->set_loading(false);
         co_return;
     }
 

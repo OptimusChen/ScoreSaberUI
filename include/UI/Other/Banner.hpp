@@ -37,7 +37,7 @@ DECLARE_CLASS_CODEGEN(
     void set_color(UnityEngine::Color color);
 
     void set_ranking(int rank, float pp);
-    void set_status(std::string_view status, std::string_view songId);
+    void set_status(std::string_view status, int scoreboardId);
 
     void set_loading(bool value);
     void Prompt(std::string status, bool loadingIndicator, float dismiss,
@@ -54,7 +54,7 @@ DECLARE_CLASS_CODEGEN(
     bool rainbow = false;
     bool wasRainbow = false;
     float colorAngle = 0.0f;
-    std::string scoreboardId;
+    int scoreboardId;
     static constexpr const UnityEngine::Color defaultColor = {0, 0.47, 0.72, 1.0};
     custom_types::Helpers::Coroutine SetPrompt(
         std::string status, bool loadingIndicator, float dismiss,

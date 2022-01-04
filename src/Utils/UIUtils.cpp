@@ -1,4 +1,5 @@
 #include "Utils/UIUtils.hpp"
+#include "main.hpp"
 
 #include "CustomTypes/Components/ImageButton.hpp"
 #include "HMUI/ButtonSpriteSwap.hpp"
@@ -11,7 +12,6 @@
 #include "UnityEngine/SpriteRenderer.hpp"
 #include "UnityEngine/UI/LayoutElement.hpp"
 #include "UnityEngine/Vector3.hpp"
-#include "main.hpp"
 #include "questui/shared/ArrayUtil.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 

@@ -20,6 +20,8 @@ namespace ScoreSaber::Data
         LeaderboardInfo(const rapidjson::GenericValue<rapidjson::UTF16<char16_t>>&& value);
         LeaderboardInfo(rapidjson::GenericObject<true, rapidjson::Value> value);
         LeaderboardInfo(rapidjson::GenericObject<true, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>> value);
+        LeaderboardInfo(rapidjson::GenericObject<false, rapidjson::Value> value);
+        LeaderboardInfo(rapidjson::GenericObject<false, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>> value);
 
         int id;
         std::u16string songHash;

@@ -17,6 +17,7 @@ namespace ScoreSaberUI
             std::string GetRoleColor(std::string role);
 
             std::string FormatScore(std::string percent);
+            std::u16string FormatScore(double s);
 
             std::string FormatPP(std::string pp,
                                  rapidjson::GenericObject<true, rapidjson::Value> score);

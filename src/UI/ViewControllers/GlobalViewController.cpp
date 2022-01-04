@@ -225,6 +225,20 @@ void GlobalViewController::DidActivate(bool firstActivation,
         VerticalLayoutGroup* playersHost = BeatSaberUI::CreateVerticalLayoutGroup(
             globalVerticalHost->get_transform());
 
+        auto loadingVertical = CreateVerticalLayoutGroup(get_transform());
+        SetPreferredSize(loadingVertical, 10, 10);
+        layoutloadingVertical->set_ignoreLayout(true);
+        loadingVertical->get_rectTransform()->set_anchoredPosition(playersHost->get_rectTransform()->get_anchoredPosition());
+        auto loadingHorizontal = CreateHorizontalLayoutGroup(loadingVertical->get_transform());
+        SetPreferredSize(loadingHorizontal, 10, 10);
+
+        loadingIndicator =
+            UIUtils::CreateLoadingIndicator(loadingHorizontal->get_transform());
+        auto loadingIndicatorLayout =
+            loadingIndicator->GetComponent<LayoutElement*>();
+        auto loadingIndicatorRectTransform =
+            reinterpret_cast<RectTransform*>(loadingIndicator->get_transform());
+
         playersHost->set_padding(RectOffset::New_ctor(2, 2, 2, 2));
 
         Backgroundable* playersHostBg =
@@ -252,6 +266,7 @@ void GlobalViewController::DidActivate(bool firstActivation,
         playersHost->set_childScaleHeight(false);
 
         leaderboardList = CreateCustomSourceList<ScoreSaberUI::CustomTypes::Components::CustomCellListTableData*>(playersHost->get_transform(), Vector2(sizeDelta.x, sizeDelta.y), nullptr);
+        leaderboardList->globalViewController = this;
         leaderboardList->StartRefresh(true);
         /*
         GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine(
@@ -266,6 +281,10 @@ void GlobalViewController::DidActivate(bool firstActivation,
                                 }))));
                                 */
     }
+}
+void GlobalViewController::set_loading(bool value)
+{
+    loadingIndicator->SetActive(value);
 }
 
 void GlobalViewController::UpButtonWasPressed()

@@ -52,6 +52,7 @@
 
 #include "logging.hpp"
 
+#include "Data/LeaderboardInfo.hpp"
 #include "Data/ScoreCollection.hpp"
 
 DEFINE_TYPE(ScoreSaberUI::CustomTypes, CustomLeaderboardPlatformHandler);
@@ -114,9 +115,7 @@ custom_types::Helpers::Coroutine GetScoresInternal(
                     const Data::Score& score = scoreCollection[i];
                     auto& leaderboardPlayerInfo = score.leaderboardPlayerInfo;
                     std::u16string coloredName = Colorize(leaderboardPlayerInfo.name, GetRoleColor(leaderboardPlayerInfo.role));
-                    double scorePercent = (double)score.modifiedScore / (double)maxScore;
-                    std::string scoreString = std::to_string(scorePercent);
-                    std::u16string formattedScore = to_utf16(FormatScore(scoreString));
+                    std::u16string formattedScore = FormatScore(((double)score.modifiedScore / (double)maxScore) * 100.0);
                     std::u16string formattedPP = FormatPP(score);
                     std::u16string result = Resize(coloredName + formattedScore + formattedPP, 80);
                     scores->Add(PlatformLeaderboardsModel::LeaderboardScore::New_ctor(score.modifiedScore, score.rank,
@@ -195,10 +194,8 @@ custom_types::Helpers::Coroutine GetLeaderboardInfoInternal(
         auto errorItr = doc.FindMember("errorMessage");
         if (errorItr == doc.MemberEnd())
         {
-            int leaderboardId = doc["id"].GetInt();
-            bool ranked = doc["ranked"].GetBool();
-            std::string rankedStatus = ranked ? "Ranked" : "Unranked";
-            self->scoreSaberBanner->set_status(string_format("%s (modifiers disabled)", rankedStatus.c_str()), std::to_string(leaderboardId));
+            const Data::LeaderboardInfo leaderboardInfo(doc.GetObject());
+            self->scoreSaberBanner->set_status(string_format("%s (modifiers disabled)", leaderboardInfo.ranked ? "Ranked" : "Unranked"), leaderboardInfo.id);
         }
         else
         {

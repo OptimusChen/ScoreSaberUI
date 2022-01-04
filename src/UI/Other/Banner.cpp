@@ -178,7 +178,7 @@ namespace ScoreSaber::UI
 
     void Banner::OpenSongInBrowser()
     {
-        auto songURL = string_format("https://scoresaber.com/leaderboard/%s", scoreboardId.c_str());
+        auto songURL = string_format("https://scoresaber.com/leaderboard/%d", scoreboardId);
         Application::OpenURL(il2cpp_utils::newcsstr(songURL));
     }
 
@@ -278,7 +278,7 @@ namespace ScoreSaber::UI
         set_loading(false);
     }
 
-    void Banner::set_status(std::string_view status, std::string_view scoreboardId)
+    void Banner::set_status(std::string_view status, int scoreboardId)
     {
         set_bottomText(string_format("<b><color=#FFDE1A>Ranked Status:</color></b> %s", status.data()));
         this->scoreboardId = scoreboardId;

@@ -283,6 +283,94 @@ namespace ScoreSaber::Data
         }
     }
 
+    LeaderboardInfo::LeaderboardInfo(rapidjson::GenericObject<false, rapidjson::Value> value) : difficulty(value["difficulty"].GetObject())
+    {
+        id = value["id"].GetInt();
+        songHash = to_utf16(value["songHash"].GetString());
+        songName = to_utf16(value["songName"].GetString());
+        songSubName = to_utf16(value["songSubName"].GetString());
+        songAuthorName = to_utf16(value["songAuthorName"].GetString());
+        maxScore = value["maxScore"].GetInt();
+        createdDate = value["createdDate"].GetString();
+        auto rankedDateItr = value.FindMember("rankedDate");
+        if (!rankedDateItr->value.IsNull())
+        {
+            rankedDate = std::make_optional(std::string(rankedDateItr->value.GetString()));
+        }
+        auto qualifiedDateItr = value.FindMember("qualifiedDate");
+        if (!qualifiedDateItr->value.IsNull())
+        {
+            qualifiedDate = std::make_optional(std::string(qualifiedDateItr->value.GetString()));
+        }
+        auto lovedDateItr = value.FindMember("lovedDate");
+        if (!lovedDateItr->value.IsNull())
+        {
+            lovedDate = std::make_optional(std::string(lovedDateItr->value.GetString()));
+        }
+        ranked = value["ranked"].GetBool();
+        qualified = value["qualified"].GetBool();
+        loved = value["loved"].GetBool();
+        maxPP = value["maxPP"].GetDouble();
+        stars = value["stars"].GetDouble();
+        positiveModifiers = value["positiveModifiers"].GetBool();
+        plays = value["plays"].GetInt();
+        dailyPlays = value["dailyPlays"].GetInt();
+        coverImage = value["coverImage"].GetString();
+        auto playerScoreItr = value.FindMember("playerScore");
+        if (!playerScoreItr->value.IsNull())
+        {
+            playerScore = std::make_optional(Score(playerScoreItr->value.GetObject()));
+        }
+        for (auto& diff : value["difficulties"].GetArray())
+        {
+            difficulties.emplace_back(diff.GetObject());
+        }
+    }
+
+    LeaderboardInfo::LeaderboardInfo(rapidjson::GenericObject<false, rapidjson::GenericValue<rapidjson::UTF16<char16_t>>> value) : difficulty(value[u"difficulty"].GetObject())
+    {
+        id = value[u"id"].GetInt();
+        songHash = std::u16string(value[u"songHash"].GetString());
+        songName = std::u16string(value[u"songName"].GetString());
+        songSubName = std::u16string(value[u"songSubName"].GetString());
+        songAuthorName = std::u16string(value[u"songAuthorName"].GetString());
+        maxScore = value[u"maxScore"].GetInt();
+        createdDate = to_utf8(value[u"createdDate"].GetString());
+        auto rankedDateItr = value.FindMember(u"rankedDate");
+        if (!rankedDateItr->value.IsNull())
+        {
+            rankedDate = std::make_optional(to_utf8(rankedDateItr->value.GetString()));
+        }
+        auto qualifiedDateItr = value.FindMember(u"qualifiedDate");
+        if (!qualifiedDateItr->value.IsNull())
+        {
+            qualifiedDate = std::make_optional(to_utf8(qualifiedDateItr->value.GetString()));
+        }
+        auto lovedDateItr = value.FindMember(u"lovedDate");
+        if (!lovedDateItr->value.IsNull())
+        {
+            lovedDate = std::make_optional(to_utf8(lovedDateItr->value.GetString()));
+        }
+        ranked = value[u"ranked"].GetBool();
+        qualified = value[u"qualified"].GetBool();
+        loved = value[u"loved"].GetBool();
+        maxPP = value[u"maxPP"].GetDouble();
+        stars = value[u"stars"].GetDouble();
+        positiveModifiers = value[u"positiveModifiers"].GetBool();
+        plays = value[u"plays"].GetInt();
+        dailyPlays = value[u"dailyPlays"].GetInt();
+        coverImage = to_utf8(value[u"coverImage"].GetString());
+        auto playerScoreItr = value.FindMember(u"playerScore");
+        if (!playerScoreItr->value.IsNull())
+        {
+            playerScore = std::make_optional(Score(playerScoreItr->value.GetObject()));
+        }
+        for (auto& diff : value[u"difficulties"].GetArray())
+        {
+            difficulties.emplace_back(diff.GetObject());
+        }
+    }
+
     LeaderboardInfo::LeaderboardInfo(Il2CppString* string) : LeaderboardInfo(getdoc(csstrtostr(string))){};
 
     LeaderboardInfo::LeaderboardInfo(std::string_view string) : LeaderboardInfo(getdoc(string)){};

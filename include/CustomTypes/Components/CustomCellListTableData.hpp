@@ -3,6 +3,7 @@
 #include "HMUI/TableCell.hpp"
 #include "HMUI/TableView.hpp"
 #include "HMUI/TableView_IDataSource.hpp"
+#include "HMUI/ViewController.hpp"
 #include "UnityEngine/MonoBehaviour.hpp"
 #include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
 #include "custom-types/shared/coroutine.hpp"
@@ -26,14 +27,16 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(
     ScoreSaberUI::CustomTypes::Components, CustomCellListTableData,
     Il2CppTypeEnum::IL2CPP_TYPE_CLASS, UnityEngine::MonoBehaviour, "QuestUI",
     GetInterfaces(), 0, nullptr,
-    DECLARE_INSTANCE_FIELD(Il2CppString*, cellTemplate);
     DECLARE_INSTANCE_FIELD(Il2CppString*, reuseIdentifier);
     DECLARE_INSTANCE_FIELD(float, cellSize);
     DECLARE_INSTANCE_FIELD(HMUI::TableView*, tableView);
     DECLARE_INSTANCE_FIELD(bool, clickableCells);
     DECLARE_INSTANCE_FIELD(bool, initialized);
     DECLARE_INSTANCE_FIELD(bool, isLoading);
-    DECLARE_INSTANCE_FIELD(int, page); DECLARE_INSTANCE_FIELD(int, page2);
+    DECLARE_INSTANCE_FIELD(int, page);
+    DECLARE_INSTANCE_FIELD(int, page2);
+    DECLARE_INSTANCE_FIELD(Il2CppString*, cellTemplate);
+    DECLARE_INSTANCE_FIELD(HMUI::ViewController*, globalViewController);
 
     DECLARE_CTOR(ctor);
     DECLARE_INSTANCE_METHOD(void, DownButtonWasPressed);

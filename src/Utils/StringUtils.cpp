@@ -38,6 +38,11 @@ namespace ScoreSaberUI::Utils
             return "#FFFFFF";
         }
 
+        std::u16string FormatScore(double s)
+        {
+            return to_utf16(string_format(" - (<color=#ffd42a>%.2f%%</color>)", s));
+        }
+
         std::string FormatScore(std::string s)
         {
             for (int i = 0; i < 2; i++)

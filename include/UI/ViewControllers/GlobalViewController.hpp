@@ -15,6 +15,8 @@ DECLARE_CLASS_CODEGEN(
                             bool screenSystemEnabling);
     DECLARE_INSTANCE_FIELD(ScoreSaberUI::CustomTypes::Components::CustomCellListTableData*, leaderboardList);
     DECLARE_INSTANCE_FIELD(HMUI::ModalView*, moreInfoModal);
+    DECLARE_INSTANCE_FIELD(UnityEngine::GameObject*, loadingIndicator);
+    void set_loading(bool value);
     private
     :
 
