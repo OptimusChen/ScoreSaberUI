@@ -1,5 +1,5 @@
-#include "CustomTypes/Components/CustomCellListTableData.hpp"
-#include "CustomTypes/Components/PlayerTableCell.hpp"
+#include "CustomTypes/Components/GlobalLeaderboardTableData.hpp"
+#include "CustomTypes/Components/GlobalLeaderboardTableCell.hpp"
 #include "GlobalNamespace/SharedCoroutineStarter.hpp"
 #include "HMUI/ScrollView.hpp"
 #include "HMUI/Touchable.hpp"
@@ -20,7 +20,7 @@
 #include "Data/PlayerCollection.hpp"
 #include "UI/ViewControllers/GlobalViewController.hpp"
 
-DEFINE_TYPE(ScoreSaber::CustomTypes::Components, CustomCellListTableData);
+DEFINE_TYPE(ScoreSaber::CustomTypes::Components, GlobalLeaderboardTableData);
 
 using namespace ScoreSaber::CustomTypes::Components;
 using namespace UnityEngine::UI;
@@ -36,7 +36,7 @@ using namespace ScoreSaber;
 Data::PlayerCollection playerCollection;
 
 custom_types::Helpers::Coroutine GetDocument(
-     ScoreSaber::CustomTypes::Components::CustomCellListTableData* self)
+    ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData* self)
 {
     std::string url = self->get_leaderboardURL();
     INFO("Getting player data from url %s", url.c_str());
@@ -57,7 +57,7 @@ custom_types::Helpers::Coroutine GetDocument(
 
 namespace ScoreSaber::CustomTypes::Components
 {
-    void CustomCellListTableData::ctor()
+    void GlobalLeaderboardTableData::ctor()
     {
         page = 1;
         page2 = 0;
@@ -66,19 +66,19 @@ namespace ScoreSaber::CustomTypes::Components
         leaderboardType = Global;
     }
 
-    float CustomCellListTableData::CellSize()
+    float GlobalLeaderboardTableData::CellSize()
     {
         return 12.0f;
     }
 
-    int CustomCellListTableData::NumberOfCells()
+    int GlobalLeaderboardTableData::NumberOfCells()
     {
         // if we have less than 50 players in the playerCollection for SOME reason, this will make sure that if we reach the end of the list it won't overextend
         int size = playerCollection.size() - (page2 * 5);
         return size < 5 ? size : 5;
     }
 
-    void CustomCellListTableData::set_leaderboardType(LeaderboardType type)
+    void GlobalLeaderboardTableData::set_leaderboardType(LeaderboardType type)
     {
         // if the new type is the same as the old type
         bool sameType = leaderboardType == type;
@@ -91,7 +91,7 @@ namespace ScoreSaber::CustomTypes::Components
         StartRefresh(!wasPage1 || !sameType);
     }
 
-    std::string CustomCellListTableData::get_leaderboardURL()
+    std::string GlobalLeaderboardTableData::get_leaderboardURL()
     {
         switch (leaderboardType)
         {
@@ -116,7 +116,7 @@ namespace ScoreSaber::CustomTypes::Components
         }
     }
 
-    void CustomCellListTableData::
+    void GlobalLeaderboardTableData::
         DownButtonWasPressed()
     {
         if (isLoading)
@@ -137,7 +137,7 @@ namespace ScoreSaber::CustomTypes::Components
         INFO("After page: %d, subpage: %d", page, page2);
     }
 
-    void CustomCellListTableData::
+    void GlobalLeaderboardTableData::
         UpButtonWasPressed()
     {
         if (isLoading)
@@ -176,7 +176,7 @@ namespace ScoreSaber::CustomTypes::Components
         INFO("After page: %d, subpage: %d", page, page2);
     }
 
-    void CustomCellListTableData::StartRefresh(bool redownload)
+    void GlobalLeaderboardTableData::StartRefresh(bool redownload)
     {
         if (isLoading)
             return;
@@ -228,7 +228,7 @@ namespace ScoreSaber::CustomTypes::Components
     }
 
     custom_types::Helpers::Coroutine
-    CustomCellListTableData::Refresh(bool redownload)
+    GlobalLeaderboardTableData::Refresh(bool redownload)
     {
         isLoading = true;
         if (redownload || !initialized)
@@ -248,15 +248,15 @@ namespace ScoreSaber::CustomTypes::Components
     }
 
     HMUI::TableCell*
-    CustomCellListTableData::CellForIdx(
+    GlobalLeaderboardTableData::CellForIdx(
         HMUI::TableView* tableView, int idx)
     {
-        PlayerTableCell* playerCell = reinterpret_cast<PlayerTableCell*>(
+        GlobalLeaderboardTableCell* playerCell = reinterpret_cast<GlobalLeaderboardTableCell*>(
             tableView->DequeueReusableCellForIdentifier(reuseIdentifier));
 
         if (!playerCell)
         {
-            playerCell = PlayerTableCell::CreateCell();
+            playerCell = GlobalLeaderboardTableCell::CreateCell();
             playerCell->playerProfileModal = playerProfileModal;
             //playerCell->get_transform()->SetParent(tableView->get_transform()->GetChild(0)->GetChild(0), false);
         }

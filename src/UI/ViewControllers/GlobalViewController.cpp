@@ -1,7 +1,7 @@
 #include "UI/ViewControllers/GlobalViewController.hpp"
 
-#include "CustomTypes/Components/CustomCellListTableData.hpp"
-#include "CustomTypes/Components/PlayerTableCell.hpp"
+#include "CustomTypes/Components/GlobalLeaderboardTableCell.hpp"
+#include "CustomTypes/Components/GlobalLeaderboardTableData.hpp"
 #include "GlobalNamespace/SharedCoroutineStarter.hpp"
 #include "HMUI/TableView_ScrollPositionType.hpp"
 
@@ -14,8 +14,6 @@
 #include "Utils/UIUtils.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
-#include "questui/shared/CustomTypes/Components/List/CustomCellListTableData.hpp"
-#include "questui/shared/CustomTypes/Components/List/CustomCellListWrapper.hpp"
 #include "questui/shared/QuestUI.hpp"
 
 DEFINE_TYPE(ScoreSaber::UI::ViewControllers, GlobalViewController);
@@ -28,7 +26,7 @@ using namespace QuestUI;
 using namespace QuestUI::BeatSaberUI;
 
 custom_types::Helpers::Coroutine WaitForInit(
-    SafePtr<ScoreSaber::CustomTypes::Components::CustomCellListTableData>
+    SafePtr<ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData>
         leaderboard,
     std::function<void()> callback)
 {
@@ -202,17 +200,17 @@ namespace ScoreSaber::UI::ViewControllers
                                                 { return to_utf8(csstrtostr(x->get_name())) == "FriendsIcon"; });
             UIUtils::CreateImageButton(imagesGroup->get_gameObject(),
                                        globalIcon, {0.0f, 0.0f},
-                                       {4.0f, 4.0f}, std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::CustomCellListTableData::LeaderboardType::Global));
+                                       {4.0f, 4.0f}, std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType::Global));
             UIUtils::CreateImageButton(imagesGroup->get_gameObject(),
                                        playerIcon, {0.0f, 0.0f},
-                                       {4.0f, 4.0f}, std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::CustomCellListTableData::LeaderboardType::AroundYou));
+                                       {4.0f, 4.0f}, std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType::AroundYou));
             UIUtils::CreateImageButton(imagesGroup->get_gameObject(),
                                        friendsIcon, {0.0f, 0.0f},
-                                       {4.0f, 4.0f}, std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::CustomCellListTableData::LeaderboardType::Friends));
+                                       {4.0f, 4.0f}, std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType::Friends));
             UIUtils::CreateImageButton(
                 imagesGroup->get_gameObject(),
                 Base64ToSprite(country_base64), {0.0f, 0.0f},
-                {4.0f, 4.0f}, std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::CustomCellListTableData::LeaderboardType::Country));
+                {4.0f, 4.0f}, std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType::Country));
 
             ImageButton* downrrow = UIUtils::CreateImageButton(
                 scoreScopesHost->get_gameObject(),
@@ -253,7 +251,7 @@ namespace ScoreSaber::UI::ViewControllers
 
             /*
         leaderboardList = BeatSaberUI::CreateCustomSourceList<
-            ScoreSaber::CustomTypes::Components::CustomCellListTableData*>(
+            ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData*>(
             playersHost->get_transform(), nullptr);
         */
 
@@ -265,7 +263,7 @@ namespace ScoreSaber::UI::ViewControllers
             playersHost->set_childControlHeight(false);
             playersHost->set_childScaleHeight(false);
 
-            leaderboardList = CreateCustomSourceList<ScoreSaber::CustomTypes::Components::CustomCellListTableData*>(playersHost->get_transform(), Vector2(sizeDelta.x, sizeDelta.y), nullptr);
+            leaderboardList = CreateCustomSourceList<ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData*>(playersHost->get_transform(), Vector2(sizeDelta.x, sizeDelta.y), nullptr);
             leaderboardList->globalViewController = this;
             leaderboardList->StartRefresh(true);
 
@@ -334,7 +332,7 @@ namespace ScoreSaber::UI::ViewControllers
         moreInfoModal->Show(true, true, nullptr);
     }
 
-    void GlobalViewController::FilterWasClicked(ScoreSaber::CustomTypes::Components::CustomCellListTableData::LeaderboardType type)
+    void GlobalViewController::FilterWasClicked(ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType type)
     {
         leaderboardList->set_leaderboardType(type);
     }

@@ -9,12 +9,8 @@
 #include "UnityEngine/MonoBehaviour.hpp"
 #include "custom-types/shared/coroutine.hpp"
 #include "custom-types/shared/macros.hpp"
-#include "custom-types/shared/types.hpp"
-#include "custom-types/shared/util.hpp"
 #include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
-#include "questui/shared/CustomTypes/Components/List/CustomCellListWrapper.hpp"
-#include "questui/shared/CustomTypes/Components/List/QuestUITableView.hpp"
-#include "questui/shared/CustomTypes/Components/SegmentedControl/CustomTextSegmentedControlData.hpp"
+
 #define GET_FIND_METHOD(mPtr) \
     il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::get()
 
@@ -24,7 +20,7 @@ static std::vector<Il2CppClass*> GetInterfaces()
 }
 
 ___DECLARE_TYPE_WRAPPER_INHERITANCE(
-    ScoreSaber::CustomTypes::Components, CustomCellListTableData,
+    ScoreSaber::CustomTypes::Components, GlobalLeaderboardTableData,
     Il2CppTypeEnum::IL2CPP_TYPE_CLASS, UnityEngine::MonoBehaviour, "QuestUI",
     GetInterfaces(), 0, nullptr,
     DECLARE_INSTANCE_FIELD(Il2CppString*, reuseIdentifier);

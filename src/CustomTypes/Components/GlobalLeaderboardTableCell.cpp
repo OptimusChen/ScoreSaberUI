@@ -1,4 +1,4 @@
-#include "CustomTypes/Components/PlayerTableCell.hpp"
+#include "CustomTypes/Components/GlobalLeaderboardTableCell.hpp"
 
 #include "CustomTypes/Components/ImageButton.hpp"
 #include "GlobalNamespace/SharedCoroutineStarter.hpp"
@@ -20,7 +20,7 @@
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
 #include "questui/shared/QuestUI.hpp"
 
-DEFINE_TYPE(ScoreSaber::CustomTypes::Components, PlayerTableCell);
+DEFINE_TYPE(ScoreSaber::CustomTypes::Components, GlobalLeaderboardTableCell);
 
 using namespace ScoreSaber::CustomTypes::Components;
 using namespace StringUtils;
@@ -31,7 +31,7 @@ using namespace QuestUI;
 using namespace QuestUI::BeatSaberUI;
 using namespace TMPro;
 
-using LeaderboardType = ScoreSaber::CustomTypes::Components::CustomCellListTableData::LeaderboardType;
+using LeaderboardType = ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType;
 
 #define BeginCoroutine(method)                                               \
     GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine( \
@@ -49,7 +49,7 @@ static custom_types::Helpers::Coroutine WaitForImageDownload(std::string url, HM
     co_return;
 }
 
-void PlayerTableCell::ctor() {}
+void GlobalLeaderboardTableCell::ctor() {}
 
 VerticalLayoutGroup* CreateHost(Transform* parent, Vector2 anchoredPos,
                                 Vector2 size)
@@ -76,7 +76,7 @@ std::string flag_url(std::string_view COUNTRY)
     return url;
 }
 
-void PlayerTableCell::Refresh(ScoreSaber::Data::Player& player, LeaderboardType leaderboardType)
+void GlobalLeaderboardTableCell::Refresh(ScoreSaber::Data::Player& player, LeaderboardType leaderboardType)
 {
     stopProfileRoutine();
     stopFlagRoutine();
@@ -148,11 +148,11 @@ void PlayerTableCell::Refresh(ScoreSaber::Data::Player& player, LeaderboardType 
     playerId = player.id;
 }
 
-PlayerTableCell* PlayerTableCell::CreateCell()
+GlobalLeaderboardTableCell* GlobalLeaderboardTableCell::CreateCell()
 {
     static auto playerTableCellStr = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("CustomPlayerTableCell");
     auto cellGO = UnityEngine::GameObject::New_ctor();
-    auto playerCell = cellGO->AddComponent<PlayerTableCell*>();
+    auto playerCell = cellGO->AddComponent<GlobalLeaderboardTableCell*>();
     cellGO->set_name(playerTableCellStr);
 
     cellGO->AddComponent<HMUI::Touchable*>();
@@ -171,11 +171,11 @@ PlayerTableCell* PlayerTableCell::CreateCell()
     playerCell->profile = UIUtils::CreateClickableImage(
         CreateHost(t, {-45.0f, 0.0f}, {10.0f, 10.0f})->get_transform(),
         Base64ToSprite(oculus_base64), {0.0f, 0.0f},
-        {10.0f, 10.0f}, std::bind(&PlayerTableCell::OpenPlayerProfileModal, playerCell));
+        {10.0f, 10.0f}, std::bind(&GlobalLeaderboardTableCell::OpenPlayerProfileModal, playerCell));
 
     playerCell->name = UIUtils::CreateClickableText(
         CreateHost(t, {-11.0f, 2.8f}, {55.0f, 8.0f})->get_transform(),
-        u"Username", {0.0f, 0.0f}, {0.0f, 0.0f}, std::bind(&PlayerTableCell::OpenPlayerProfileModal, playerCell));
+        u"Username", {0.0f, 0.0f}, {0.0f, 0.0f}, std::bind(&GlobalLeaderboardTableCell::OpenPlayerProfileModal, playerCell));
     playerCell->name->set_overflowMode(TextOverflowModes::Ellipsis);
     playerCell->name->set_alignment(TextAlignmentOptions::Left);
     playerCell->name->set_fontSize(5.0f);
@@ -212,21 +212,21 @@ PlayerTableCell* PlayerTableCell::CreateCell()
     return playerCell;
 }
 
-void PlayerTableCell::stopProfileRoutine()
+void GlobalLeaderboardTableCell::stopProfileRoutine()
 {
     if (profileRoutine)
         GlobalNamespace::SharedCoroutineStarter::get_instance()->StopCoroutine(profileRoutine);
     profileRoutine = nullptr;
 }
 
-void PlayerTableCell::stopFlagRoutine()
+void GlobalLeaderboardTableCell::stopFlagRoutine()
 {
     if (flagRoutine)
         GlobalNamespace::SharedCoroutineStarter::get_instance()->StopCoroutine(flagRoutine);
     flagRoutine = nullptr;
 }
 
-void PlayerTableCell::OpenPlayerProfileModal()
+void GlobalLeaderboardTableCell::OpenPlayerProfileModal()
 {
     if (playerProfileModal)
     {

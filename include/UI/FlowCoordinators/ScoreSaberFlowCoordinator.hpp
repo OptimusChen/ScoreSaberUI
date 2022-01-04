@@ -5,6 +5,7 @@
 #include "UI/ViewControllers/FAQViewController.hpp"
 #include "UI/ViewControllers/GlobalViewController.hpp"
 #include "UI/ViewControllers/TeamViewController.hpp"
+#include "UnityEngine/GameObject.hpp"
 #include "custom-types/shared/macros.hpp"
 
 DECLARE_CLASS_CODEGEN(ScoreSaber::UI::FlowCoordinators, ScoreSaberFlowCoordinator, HMUI::FlowCoordinator,

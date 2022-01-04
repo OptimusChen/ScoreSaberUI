@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CustomTypes/Components/CustomCellListTableData.hpp"
+#include "CustomTypes/Components/GlobalLeaderboardTableData.hpp"
 #include "CustomTypes/Components/ImageButton.hpp"
 #include "Data/Player.hpp"
 #include "UI/Other/PlayerProfileModal.hpp"
@@ -15,15 +15,12 @@
 #include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
 #include "custom-types/shared/macros.hpp"
 #include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
-#include "questui/shared/CustomTypes/Components/List/CustomCellListWrapper.hpp"
-#include "questui/shared/CustomTypes/Components/List/QuestUITableView.hpp"
-#include "questui/shared/CustomTypes/Components/SegmentedControl/CustomTextSegmentedControlData.hpp"
 
 #define GET_FIND_METHOD(mPtr) \
     il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::get()
 
 DECLARE_CLASS_CODEGEN(
-    ScoreSaber::CustomTypes::Components, PlayerTableCell, HMUI::TableCell,
+    ScoreSaber::CustomTypes::Components, GlobalLeaderboardTableCell, HMUI::TableCell,
     DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, rank);
     DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, pp);
     DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, country);
@@ -40,8 +37,8 @@ DECLARE_CLASS_CODEGEN(
 
     public
     : std::string playerId;
-    static PlayerTableCell * CreateCell();
-    void Refresh(ScoreSaber::Data::Player& player, ScoreSaber::CustomTypes::Components::CustomCellListTableData::LeaderboardType leaderboardType);
+    static GlobalLeaderboardTableCell * CreateCell();
+    void Refresh(ScoreSaber::Data::Player& player, ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType leaderboardType);
     void stopProfileRoutine();
     void stopFlagRoutine();
     void OpenPlayerProfileModal();
