@@ -20,24 +20,15 @@ static std::vector<Il2CppClass*> GetInterfaces()
 }
 
 ___DECLARE_TYPE_WRAPPER_INHERITANCE(
-    ScoreSaber::CustomTypes::Components, GlobalLeaderboardTableData,
+    ScoreSaber::CustomTypes::Components, LeaderboardScoreInfoTableData,
     Il2CppTypeEnum::IL2CPP_TYPE_CLASS, UnityEngine::MonoBehaviour, "ScoreSaber",
     GetInterfaces(), 0, nullptr,
     DECLARE_INSTANCE_FIELD(Il2CppString*, reuseIdentifier);
     DECLARE_INSTANCE_FIELD(float, cellSize);
     DECLARE_INSTANCE_FIELD(HMUI::TableView*, tableView);
     DECLARE_INSTANCE_FIELD(bool, clickableCells);
-    DECLARE_INSTANCE_FIELD(bool, initialized);
-    DECLARE_INSTANCE_FIELD(bool, isLoading);
-    DECLARE_INSTANCE_FIELD(int, page);
-    DECLARE_INSTANCE_FIELD(int, page2);
-    DECLARE_INSTANCE_FIELD(Il2CppString*, cellTemplate);
-    DECLARE_INSTANCE_FIELD(HMUI::ViewController*, globalViewController);
-    DECLARE_INSTANCE_FIELD(ScoreSaber::UI::Other::PlayerProfileModal*, playerProfileModal);
 
     DECLARE_CTOR(ctor);
-    DECLARE_INSTANCE_METHOD(void, DownButtonWasPressed);
-    DECLARE_INSTANCE_METHOD(void, UpButtonWasPressed);
 
     DECLARE_OVERRIDE_METHOD(
         HMUI::TableCell*, CellForIdx,
@@ -53,18 +44,4 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(
         il2cpp_utils::il2cpp_type_check::MetadataGetter<
             &HMUI::TableView::IDataSource::NumberOfCells>::get());
 
-    public
-    :
-
-    enum LeaderboardType{
-        Global,
-        AroundYou,
-        Friends,
-        Country};
-
-    std::string myCountry;
-    LeaderboardType leaderboardType = Global;
-    void set_leaderboardType(LeaderboardType type);
-    std::string get_leaderboardURL();
-    void StartRefresh(bool redownload = false);
-    custom_types::Helpers::Coroutine Refresh(bool redownload = false);)
+)
