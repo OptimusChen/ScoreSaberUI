@@ -53,6 +53,6 @@ extern "C" void load()
     QuestUI::Init();
     custom_types::Register::AutoRegister();
 
-    Hooks::InstallHooks(ScoreSaberUI::Logging::getLogger());
-    ScoreSaberUI::Utils::TeamUtils::Download();
+    Hooks::InstallHooks(ScoreSaber::Logging::getLogger());
+    TeamUtils::Download();
 }

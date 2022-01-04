@@ -13,33 +13,33 @@
 
 #include "Sprites.hpp"
 
-DEFINE_TYPE(ScoreSaberUI::UI::ViewControllers, FAQViewController);
+DEFINE_TYPE(ScoreSaber::UI::ViewControllers, FAQViewController);
 
-using namespace ScoreSaberUI;
-using namespace ScoreSaberUI::UI::ViewControllers;
-using namespace ScoreSaberUI::Utils;
+using namespace ScoreSaber;
+using namespace ScoreSaber::UI::ViewControllers;
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 using namespace QuestUI;
 using namespace QuestUI::BeatSaberUI;
 using namespace TMPro;
 
+// clickable text
 #define SCORESABER_LINK "https://scoresaber.com/"
+// button
 #define SCORESABER_DISCORD "https://discord.gg/scoresaber"
+// button
 #define SCORESABER_TWITTER "https://twitter.com/scoresaber"
+// button
 #define SCORESABER_PATREON "https://www.patreon.com/scoresaber"
 
+// clickable text
 #define BSMG_LINK "https://bsmg.wiki/"
+// button
 #define BSMG_DISCORD "https://discord.gg/beatsabermods"
+// button
 #define BSMG_TWITTER "https://twitter.com/beatsabermods"
+// button
 #define BSMG_PATREON "https://www.patreon.com/beatsabermods"
-
-#define SetPreferredSize(identifier, width, height)                                         \
-    auto layout##identifier = identifier->get_gameObject()->GetComponent<LayoutElement*>(); \
-    if (!layout##identifier)                                                                \
-        layout##identifier = identifier->get_gameObject()->AddComponent<LayoutElement*>();  \
-    layout##identifier->set_preferredWidth(width);                                          \
-    layout##identifier->set_preferredHeight(height)
 
 struct LinkBoxData
 {
@@ -84,7 +84,7 @@ void CreateLinkBoxes(Transform* parent, LinkBoxData data)
     layoutElement->set_preferredWidth(40.0f);
     layoutElement->set_preferredHeight(60.0f);
 
-    ScoreSaber::ClickableText* text =
+    ScoreSaber::CustomTypes::Components::ClickableText* text =
         UIUtils::CreateClickableText(layoutGroup->get_transform(), to_utf16(data.mainText), [url = data.mainURL]()
                                      { Application::OpenURL(il2cpp_utils::newcsstr(url)); });
     text->set_fontSize(6.5f);
@@ -117,28 +117,30 @@ void CreateLinkBoxes(Transform* parent, LinkBoxData data)
     image->set_preserveAspect(true);
 }
 
-void FAQViewController::DidActivate(bool firstActivation, bool addedToHierarchy,
-                                    bool screenSystemEnabling)
+namespace ScoreSaber::UI::ViewControllers
 {
-    if (firstActivation)
+    void FAQViewController::DidActivate(bool firstActivation, bool addedToHierarchy,
+                                        bool screenSystemEnabling)
     {
-        VerticalLayoutGroup* vertical =
-            BeatSaberUI::CreateVerticalLayoutGroup(get_transform());
-        ContentSizeFitter* sizeFitter =
-            vertical->GetComponent<ContentSizeFitter*>();
-        sizeFitter->set_horizontalFit(ContentSizeFitter::FitMode::PreferredSize);
-        sizeFitter->set_verticalFit(ContentSizeFitter::FitMode::PreferredSize);
-        vertical->set_spacing(2.0f);
+        if (firstActivation)
+        {
+            VerticalLayoutGroup* vertical =
+                BeatSaberUI::CreateVerticalLayoutGroup(get_transform());
+            ContentSizeFitter* sizeFitter =
+                vertical->GetComponent<ContentSizeFitter*>();
+            sizeFitter->set_horizontalFit(ContentSizeFitter::FitMode::PreferredSize);
+            sizeFitter->set_verticalFit(ContentSizeFitter::FitMode::PreferredSize);
+            vertical->set_spacing(2.0f);
 
-        auto headerHorizontal = CreateHorizontalLayoutGroup(vertical->get_transform());
-        headerHorizontal->set_childAlignment(TextAnchor::MiddleCenter);
-        auto headerText = CreateText(headerHorizontal->get_transform(), "Links");
-        headerText->set_alignment(TMPro::TextAlignmentOptions::Center);
-        headerText->set_fontSize(7.0f);
-        auto headerBG = headerHorizontal->get_gameObject()->AddComponent<Backgroundable*>();
-        headerBG->ApplyBackgroundWithAlpha(il2cpp_utils::newcsstr("round-rect-panel"), 0.5f);
+            auto headerHorizontal = CreateHorizontalLayoutGroup(vertical->get_transform());
+            headerHorizontal->set_childAlignment(TextAnchor::MiddleCenter);
+            auto headerText = CreateText(headerHorizontal->get_transform(), "Links");
+            headerText->set_alignment(TMPro::TextAlignmentOptions::Center);
+            headerText->set_fontSize(7.0f);
+            auto headerBG = headerHorizontal->get_gameObject()->AddComponent<Backgroundable*>();
+            headerBG->ApplyBackgroundWithAlpha(il2cpp_utils::newcsstr("round-rect-panel"), 0.5f);
 
-        /*
+            /*
         UnityEngine::UI::HorizontalLayoutGroup* header =
             UIUtils::CreateHeader(vertical->get_transform(),
                                   Color(0.1f, 0.1f, 0.1f, 0.7f));
@@ -154,38 +156,39 @@ void FAQViewController::DidActivate(bool firstActivation, bool addedToHierarchy,
         layoutelem->set_preferredWidth(90.0f);
         */
 
-        HorizontalLayoutGroup* horizontal =
-            BeatSaberUI::CreateHorizontalLayoutGroup(vertical->get_transform());
+            HorizontalLayoutGroup* horizontal =
+                BeatSaberUI::CreateHorizontalLayoutGroup(vertical->get_transform());
 
-        ContentSizeFitter* horizFitter =
-            horizontal->GetComponent<ContentSizeFitter*>();
-        horizFitter->set_verticalFit(ContentSizeFitter::FitMode::PreferredSize);
-        horizFitter->set_horizontalFit(ContentSizeFitter::FitMode::PreferredSize);
+            ContentSizeFitter* horizFitter =
+                horizontal->GetComponent<ContentSizeFitter*>();
+            horizFitter->set_verticalFit(ContentSizeFitter::FitMode::PreferredSize);
+            horizFitter->set_horizontalFit(ContentSizeFitter::FitMode::PreferredSize);
 
-        LayoutElement* horizontalElement =
-            horizontal->GetComponent<LayoutElement*>();
-        horizontalElement->set_preferredWidth(90.0f);
+            LayoutElement* horizontalElement =
+                horizontal->GetComponent<LayoutElement*>();
+            horizontalElement->set_preferredWidth(90.0f);
 
-        LinkBoxData scoreSaber = {
-            "ScoreSaber",
-            SCORESABER_LINK,
-            SCORESABER_DISCORD,
-            SCORESABER_TWITTER,
-            SCORESABER_PATREON,
-            Base64ToSprite(ScoreSaber_Active),
-            Color(0.0f, 0.2f, 0.25f, 1.0f),
-            Color(0.0f, 0.35f, 0.4f, 1.0f)};
-        LinkBoxData bsmg = {
-            "BSMG",
-            BSMG_LINK,
-            BSMG_DISCORD,
-            BSMG_TWITTER,
-            BSMG_PATREON,
-            Base64ToSprite(bsmg_base64),
-            Color(0.05f, 0.0f, 0.05f, 1.0f),
-            Color(0.1f, 0.0f, 0.1f, 1.0f)};
+            LinkBoxData scoreSaber = {
+                "ScoreSaber",
+                SCORESABER_LINK,
+                SCORESABER_DISCORD,
+                SCORESABER_TWITTER,
+                SCORESABER_PATREON,
+                Base64ToSprite(ScoreSaber_Active),
+                Color(0.0f, 0.2f, 0.25f, 1.0f),
+                Color(0.0f, 0.35f, 0.4f, 1.0f)};
+            LinkBoxData bsmg = {
+                "BSMG",
+                BSMG_LINK,
+                BSMG_DISCORD,
+                BSMG_TWITTER,
+                BSMG_PATREON,
+                Base64ToSprite(bsmg_base64),
+                Color(0.05f, 0.0f, 0.05f, 1.0f),
+                Color(0.1f, 0.0f, 0.1f, 1.0f)};
 
-        CreateLinkBoxes(horizontal->get_transform(), scoreSaber);
-        CreateLinkBoxes(horizontal->get_transform(), bsmg);
+            CreateLinkBoxes(horizontal->get_transform(), scoreSaber);
+            CreateLinkBoxes(horizontal->get_transform(), bsmg);
+        }
     }
 }

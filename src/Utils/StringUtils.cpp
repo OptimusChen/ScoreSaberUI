@@ -14,207 +14,204 @@ static std::u16string size_suffix_u16 = u"</size>";
 
 using namespace std;
 
-namespace ScoreSaberUI::Utils
+namespace StringUtils
 {
-    namespace StringUtils
+
+    std::string to_utf8(std::u16string_view view)
     {
+        return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}
+            .to_bytes(view.data());
+    }
 
-        std::string to_utf8(std::u16string_view view)
+    std::string GetRoleColor(std::string role)
+    {
+        if (role.compare("Supporter") == 0)
         {
-            return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}
-                .to_bytes(view.data());
+            return "#f76754";
         }
-
-        std::string GetRoleColor(std::string role)
+        if (role.compare("Ranking Team") == 0)
         {
-            if (role.compare("Supporter") == 0)
-            {
-                return "#f76754";
-            }
-            if (role.compare("Ranking Team") == 0)
-            {
-                return "#1cbc9c";
-            }
-            return "#FFFFFF";
+            return "#1cbc9c";
         }
+        return "#FFFFFF";
+    }
 
-        std::u16string FormatScore(double s)
+    std::u16string FormatScore(double s)
+    {
+        return to_utf16(string_format(" - (<color=#ffd42a>%.2f%%</color>)", s));
+    }
+
+    std::string FormatScore(std::string s)
+    {
+        for (int i = 0; i < 2; i++)
         {
-            return to_utf16(string_format(" - (<color=#ffd42a>%.2f%%</color>)", s));
+            s.pop_back();
         }
+        s = s.substr(2);
+        s.insert(2, ".");
+        s = s + "%";
+        return " - (" + Colorize(s, "#ffd42a") + ") ";
+    }
 
-        std::string FormatScore(std::string s)
+    std::string RemoveTrailingZeros(std::string s, int zeros)
+    {
+        for (int i = 0; i < zeros; i++)
         {
-            for (int i = 0; i < 2; i++)
-            {
-                s.pop_back();
-            }
-            s = s.substr(2);
-            s.insert(2, ".");
-            s = s + "%";
-            return " - (" + Colorize(s, "#ffd42a") + ") ";
+            s.pop_back();
         }
+        return s;
+    }
 
-        std::string RemoveTrailingZeros(std::string s, int zeros)
+    std::string ColorizePosNeg(std::string s)
+    {
+        float f = stof(s);
+        if (f > 0)
         {
-            for (int i = 0; i < zeros; i++)
-            {
-                s.pop_back();
-            }
+            return Colorize(s, "green");
+        }
+        else if (f < 0)
+        {
+            return Colorize(s, "red");
+        }
+        else
+        {
             return s;
         }
+    }
 
-        std::string ColorizePosNeg(std::string s)
+    std::u16string FormatPP(const ::ScoreSaber::Data::Score&& score)
+    {
+        const std::string& modifiers = score.modifiers;
+        double pp = score.pp;
+        std::string ppString = std::to_string(pp);
+        for (int i = 0; i < 4; i++)
+            ppString.pop_back();
+        std::u16string s = to_utf16(ppString) + Resize(u"pp", 50);
+        s = Colorize(u" - (", "\"white\"") + s + Colorize(u")", "\"white\"");
+        if (pp > 0.0f)
         {
-            float f = stof(s);
-            if (f > 0)
-            {
-                return Colorize(s, "green");
-            }
-            else if (f < 0)
-            {
-                return Colorize(s, "red");
-            }
-            else
+            s = Colorize(s, "#6872e5");
+            if (modifiers.compare("") == 0)
             {
                 return s;
             }
-        }
-
-        std::u16string FormatPP(const ::ScoreSaber::Data::Score&& score)
-        {
-            const std::string& modifiers = score.modifiers;
-            double pp = score.pp;
-            std::string ppString = std::to_string(pp);
-            for (int i = 0; i < 4; i++)
-                ppString.pop_back();
-            std::u16string s = to_utf16(ppString) + Resize(u"pp", 50);
-            s = Colorize(u" - (", "\"white\"") + s + Colorize(u")", "\"white\"");
-            if (pp > 0.0f)
+            else
             {
-                s = Colorize(s, "#6872e5");
-                if (modifiers.compare("") == 0)
-                {
-                    return s;
-                }
-                else
-                {
-                    return s + u" - " + Colorize(u"[" + to_utf16(modifiers) + u"]", "#464f55");
-                }
+                return s + u" - " + Colorize(u"[" + to_utf16(modifiers) + u"]", "#464f55");
+            }
+        }
+        else
+        {
+            if (modifiers.compare("") == 0)
+            {
+                return u"";
             }
             else
             {
-                if (modifiers.compare("") == 0)
-                {
-                    return u"";
-                }
-                else
-                {
-                    return u" - " + Colorize(u"[" + to_utf16(modifiers) + u"]", "#464f55");
-                }
+                return u" - " + Colorize(u"[" + to_utf16(modifiers) + u"]", "#464f55");
             }
         }
+    }
 
-        std::u16string FormatPP(const ::ScoreSaber::Data::Score& score)
+    std::u16string FormatPP(const ::ScoreSaber::Data::Score& score)
+    {
+        const std::string& modifiers = score.modifiers;
+        double pp = score.pp;
+        std::string ppString = std::to_string(pp);
+        for (int i = 0; i < 4; i++)
+            ppString.pop_back();
+        std::u16string s = to_utf16(ppString) + Resize(u"pp", 50);
+        s = Colorize(u" - (", "\"white\"") + s + Colorize(u")", "\"white\"");
+        if (pp > 0.0f)
         {
-            const std::string& modifiers = score.modifiers;
-            double pp = score.pp;
-            std::string ppString = std::to_string(pp);
-            for (int i = 0; i < 4; i++)
-                ppString.pop_back();
-            std::u16string s = to_utf16(ppString) + Resize(u"pp", 50);
-            s = Colorize(u" - (", "\"white\"") + s + Colorize(u")", "\"white\"");
-            if (pp > 0.0f)
+            s = Colorize(s, "#6872e5");
+            if (modifiers.compare("") == 0)
             {
-                s = Colorize(s, "#6872e5");
-                if (modifiers.compare("") == 0)
-                {
-                    return s;
-                }
-                else
-                {
-                    return s + u" - " + Colorize(u"[" + to_utf16(modifiers) + u"]", "#464f55");
-                }
+                return s;
             }
             else
             {
-                if (modifiers.compare("") == 0)
-                {
-                    return u"";
-                }
-                else
-                {
-                    return u" - " + Colorize(u"[" + to_utf16(modifiers) + u"]", "#464f55");
-                }
+                return s + u" - " + Colorize(u"[" + to_utf16(modifiers) + u"]", "#464f55");
             }
         }
-
-        std::string FormatPP(std::string s,
-                             rapidjson::GenericObject<true, rapidjson::Value> score)
+        else
         {
-            std::string modifiers = std::string(score["modifiers"].GetString());
-            double pp = score["pp"].GetDouble();
-            for (int i = 0; i < 4; i++)
+            if (modifiers.compare("") == 0)
             {
-                s.pop_back();
-            }
-            s = s + Resize("pp", 50);
-            s = Colorize(" - (", "\"white\"") + s + Colorize(")", "\"white\"");
-            if (pp > 0.0f)
-            {
-                s = Colorize(s, "#6872e5");
-                if (modifiers.compare("") == 0)
-                {
-                    return s;
-                }
-                else
-                {
-                    return s + string(" - ") + Colorize("[" + modifiers + "]", "#464f55");
-                }
+                return u"";
             }
             else
             {
-                if (modifiers.compare("") == 0)
-                {
-                    return "";
-                }
-                else
-                {
-                    return " - " + Colorize("[" + modifiers + "]", "#464f55");
-                }
+                return u" - " + Colorize(u"[" + to_utf16(modifiers) + u"]", "#464f55");
             }
         }
+    }
 
-        std::string Colorize(std::string s, std::string color)
+    std::string FormatPP(std::string s,
+                         rapidjson::GenericObject<true, rapidjson::Value> score)
+    {
+        std::string modifiers = std::string(score["modifiers"].GetString());
+        double pp = score["pp"].GetDouble();
+        for (int i = 0; i < 4; i++)
         {
-            return color_prefix + color + string(">") + s + color_suffix;
+            s.pop_back();
         }
-
-        std::u16string Colorize(std::u16string s, std::string color)
+        s = s + Resize("pp", 50);
+        s = Colorize(" - (", "\"white\"") + s + Colorize(")", "\"white\"");
+        if (pp > 0.0f)
         {
-            return color_prefix_u16 + to_utf16(color) + u">" + s + color_suffix_u16;
+            s = Colorize(s, "#6872e5");
+            if (modifiers.compare("") == 0)
+            {
+                return s;
+            }
+            else
+            {
+                return s + string(" - ") + Colorize("[" + modifiers + "]", "#464f55");
+            }
         }
-
-        std::string Resize(std::string s, int sizePercent)
+        else
         {
-            return size_prefix + to_string(sizePercent) + string("%>") + s + size_suffix;
+            if (modifiers.compare("") == 0)
+            {
+                return "";
+            }
+            else
+            {
+                return " - " + Colorize("[" + modifiers + "]", "#464f55");
+            }
         }
+    }
 
-        std::u16string Resize(std::u16string s, int sizePercent)
-        {
-            return size_prefix_u16 + to_utf16(to_string(sizePercent)) + u"\%>" + s + size_suffix_u16;
-        }
+    std::string Colorize(std::string s, std::string color)
+    {
+        return color_prefix + color + string(">") + s + color_suffix;
+    }
 
-        std::string Il2cppStrToStr(Il2CppString* s) { return to_utf8(csstrtostr(s)); }
+    std::u16string Colorize(std::u16string s, std::string color)
+    {
+        return color_prefix_u16 + to_utf16(color) + u">" + s + color_suffix_u16;
+    }
 
-        Il2CppString* StrToIl2cppStr(std::u16string_view s)
-        {
-            return il2cpp_utils::newcsstr(s);
-        }
-        Il2CppString* StrToIl2cppStr(std::string_view s)
-        {
-            return il2cpp_utils::newcsstr(s);
-        }
+    std::string Resize(std::string s, int sizePercent)
+    {
+        return size_prefix + to_string(sizePercent) + string("%>") + s + size_suffix;
+    }
 
-    } // namespace StringUtils
-} // namespace ScoreSaberUI::Utils
+    std::u16string Resize(std::u16string s, int sizePercent)
+    {
+        return size_prefix_u16 + to_utf16(to_string(sizePercent)) + u"\%>" + s + size_suffix_u16;
+    }
+
+    std::string Il2cppStrToStr(Il2CppString* s) { return to_utf8(csstrtostr(s)); }
+
+    Il2CppString* StrToIl2cppStr(std::u16string_view s)
+    {
+        return il2cpp_utils::newcsstr(s);
+    }
+    Il2CppString* StrToIl2cppStr(std::string_view s)
+    {
+        return il2cpp_utils::newcsstr(s);
+    }
+
+} // namespace StringUtils

@@ -3,14 +3,14 @@
 #include <string>
 
 std::map<std::string, LoggerContextObject> contextLoggers;
-namespace ScoreSaberUI
+namespace ScoreSaber
 {
     Logger& Logging::getLogger()
     {
         static Logger* logger = new Logger({ID, VERSION}, LoggerOptions(false, true));
         return *logger;
     }
-    
+
     LoggerContextObject& Logging::getContextLogger(const char* func, const char* file, int line)
     {
         std::string contextString(string_format("%s:%i", file, line));

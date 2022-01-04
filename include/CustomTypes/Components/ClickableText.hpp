@@ -4,7 +4,7 @@
 
 #include "UnityEngine/Material.hpp"
 
-#include "HMUI/ImageView.hpp"
+#include "HMUI/CurvedTextMeshPro.hpp"
 #include "UnityEngine/Color.hpp"
 #include "UnityEngine/EventSystems/IEventSystemHandler.hpp"
 #include "UnityEngine/EventSystems/IPointerClickHandler.hpp"
@@ -20,7 +20,7 @@
         classof(UnityEngine::EventSystems::IPointerClickHandler*), classof(UnityEngine::EventSystems::IPointerEnterHandler*), classof(UnityEngine::EventSystems::IPointerExitHandler*), classof(UnityEngine::EventSystems::IEventSystemHandler*) \
     }
 
-___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber, ClickableImage, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, HMUI::ImageView, "ScoreSaber", TextInterfaces, 0, nullptr,
+___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber::CustomTypes::Components, ClickableText, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, HMUI::CurvedTextMeshPro, "ScoreSaber", TextInterfaces, 0, nullptr,
                                     DECLARE_INSTANCE_METHOD(void, set_highlightColor, UnityEngine::Color color);
                                     DECLARE_INSTANCE_METHOD(UnityEngine::Color, get_highlightColor);
                                     DECLARE_INSTANCE_METHOD(void, set_defaultColor, UnityEngine::Color color);
@@ -40,7 +40,10 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ScoreSaber, ClickableImage, Il2CppTypeEnum::
                                     OnPointerEnterEvent & get_onPointerEnterEvent();
                                     OnPointerExitEvent & get_onPointerExitEvent();
                                     private
-                                    : UnityEngine::Color highlightColor;
+                                    :
+                                    // purely here because CurvedTextMeshPro is larger than it says it is
+                                    uint8_t padding[16];
+                                    UnityEngine::Color highlightColor;
                                     UnityEngine::Color defaultColor;
                                     bool isHighlighted;
                                     OnPointerClickEvent onClickEvent;

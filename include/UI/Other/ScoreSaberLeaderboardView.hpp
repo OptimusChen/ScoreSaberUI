@@ -12,7 +12,7 @@
 using namespace UnityEngine;
 using namespace GlobalNamespace;
 
-DECLARE_CLASS_CODEGEN(ScoreSaberUI::UI::Other, ScoreSaberLeaderboardView,
+DECLARE_CLASS_CODEGEN(ScoreSaber::UI::Other, ScoreSaberLeaderboardView,
                       UnityEngine::MonoBehaviour,
                       DECLARE_CTOR(ctor, PlatformLeaderboardViewController);
                       DECLARE_INSTANCE_FIELD(HMUI::ModalView*, infoModal);

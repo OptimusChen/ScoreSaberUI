@@ -1,5 +1,5 @@
 #include "UI/Other/Banner.hpp"
-#include "UI/MainMenuFlowCoordinator.hpp"
+#include "UI/FlowCoordinators/ScoreSaberFlowCoordinator.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
 
@@ -26,14 +26,13 @@
 
 #include "Utils/UIUtils.hpp"
 
-DEFINE_TYPE(ScoreSaber::UI, Banner);
+DEFINE_TYPE(ScoreSaber::UI::Other, Banner);
 
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 using namespace HMUI;
 using namespace QuestUI;
 using namespace QuestUI::BeatSaberUI;
-using namespace ScoreSaberUI::Utils;
 
 #define SetPreferredSize(identifier, width, height)                                         \
     auto layout##identifier = identifier->get_gameObject()->GetComponent<LayoutElement*>(); \
@@ -42,7 +41,7 @@ using namespace ScoreSaberUI::Utils;
     layout##identifier->set_preferredWidth(width);                                          \
     layout##identifier->set_preferredHeight(height)
 
-namespace ScoreSaber::UI
+namespace ScoreSaber::UI::Other
 {
     Banner* Banner::Create(Transform* parent)
     {
@@ -162,9 +161,9 @@ namespace ScoreSaber::UI
         auto mainfc = GetMainFlowCoordinator();
         auto youngest = mainfc->YoungestChildFlowCoordinatorOrSelf();
 
-        auto fc = ArrayUtil::First(Resources::FindObjectsOfTypeAll<ScoreSaber::UI::MainMenuFlowCoordinator*>());
+        auto fc = ArrayUtil::First(Resources::FindObjectsOfTypeAll<ScoreSaber::UI::FlowCoordinators::ScoreSaberFlowCoordinator*>());
         if (!fc)
-            fc = CreateFlowCoordinator<ScoreSaber::UI::MainMenuFlowCoordinator*>();
+            fc = CreateFlowCoordinator<ScoreSaber::UI::FlowCoordinators::ScoreSaberFlowCoordinator*>();
 
         youngest->PresentFlowCoordinator(fc, nullptr, ViewController::AnimationDirection::Horizontal, false, false);
     }

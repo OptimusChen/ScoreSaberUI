@@ -1,6 +1,6 @@
 #pragma once
 #include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
- 
+
 #include "HMUI/TableCell.hpp"
 #include "HMUI/TableView.hpp"
 #include "HMUI/TableView_IDataSource.hpp"
@@ -24,7 +24,7 @@ static std::vector<Il2CppClass*> GetInterfaces()
 }
 
 ___DECLARE_TYPE_WRAPPER_INHERITANCE(
-    ScoreSaberUI::CustomTypes::Components, CustomCellListTableData,
+    ScoreSaber::CustomTypes::Components, CustomCellListTableData,
     Il2CppTypeEnum::IL2CPP_TYPE_CLASS, UnityEngine::MonoBehaviour, "QuestUI",
     GetInterfaces(), 0, nullptr,
     DECLARE_INSTANCE_FIELD(Il2CppString*, reuseIdentifier);
@@ -37,7 +37,7 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(
     DECLARE_INSTANCE_FIELD(int, page2);
     DECLARE_INSTANCE_FIELD(Il2CppString*, cellTemplate);
     DECLARE_INSTANCE_FIELD(HMUI::ViewController*, globalViewController);
-    DECLARE_INSTANCE_FIELD(ScoreSaber::UI::PlayerProfileModal*, playerProfileModal);
+    DECLARE_INSTANCE_FIELD(ScoreSaber::UI::Other::PlayerProfileModal*, playerProfileModal);
 
     DECLARE_CTOR(ctor);
     DECLARE_INSTANCE_METHOD(void, DownButtonWasPressed);

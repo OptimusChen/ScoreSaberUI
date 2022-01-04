@@ -19,20 +19,20 @@ using namespace QuestUI::BeatSaberUI;
     {                                                                \
         out = "";                                                    \
     }
-namespace ScoreSaberUI::Utils::TeamUtils
+namespace TeamUtils
 {
     std::map<std::string, std::vector<TeamMember>> members;
 
     void Download()
     {
         std::string url = "https://raw.githubusercontent.com/Umbranoxio/ScoreSaber-Team/main/team.json";
-        ScoreSaberUI::Utils::WebUtils::GetAsync(url, [&](long code, std::string result)
-                                                {
-                                                    if (code == 200)
-                                                    {
-                                                        ParseMembers(result);
-                                                    }
-                                                });
+        WebUtils::GetAsync(url, [&](long code, std::string result)
+                           {
+                               if (code == 200)
+                               {
+                                   ParseMembers(result);
+                               }
+                           });
     }
 
     void ParseMembers(std::string_view doc)

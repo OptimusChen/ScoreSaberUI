@@ -9,11 +9,11 @@
 
 #define TIMEOUT 10
 #define USER_AGENT                                      \
-    (std::string("ScoreSaberUI/") + VERSION +           \
-     " (+https://github.com/OptimusChen/ScoreSaberUI)") \
+    (std::string("ScoreSaber/") + VERSION +           \
+     " (+https://github.com/OptimusChen/ScoreSaber)") \
         .c_str()
 
-namespace ScoreSaberUI::Utils::WebUtils
+namespace WebUtils
 {
 
     // https://stackoverflow.com/a/55660581
@@ -251,4 +251,4 @@ namespace ScoreSaberUI::Utils::WebUtils
                  });
     }
 
-} // namespace ScoreSaberUI::Utils::WebUtils
+} // namespace WebUtils

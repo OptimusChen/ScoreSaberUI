@@ -19,7 +19,7 @@
     il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::get()
 
 DECLARE_CLASS_CODEGEN(
-    ScoreSaberUI::CustomTypes, CustomLeaderboardPlatformHandler,
+    ScoreSaber::CustomTypes, CustomLeaderboardPlatformHandler,
     GlobalNamespace::PlatformLeaderboardsHandler,
     DECLARE_OVERRIDE_METHOD(
         GlobalNamespace::HMAsyncRequest*, GetScores,
@@ -40,6 +40,6 @@ DECLARE_CLASS_CODEGEN(
     DECLARE_INSTANCE_FIELD_DEFAULT(int, page, 1);
     DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, ranked);
     DECLARE_INSTANCE_FIELD_DEFAULT(bool, mapRanked, true);
-    DECLARE_INSTANCE_FIELD(ScoreSaber::UI::Banner*, scoreSaberBanner);
+    DECLARE_INSTANCE_FIELD(ScoreSaber::UI::Other::Banner*, scoreSaberBanner);
     public
     : void changePage(bool inc);)

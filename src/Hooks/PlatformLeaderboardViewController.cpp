@@ -1,4 +1,4 @@
-#include "ScoreSaberUI.hpp"
+
 #include "Sprites.hpp"
 #include "hooks.hpp"
 
@@ -44,19 +44,20 @@ using namespace QuestUI::BeatSaberUI;
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 using namespace GlobalNamespace;
-using namespace ScoreSaberUI;
-using namespace ScoreSaberUI::Utils::StringUtils;
-using namespace ScoreSaberUI::CustomTypes;
-using namespace ScoreSaberUI::UI::FlowCoordinators;
+using namespace ScoreSaber;
+using namespace StringUtils;
+using namespace ScoreSaber::CustomTypes;
+using namespace ScoreSaber::UI::FlowCoordinators;
 
-ScoreSaberUI::UI::Other::PanelView* view;
+ScoreSaber::UI::Other::PanelView* view;
 
 UnityEngine::UI::Button* up;
 UnityEngine::UI::Button* down;
 std::string iconPath =
     "/sdcard/ModData/com.beatgames.beatsaber/"
-    "Mods/ScoreSaberUI/Icons/";
+    "Mods/ScoreSaber/Icons/";
 
+extern CustomLeaderboardPlatformHandler* leaderboardsHandler;
 MAKE_AUTO_HOOK_MATCH(
     PlatformLeaderboardViewController_DidActivate,
     &GlobalNamespace::PlatformLeaderboardViewController::DidActivate, void,
@@ -65,9 +66,6 @@ MAKE_AUTO_HOOK_MATCH(
 {
     PlatformLeaderboardViewController_DidActivate(
         self, firstActivation, addedToHeirarchy, screenSystemEnabling);
-
-    CustomLeaderboardPlatformHandler* leaderboardsHandler =
-        ScoreSaberUI::ScoreSaber::leaderboard;
 
     leaderboardsHandler->page = 1;
     if (firstActivation)
@@ -99,8 +97,8 @@ MAKE_AUTO_HOOK_MATCH(
         // RedBrumbler top panel
         if (firstActivation)
         {
-            leaderboardsHandler->scoreSaberBanner = ::ScoreSaber::UI::Banner::Create(self->get_transform());
-            leaderboardsHandler->scoreSaberBanner->playerProfileModal = ::ScoreSaber::UI::PlayerProfileModal::Create(self->get_transform());
+            leaderboardsHandler->scoreSaberBanner = ::ScoreSaber::UI::Other::Banner::Create(self->get_transform());
+            leaderboardsHandler->scoreSaberBanner->playerProfileModal = ::ScoreSaber::UI::Other::PlayerProfileModal::Create(self->get_transform());
 
             leaderboardsHandler->scoreSaberBanner->Prompt("Connecting to ScoreSaber", true, 5.0f, [=]()
                                                           { leaderboardsHandler->scoreSaberBanner->Prompt(
@@ -110,7 +108,7 @@ MAKE_AUTO_HOOK_MATCH(
 
         /*
         view = BeatSaberUI::CreateViewController<
-            ScoreSaberUI::UI::Other::PanelView*>();
+            ScoreSaber::UI::Other::PanelView*>();
         view->Init(self);
         view->Show();
         */
@@ -123,9 +121,6 @@ MAKE_AUTO_HOOK_MATCH(PlatformLeaderboardViewController_Refresh,
                      bool showLoadingIndicator, bool clear)
 {
     PlatformLeaderboardViewController_Refresh(self, showLoadingIndicator, clear);
-
-    CustomLeaderboardPlatformHandler* leaderboardsHandler =
-        ScoreSaberUI::ScoreSaber::leaderboard;
 
     if (self->difficultyBeatmap == nullptr)
     {

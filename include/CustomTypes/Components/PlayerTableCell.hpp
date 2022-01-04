@@ -23,7 +23,7 @@
     il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::get()
 
 DECLARE_CLASS_CODEGEN(
-    ScoreSaberUI::CustomTypes::Components, PlayerTableCell, HMUI::TableCell,
+    ScoreSaber::CustomTypes::Components, PlayerTableCell, HMUI::TableCell,
     DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, rank);
     DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, pp);
     DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, country);
@@ -34,15 +34,14 @@ DECLARE_CLASS_CODEGEN(
     DECLARE_INSTANCE_FIELD(QuestUI::Backgroundable*, bg);
     DECLARE_INSTANCE_FIELD(UnityEngine::Coroutine*, profileRoutine);
     DECLARE_INSTANCE_FIELD(UnityEngine::Coroutine*, flagRoutine);
-    DECLARE_INSTANCE_FIELD(ScoreSaber::UI::PlayerProfileModal*, playerProfileModal);
+    DECLARE_INSTANCE_FIELD(ScoreSaber::UI::Other::PlayerProfileModal*, playerProfileModal);
 
     DECLARE_CTOR(ctor);
 
     public
-    :
-    std::string playerId;
+    : std::string playerId;
     static PlayerTableCell * CreateCell();
-    void Refresh(ScoreSaber::Data::Player& player, ScoreSaberUI::CustomTypes::Components::CustomCellListTableData::LeaderboardType leaderboardType);
+    void Refresh(ScoreSaber::Data::Player& player, ScoreSaber::CustomTypes::Components::CustomCellListTableData::LeaderboardType leaderboardType);
     void stopProfileRoutine();
     void stopFlagRoutine();
     void OpenPlayerProfileModal();

@@ -4,7 +4,7 @@
 #include "UnityEngine/Sprite.hpp"
 #include <string>
 
-namespace ScoreSaberUI::Utils::TeamUtils
+namespace TeamUtils
 {
     class TeamMember
     {
@@ -33,4 +33,4 @@ namespace ScoreSaberUI::Utils::TeamUtils
     void ParseMembers(std::string_view doc);
     void Download();
     std::vector<TeamMember>& get_members(std::string_view type);
-}
+} // namespace TeamUtils

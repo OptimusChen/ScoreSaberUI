@@ -1,4 +1,3 @@
-#include "ScoreSaberUI.hpp"
 #include "hooks.hpp"
 
 #include "GlobalNamespace/LeaderboardTableCell.hpp"

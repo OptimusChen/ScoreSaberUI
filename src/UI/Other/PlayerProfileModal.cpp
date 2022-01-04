@@ -20,7 +20,7 @@
 #include "Sprites.hpp"
 #include "logging.hpp"
 
-DEFINE_TYPE(ScoreSaber::UI, PlayerProfileModal);
+DEFINE_TYPE(ScoreSaber::UI::Other, PlayerProfileModal);
 
 using namespace HMUI;
 using namespace UnityEngine;
@@ -53,7 +53,7 @@ static custom_types::Helpers::Coroutine WaitForImageDownload(std::string url, HM
 
 #define WIDTH 80.0f
 #define HEIGHT 60.0f
-namespace ScoreSaber::UI
+namespace ScoreSaber::UI::Other
 {
     custom_types::Helpers::Coroutine PlayerProfileModal::FetchPlayerData(std::string playerId)
     {

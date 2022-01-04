@@ -2,22 +2,26 @@
 #include "main.hpp"
 
 #include "CustomTypes/Components/ImageButton.hpp"
+#include "GlobalNamespace/SharedCoroutineStarter.hpp"
 #include "HMUI/ButtonSpriteSwap.hpp"
 #include "HMUI/CurvedCanvasSettingsHelper.hpp"
 #include "HMUI/ImageView.hpp"
 #include "UnityEngine/Application.hpp"
 #include "UnityEngine/GameObject.hpp"
+#include "UnityEngine/Networking/DownloadHandlerTexture.hpp"
+#include "UnityEngine/Networking/UnityWebRequest.hpp"
+#include "UnityEngine/Networking/UnityWebRequestTexture.hpp"
 #include "UnityEngine/Resources.hpp"
 #include "UnityEngine/Sprite.hpp"
+#include "UnityEngine/SpriteMeshType.hpp"
 #include "UnityEngine/SpriteRenderer.hpp"
+#include "UnityEngine/Texture2D.hpp"
 #include "UnityEngine/UI/LayoutElement.hpp"
 #include "UnityEngine/Vector3.hpp"
 #include "questui/shared/ArrayUtil.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 
 #include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
-
-#include "CustomTypes/DelayedCreateImage.hpp"
 
 #include "Sprites.hpp"
 #include "logging.hpp"
@@ -45,9 +49,25 @@ using namespace QuestUI::BeatSaberUI;
         AddHoverHint(btn##identifier->get_gameObject(), "Opens in Browser");                                                                                                                                         \
     }
 
-namespace ScoreSaberUI::Utils::UIUtils
+#define BeginCoroutine(method)                                               \
+    GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine( \
+        reinterpret_cast<System::Collections::IEnumerator*>(                 \
+            custom_types::Helpers::CoroutineHelper::New(method)));
+
+static custom_types::Helpers::Coroutine WaitForImageDownload(std::string url, HMUI::ImageView* out)
 {
-    ScoreSaber::ClickableText* CreateClickableText(UnityEngine::Transform* parent, std::u16string_view text, UnityEngine::Vector2 anchoredPosition, UnityEngine::Vector2 sizeDelta, std::function<void()> onClick)
+    UnityEngine::Networking::UnityWebRequest* www = UnityEngine::Networking::UnityWebRequestTexture::GetTexture(il2cpp_utils::newcsstr(url));
+    co_yield reinterpret_cast<System::Collections::IEnumerator*>(www->SendWebRequest());
+    auto downloadHandlerTexture = reinterpret_cast<UnityEngine::Networking::DownloadHandlerTexture*>(www->get_downloadHandler());
+    auto texture = downloadHandlerTexture->get_texture();
+    auto sprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)texture->get_width(), (float)texture->get_height()), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
+    out->set_sprite(sprite);
+    co_return;
+}
+
+namespace UIUtils
+{
+    ScoreSaber::CustomTypes::Components::ClickableText* CreateClickableText(UnityEngine::Transform* parent, std::u16string_view text, UnityEngine::Vector2 anchoredPosition, UnityEngine::Vector2 sizeDelta, std::function<void()> onClick)
     {
         auto clickableText = CreateClickableText(parent, text, anchoredPosition, sizeDelta);
         if (onClick)
@@ -55,7 +75,7 @@ namespace ScoreSaberUI::Utils::UIUtils
             { onClick(); };
         return clickableText;
     }
-    ScoreSaber::ClickableText* CreateClickableText(UnityEngine::Transform* parent, std::u16string_view text, std::function<void()> onClick)
+    ScoreSaber::CustomTypes::Components::ClickableText* CreateClickableText(UnityEngine::Transform* parent, std::u16string_view text, std::function<void()> onClick)
     {
         auto clickableText = CreateClickableText(parent, text);
         if (onClick)
@@ -64,13 +84,13 @@ namespace ScoreSaberUI::Utils::UIUtils
         return clickableText;
     }
 
-    ScoreSaber::ClickableText* CreateClickableText(Transform* parent, std::u16string_view text, UnityEngine::Vector2 anchoredPosition, UnityEngine::Vector2 sizeDelta)
+    ScoreSaber::CustomTypes::Components::ClickableText* CreateClickableText(Transform* parent, std::u16string_view text, UnityEngine::Vector2 anchoredPosition, UnityEngine::Vector2 sizeDelta)
     {
         static auto name = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("QuestUIText");
         GameObject* gameObj = GameObject::New_ctor(name);
         gameObj->SetActive(false);
 
-        ScoreSaber::ClickableText* textMesh = gameObj->AddComponent<ScoreSaber::ClickableText*>();
+        ScoreSaber::CustomTypes::Components::ClickableText* textMesh = gameObj->AddComponent<ScoreSaber::CustomTypes::Components::ClickableText*>();
         RectTransform* rectTransform = textMesh->get_rectTransform();
         rectTransform->SetParent(parent, false);
         textMesh->set_font(GetMainTextFont());
@@ -92,7 +112,7 @@ namespace ScoreSaberUI::Utils::UIUtils
         return textMesh;
     }
 
-    ScoreSaber::ClickableText* CreateClickableText(UnityEngine::Transform* parent, std::string_view text, UnityEngine::Vector2 anchoredPosition, UnityEngine::Vector2 sizeDelta)
+    ScoreSaber::CustomTypes::Components::ClickableText* CreateClickableText(UnityEngine::Transform* parent, std::string_view text, UnityEngine::Vector2 anchoredPosition, UnityEngine::Vector2 sizeDelta)
     {
         return CreateClickableText(parent, to_utf16(text), anchoredPosition, sizeDelta);
     };
@@ -115,7 +135,8 @@ namespace ScoreSaberUI::Utils::UIUtils
         SetPreferredSize(horizontal, 30, -1);
         horizontal->set_spacing(2.0f);
         auto url = member.get_profilePicture();
-        auto image = ScoreSaber::UI::DelayedCreateImage::CreateImage(horizontal->get_transform(), url, nullptr);
+        auto image = CreateImage(horizontal->get_transform(), Base64ToSprite(oculus_base64), Vector2(0, 0), Vector2(0, 0));
+        BeginCoroutine(WaitForImageDownload(url, image));
         SetPreferredSize(image, 12, 12);
         image->set_preserveAspect(true);
 
@@ -137,7 +158,8 @@ namespace ScoreSaberUI::Utils::UIUtils
         SocialButton(youtube);
         return horizontal;
     }
-    ScoreSaber::ClickableImage* CreateClickableImage(UnityEngine::Transform* parent, UnityEngine::Sprite* sprite, UnityEngine::Vector2 anchoredPosition, UnityEngine::Vector2 sizeDelta, std::function<void()> onClick)
+
+    ScoreSaber::CustomTypes::Components::ClickableImage* CreateClickableImage(UnityEngine::Transform* parent, UnityEngine::Sprite* sprite, UnityEngine::Vector2 anchoredPosition, UnityEngine::Vector2 sizeDelta, std::function<void()> onClick)
     {
         auto image = CreateClickableImage(parent, sprite, anchoredPosition, sizeDelta);
         if (onClick)
@@ -146,12 +168,12 @@ namespace ScoreSaberUI::Utils::UIUtils
         return image;
     }
 
-    ScoreSaber::ClickableImage* CreateClickableImage(UnityEngine::Transform* parent, UnityEngine::Sprite* sprite, UnityEngine::Vector2 anchoredPosition, UnityEngine::Vector2 sizeDelta)
+    ScoreSaber::CustomTypes::Components::ClickableImage* CreateClickableImage(UnityEngine::Transform* parent, UnityEngine::Sprite* sprite, UnityEngine::Vector2 anchoredPosition, UnityEngine::Vector2 sizeDelta)
     {
         static auto name = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("ScoreSaberClickableImage");
         auto go = GameObject::New_ctor(name);
 
-        auto image = go->AddComponent<ScoreSaber::ClickableImage*>();
+        auto image = go->AddComponent<ScoreSaber::CustomTypes::Components::ClickableImage*>();
         auto mat_UINoGlow = ArrayUtil::First(Resources::FindObjectsOfTypeAll<Material*>(), [](Material* x)
                                              { return to_utf8(csstrtostr(x->get_name())) == "UINoGlow"; });
         image->set_material(mat_UINoGlow);
@@ -190,14 +212,14 @@ namespace ScoreSaberUI::Utils::UIUtils
         return horizontal;
     }
 
-    CustomTypes::Components::ImageButton* CreateImageButton(GameObject* parent, Sprite* sprite,
-                                                            Vector2 anchoredPosition,
-                                                            Vector2 sizeDelta,
-                                                            std::function<void()> onClick)
+    ScoreSaber::CustomTypes::Components::ImageButton* CreateImageButton(GameObject* parent, Sprite* sprite,
+                                                                        Vector2 anchoredPosition,
+                                                                        Vector2 sizeDelta,
+                                                                        std::function<void()> onClick)
     {
-        CustomTypes::Components::ImageButton* button = parent->AddComponent<CustomTypes::Components::ImageButton*>();
+        ScoreSaber::CustomTypes::Components::ImageButton* button = parent->AddComponent<ScoreSaber::CustomTypes::Components::ImageButton*>();
         button->sprite = sprite;
         button->Init(parent->get_transform(), anchoredPosition, sizeDelta, onClick);
         return button;
     }
-}
+} // namespace UIUtils

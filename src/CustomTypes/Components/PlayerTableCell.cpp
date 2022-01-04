@@ -20,18 +20,18 @@
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
 #include "questui/shared/QuestUI.hpp"
 
-DEFINE_TYPE(ScoreSaberUI::CustomTypes::Components, PlayerTableCell);
+DEFINE_TYPE(ScoreSaber::CustomTypes::Components, PlayerTableCell);
 
-using namespace ScoreSaberUI::CustomTypes::Components;
-using namespace ScoreSaberUI::Utils::StringUtils;
-using namespace ScoreSaberUI::Utils;
+using namespace ScoreSaber::CustomTypes::Components;
+using namespace StringUtils;
+
 using namespace UnityEngine;
 using namespace UnityEngine::UI;
 using namespace QuestUI;
 using namespace QuestUI::BeatSaberUI;
 using namespace TMPro;
 
-using LeaderboardType = ScoreSaberUI::CustomTypes::Components::CustomCellListTableData::LeaderboardType;
+using LeaderboardType = ScoreSaber::CustomTypes::Components::CustomCellListTableData::LeaderboardType;
 
 #define BeginCoroutine(method)                                               \
     GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine( \

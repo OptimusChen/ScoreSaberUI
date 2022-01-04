@@ -55,17 +55,16 @@
 #include "Data/LeaderboardInfo.hpp"
 #include "Data/ScoreCollection.hpp"
 
-DEFINE_TYPE(ScoreSaberUI::CustomTypes, CustomLeaderboardPlatformHandler);
+DEFINE_TYPE(ScoreSaber::CustomTypes, CustomLeaderboardPlatformHandler);
 
 using namespace GlobalNamespace;
-using namespace ScoreSaberUI::Utils;
-using namespace ScoreSaberUI::Utils::StringUtils;
-using namespace ScoreSaberUI::Utils::BeatmapUtils;
-using namespace ScoreSaberUI::CustomTypes;
+using namespace StringUtils;
+using namespace BeatmapUtils;
+using namespace ScoreSaber::CustomTypes;
 using namespace ScoreSaber;
 
 custom_types::Helpers::Coroutine GetScoresInternal(
-    ScoreSaberUI::CustomTypes::CustomLeaderboardPlatformHandler* self,
+    ScoreSaber::CustomTypes::CustomLeaderboardPlatformHandler* self,
     GlobalNamespace::IDifficultyBeatmap* beatmap,
     PlatformLeaderboardsModel::ScoresScope scope,
     PlatformLeaderboardsModel::GetScoresCompletionHandler* completionHandler)
@@ -163,7 +162,7 @@ custom_types::Helpers::Coroutine GetScoresInternal(
 }
 
 custom_types::Helpers::Coroutine GetLeaderboardInfoInternal(
-    ScoreSaberUI::CustomTypes::CustomLeaderboardPlatformHandler* self,
+    ScoreSaber::CustomTypes::CustomLeaderboardPlatformHandler* self,
     GlobalNamespace::IDifficultyBeatmap* beatmap)
 {
     Il2CppString* csHash =
@@ -210,7 +209,7 @@ custom_types::Helpers::Coroutine GetLeaderboardInfoInternal(
     co_return;
 }
 
-void ScoreSaberUI::CustomTypes::CustomLeaderboardPlatformHandler::changePage(
+void ScoreSaber::CustomTypes::CustomLeaderboardPlatformHandler::changePage(
     bool inc)
 {
     if (inc)
@@ -227,7 +226,7 @@ void ScoreSaberUI::CustomTypes::CustomLeaderboardPlatformHandler::changePage(
 }
 
 HMAsyncRequest*
-ScoreSaberUI::CustomTypes::CustomLeaderboardPlatformHandler::GetScores(
+ScoreSaber::CustomTypes::CustomLeaderboardPlatformHandler::GetScores(
     IDifficultyBeatmap* beatmap, int count, int fromRank,
     PlatformLeaderboardsModel::ScoresScope scope,
     ::Il2CppString* referencePlayerId,
@@ -246,7 +245,7 @@ ScoreSaberUI::CustomTypes::CustomLeaderboardPlatformHandler::GetScores(
 }
 
 HMAsyncRequest*
-ScoreSaberUI::CustomTypes::CustomLeaderboardPlatformHandler::UploadScore(
+ScoreSaber::CustomTypes::CustomLeaderboardPlatformHandler::UploadScore(
     LeaderboardScoreUploader::ScoreData* scoreData,
     PlatformLeaderboardsModel::UploadScoreCompletionHandler*
         completionHandler)

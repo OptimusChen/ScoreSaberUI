@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CustomTypes/ClickableText.hpp"
+#include "CustomTypes/Components/ClickableText.hpp"
 #include "UI/Other/PlayerProfileModal.hpp"
 
 #include "HMUI/ImageView.hpp"
@@ -16,18 +16,20 @@
 #include <string_view>
 
 DECLARE_CLASS_CODEGEN(
-    ScoreSaber::UI, Banner, UnityEngine::MonoBehaviour,
+    ScoreSaber::UI::Other, Banner, UnityEngine::MonoBehaviour,
     DECLARE_INSTANCE_METHOD(void, Update);
     DECLARE_INSTANCE_FIELD(QuestUI::Backgroundable*, bg);
     DECLARE_INSTANCE_FIELD(HMUI::ImageView*, bgImage);
-    DECLARE_INSTANCE_FIELD(ScoreSaber::ClickableText*, topText);
-    DECLARE_INSTANCE_FIELD(ScoreSaber::ClickableText*, bottomText);
-    DECLARE_INSTANCE_FIELD(ScoreSaber::UI::PlayerProfileModal*, playerProfileModal);
+    DECLARE_INSTANCE_FIELD(ScoreSaber::CustomTypes::Components::ClickableText*, topText);
+    DECLARE_INSTANCE_FIELD(ScoreSaber::CustomTypes::Components::ClickableText*, bottomText);
+    DECLARE_INSTANCE_FIELD(ScoreSaber::UI::Other::PlayerProfileModal*, playerProfileModal);
     DECLARE_INSTANCE_FIELD(UnityEngine::UI::VerticalLayoutGroup*, loadingVertical);
     DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, promptText);
 
     public
-    : static ScoreSaber::UI::Banner * Create(UnityEngine::Transform * parent);
+    :
+
+    static ScoreSaber::UI::Other::Banner * Create(UnityEngine::Transform * parent);
     void Setup();
     void OpenMainMenuFlowCoordinator();
     void OpenPlayerInfoModal();

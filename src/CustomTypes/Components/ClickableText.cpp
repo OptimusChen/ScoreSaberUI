@@ -1,11 +1,11 @@
-#include "CustomTypes/ClickableText.hpp"
+#include "CustomTypes/Components/ClickableText.hpp"
 #include "logging.hpp"
-DEFINE_TYPE(ScoreSaber, ClickableText);
+DEFINE_TYPE(ScoreSaber::CustomTypes::Components, ClickableText);
 
 using namespace UnityEngine;
 
 #define LOG_COLOR(color) INFO("%s: %.2f, %.2f, %.2f, %.2f", #color, color.r, color.g, color.b, color.a)
-namespace ScoreSaber
+namespace ScoreSaber::CustomTypes::Components
 {
     void ClickableText::ctor()
     {

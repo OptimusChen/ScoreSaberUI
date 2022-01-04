@@ -6,7 +6,7 @@
 #include "GlobalNamespace/PlatformLeaderboardsHandler.hpp"
 #include "GlobalNamespace/PlatformLeaderboardsModel.hpp"
 #include "GlobalNamespace/ScreenCaptureCache.hpp"
-#include "ScoreSaberUI.hpp"
+
 #include "VRUIControls/PhysicsRaycasterWithCache.hpp"
 #include "Zenject/ConcreteIdBinderGeneric_1.hpp"
 #include "Zenject/DiContainer.hpp"
@@ -19,6 +19,7 @@ using namespace GlobalNamespace;
 using namespace VRUIControls;
 using namespace Zenject;
 
+ScoreSaber::CustomTypes::CustomLeaderboardPlatformHandler* leaderboardsHandler = nullptr;
 MAKE_AUTO_HOOK_MATCH(
     MainSystemInit_InstallPlatformLeaderboardsModel,
     &GlobalNamespace::MainSystemInit::InstallPlatformLeaderboardsModel, void,
@@ -28,12 +29,10 @@ MAKE_AUTO_HOOK_MATCH(
     using namespace VRUIControls;
     using namespace Zenject;
 
-    ScoreSaberUI::CustomTypes::CustomLeaderboardPlatformHandler*
-        leaderboardsHandler = CRASH_UNLESS(
-            il2cpp_utils::New<
-                ScoreSaberUI::CustomTypes::CustomLeaderboardPlatformHandler*>());
+    leaderboardsHandler = CRASH_UNLESS(
+        il2cpp_utils::New<
+            ScoreSaber::CustomTypes::CustomLeaderboardPlatformHandler*>());
     leaderboardsHandler->page = 1;
-    ScoreSaberUI::ScoreSaber::leaderboard = leaderboardsHandler;
     container->Bind<PlatformLeaderboardsHandler*>()
         ->FromInstance(leaderboardsHandler)
         ->AsSingle();

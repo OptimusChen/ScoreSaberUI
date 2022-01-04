@@ -20,10 +20,9 @@
 #include "Data/PlayerCollection.hpp"
 #include "UI/ViewControllers/GlobalViewController.hpp"
 
-DEFINE_TYPE(ScoreSaberUI::CustomTypes::Components, CustomCellListTableData);
+DEFINE_TYPE(ScoreSaber::CustomTypes::Components, CustomCellListTableData);
 
-using namespace ScoreSaberUI::Utils;
-using namespace ScoreSaberUI::CustomTypes::Components;
+using namespace ScoreSaber::CustomTypes::Components;
 using namespace UnityEngine::UI;
 using namespace QuestUI;
 using namespace TMPro;
@@ -37,7 +36,7 @@ using namespace ScoreSaber;
 Data::PlayerCollection playerCollection;
 
 custom_types::Helpers::Coroutine GetDocument(
-    ScoreSaberUI::CustomTypes::Components::CustomCellListTableData* self)
+     ScoreSaber::CustomTypes::Components::CustomCellListTableData* self)
 {
     std::string url = self->get_leaderboardURL();
     INFO("Getting player data from url %s", url.c_str());
@@ -56,7 +55,7 @@ custom_types::Helpers::Coroutine GetDocument(
     co_return;
 }
 
-namespace ScoreSaberUI::CustomTypes::Components
+namespace ScoreSaber::CustomTypes::Components
 {
     void CustomCellListTableData::ctor()
     {
@@ -236,7 +235,7 @@ namespace ScoreSaberUI::CustomTypes::Components
         {
             playerCollection.clear();
             ReloadTableViewData(tableView);
-            reinterpret_cast<ScoreSaberUI::UI::ViewControllers::GlobalViewController*>(globalViewController)->set_loading(true);
+            reinterpret_cast<ScoreSaber::UI::ViewControllers::GlobalViewController*>(globalViewController)->set_loading(true);
             co_yield reinterpret_cast<System::Collections::IEnumerator*>(
                 custom_types::Helpers::CoroutineHelper::New(GetDocument(this)));
         }
@@ -244,7 +243,7 @@ namespace ScoreSaberUI::CustomTypes::Components
         //    CRASH_UNLESS(WaitForSeconds::New_ctor(2.0f)));
         ReloadTableViewData(tableView);
         isLoading = false;
-        reinterpret_cast<ScoreSaberUI::UI::ViewControllers::GlobalViewController*>(globalViewController)->set_loading(false);
+        reinterpret_cast<ScoreSaber::UI::ViewControllers::GlobalViewController*>(globalViewController)->set_loading(false);
         co_return;
     }
 

@@ -5,7 +5,7 @@
 #include "HMUI/CurvedCanvasSettingsHelper.hpp"
 #include "HMUI/ViewController_AnimationDirection.hpp"
 #include "HMUI/ViewController_AnimationType.hpp"
-#include "ScoreSaberUI.hpp"
+
 #include "System/Collections/IEnumerator.hpp"
 #include "TMPro/TextMeshProUGUI.hpp"
 #include "UI/FlowCoordinators/ScoreSaberFlowCoordinator.hpp"
@@ -21,12 +21,11 @@
 #include "main.hpp"
 #include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
 
-DEFINE_TYPE(ScoreSaberUI::UI::Other, PanelView);
+DEFINE_TYPE(ScoreSaber::UI::Other, PanelView);
 
-using namespace ScoreSaberUI::Utils;
-using namespace ScoreSaberUI::UI::Other;
-using namespace ScoreSaberUI::CustomTypes::Components;
-using namespace ScoreSaberUI::UI::FlowCoordinators;
+using namespace ScoreSaber::UI::Other;
+using namespace ScoreSaber::CustomTypes::Components;
+using namespace ScoreSaber::UI::FlowCoordinators;
 using namespace QuestUI;
 using namespace UnityEngine::UI;
 using namespace UnityEngine::Events;
@@ -96,7 +95,7 @@ void PanelView::Show()
 
     std::string iconPath =
         "/sdcard/ModData/com.beatgames.beatsaber/"
-        "Mods/ScoreSaberUI/Icons/";
+        "Mods/ScoreSaber/Icons/";
 
     VerticalLayoutGroup* vertical =
         QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(
@@ -139,18 +138,15 @@ void PanelView::Show()
             HMUI::FlowCoordinator* currentFlowCoordinator =
                 QuestUI::BeatSaberUI::GetMainFlowCoordinator()
                     ->YoungestChildFlowCoordinatorOrSelf();
-            ScoreSaberFlowCoordinator* flowCoordinator =
-                ScoreSaberUI::ScoreSaber::flowCoordinator;
-
+            auto flowCoordinator = ArrayUtil::First(Resources::FindObjectsOfTypeAll<ScoreSaber::UI::FlowCoordinators::ScoreSaberFlowCoordinator*>());
             if (!flowCoordinator)
             {
-                ScoreSaberUI::ScoreSaber::flowCoordinator =
+                flowCoordinator =
                     BeatSaberUI::CreateFlowCoordinator<ScoreSaberFlowCoordinator*>();
-                flowCoordinator = ScoreSaberUI::ScoreSaber::flowCoordinator;
             }
 
             currentFlowCoordinator->PresentFlowCoordinator(
-                ScoreSaberUI::ScoreSaber::flowCoordinator, nullptr,
+                flowCoordinator, nullptr,
                 HMUI::ViewController::AnimationDirection::Horizontal,
                 HMUI::ViewController::AnimationType::In, false);
         });
@@ -162,7 +158,7 @@ void PanelView::Show()
         "</color>#893 "
         "(<size=80%><color=#6771e5>11,141.92pp</color></size>)",
         true, Vector2(5.0f, 50.0f));
-    ScoreSaberUI::ScoreSaber::leaderboard->ranked =
+    ScoreSaber::ScoreSaber::leaderboard->ranked =
         QuestUI::BeatSaberUI::CreateText(
             leaderboardView->get_transform(),
             "<color=#ffde1c>Ranked Status: </color>Ranked (modifiers "

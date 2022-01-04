@@ -4,7 +4,7 @@
 #include <functional>
 #include <string>
 
-namespace ScoreSaberUI::Utils::WebUtils
+namespace WebUtils
 {
 
     std::optional<rapidjson::Document> GetJSON(std::string url);
@@ -24,4 +24,4 @@ namespace ScoreSaberUI::Utils::WebUtils
         std::string url,
         std::function<void(long, bool, rapidjson::Document&)> finished);
 
-} // namespace ScoreSaberUI::Utils::WebUtils
+} // namespace WebUtils

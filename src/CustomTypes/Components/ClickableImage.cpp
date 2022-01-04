@@ -1,11 +1,11 @@
-#include "CustomTypes/ClickableImage.hpp"
+#include "CustomTypes/Components/ClickableImage.hpp"
 #include "logging.hpp"
-DEFINE_TYPE(ScoreSaber, ClickableImage);
+DEFINE_TYPE(ScoreSaber::CustomTypes::Components, ClickableImage);
 
 using namespace UnityEngine;
 
 #define LOG_COLOR(color) INFO("%s: %.2f, %.2f, %.2f, %.2f", #color, color.r, color.g, color.b, color.a)
-namespace ScoreSaber
+namespace ScoreSaber::CustomTypes::Components
 {
     void ClickableImage::ctor()
     {
