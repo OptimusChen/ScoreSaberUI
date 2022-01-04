@@ -12,6 +12,8 @@
 #include "UnityEngine/Texture2D.hpp"
 #include "UnityEngine/UI/LayoutElement.hpp"
 
+#include "Sprites.hpp"
+
 DEFINE_TYPE(ScoreSaber::UI, PlayerProfileModal);
 
 using namespace HMUI;
@@ -83,7 +85,6 @@ namespace ScoreSaber::UI
         SetPreferredSize(dataVertical, WIDTH * 0.4f, HEIGHT * 0.75f);
 
         // pfp setup
-        // TODO: Add actual placeholder
         auto pfpHorizontal = CreateHorizontalLayoutGroup(pfpVertical->get_transform());
         SetPreferredSize(pfpHorizontal, WIDTH * 0.4f, WIDTH * 0.4f);
         auto oculusSprite = Base64ToSprite(oculus_base64);
