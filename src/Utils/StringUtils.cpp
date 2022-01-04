@@ -5,10 +5,11 @@
 
 static std::string color_prefix = "<color=";
 static std::string color_suffix = "</color>";
-static std::u16string color_prefix_u16 = u"<color=";
-static std::u16string color_suffix_u16 = u"</color>";
 static std::string size_prefix = "<size=";
 static std::string size_suffix = "</size>";
+
+static std::u16string color_prefix_u16 = u"<color=";
+static std::u16string color_suffix_u16 = u"</color>";
 static std::u16string size_prefix_u16 = u"<size=";
 static std::u16string size_suffix_u16 = u"</size>";
 

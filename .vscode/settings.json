@@ -117,7 +117,6 @@
         "__functional_base_03": "cpp",
         "__memory": "cpp"
     },
-    "C_Cpp.errorSquiggles": "Disabled",
     "cmake.configureOnOpen": false,
     "editor.formatOnSave": true
 }
