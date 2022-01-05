@@ -1,9 +1,9 @@
-#include "GlobalNamespace/LeaderboardTableView.hpp"
+#include "hooks.hpp"
 
 #include "GlobalNamespace/LeaderboardTableCell.hpp"
+#include "GlobalNamespace/LeaderboardTableView.hpp"
 #include "HMUI/TableCell.hpp"
 #include "HMUI/TableView.hpp"
-#include "ScoreSaberUI.hpp"
 #include "TMPro/TextMeshPro.hpp"
 #include "TMPro/TextMeshProUGUI.hpp"
 #include "UnityEngine/UI/CanvasUpdate.hpp"
@@ -11,24 +11,21 @@
 
 using namespace GlobalNamespace;
 
-MAKE_HOOK_MATCH(LeaderboardTableView_CellForIdx,
-                &::GlobalNamespace::LeaderboardTableView::CellForIdx,
-                HMUI::TableCell*, GlobalNamespace::LeaderboardTableView* self,
-                HMUI::TableView* tableView, int row) {
-  HMUI::TableCell* tableCell =
-      LeaderboardTableView_CellForIdx(self, tableView, row);
-  LeaderboardTableCell* cell =
-      reinterpret_cast<LeaderboardTableCell*>(tableCell);
+MAKE_AUTO_HOOK_MATCH(LeaderboardTableView_CellForIdx,
+                     &::GlobalNamespace::LeaderboardTableView::CellForIdx,
+                     HMUI::TableCell*, GlobalNamespace::LeaderboardTableView* self,
+                     HMUI::TableView* tableView, int row)
+{
+    HMUI::TableCell* tableCell =
+        LeaderboardTableView_CellForIdx(self, tableView, row);
+    LeaderboardTableCell* cell =
+        reinterpret_cast<LeaderboardTableCell*>(tableCell);
 
-  static auto playerNameStr =
-      il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("PlayerName");
+    static auto playerNameStr =
+        il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("PlayerName");
 
-  cell->playerNameText->set_richText(true);
-  cell->playerNameText->Rebuild(UnityEngine::UI::CanvasUpdate::PreRender);
+    cell->playerNameText->set_richText(true);
+    cell->playerNameText->Rebuild(UnityEngine::UI::CanvasUpdate::PreRender);
 
-  return cell;
-}
-
-void ScoreSaberUI::Hooks::LeaderboardTableView() {
-  INSTALL_HOOK(getLogger(), LeaderboardTableView_CellForIdx);
+    return cell;
 }

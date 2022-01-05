@@ -1,5 +1,8 @@
 #pragma once
 
+#include "CustomTypes/Components/LeaderboardScoreInfoButtonHandler.hpp"
+#include "UI/Other/Banner.hpp"
+
 #include "GlobalNamespace/HMAsyncRequest.hpp"
 #include "GlobalNamespace/IDifficultyBeatmap.hpp"
 #include "GlobalNamespace/LeaderboardScoreUploader_ScoreData.hpp"
@@ -13,12 +16,11 @@
 #include "custom-types/shared/register.hpp"
 #include "custom-types/shared/types.hpp"
 #include "custom-types/shared/util.hpp"
-
 #define GET_FIND_METHOD(mPtr) \
-  il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::get()
+    il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::get()
 
 DECLARE_CLASS_CODEGEN(
-    ScoreSaberUI::CustomTypes, CustomLeaderboardPlatformHandler,
+    ScoreSaber::CustomTypes, CustomLeaderboardPlatformHandler,
     GlobalNamespace::PlatformLeaderboardsHandler,
     DECLARE_OVERRIDE_METHOD(
         GlobalNamespace::HMAsyncRequest*, GetScores,
@@ -38,5 +40,8 @@ DECLARE_CLASS_CODEGEN(
             UploadScoreCompletionHandler* completionHandler);
     DECLARE_INSTANCE_FIELD_DEFAULT(int, page, 1);
     DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, ranked);
-    DECLARE_INSTANCE_FIELD_DEFAULT(bool, mapRanked, true); public
+    DECLARE_INSTANCE_FIELD_DEFAULT(bool, mapRanked, true);
+    DECLARE_INSTANCE_FIELD(ScoreSaber::UI::Other::Banner*, scoreSaberBanner);
+    DECLARE_INSTANCE_FIELD(ScoreSaber::CustomTypes::Components::LeaderboardScoreInfoButtonHandler*, leaderboardScoreInfoButtonHandler);
+    public
     : void changePage(bool inc);)

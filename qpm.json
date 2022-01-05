@@ -6,7 +6,9 @@
     "id": "scoresaberui",
     "version": "0.1.0",
     "url": null,
-    "additionalData": {}
+    "additionalData": {
+      "overrideSoName": "libscoresaberui.so"
+    }
   },
   "dependencies": [
     {
@@ -19,18 +21,28 @@
       }
     },
     {
+      "id": "modloader",
+      "versionRange": "^1.2.3",
+      "additionalData": {}
+    },
+    {
+      "id": "codegen",
+      "versionRange": "^0.14.0",
+      "additionalData": {}
+    },
+    {
       "id": "questui",
-      "versionRange": "0.11.1",
+      "versionRange": "^0.11.1",
       "additionalData": {}
     },
     {
       "id": "custom-types",
-      "versionRange": "0.12.7",
+      "versionRange": "^0.12.7",
       "additionalData": {}
     },
     {
       "id": "config-utils",
-      "versionRange": "*",
+      "versionRange": "^0.6.0",
       "additionalData": {}
     },
     {
@@ -40,7 +52,7 @@
     },
     {
       "id": "songdownloader",
-      "versionRange": "*",
+      "versionRange": "^0.3.2",
       "additionalData": {}
     }
   ],

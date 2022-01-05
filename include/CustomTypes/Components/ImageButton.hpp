@@ -11,7 +11,7 @@
 #include "custom-types/shared/util.hpp"
 
 DECLARE_CLASS_CODEGEN(
-    ScoreSaberUI::CustomTypes::Components, ImageButton,
+    ScoreSaber::CustomTypes::Components, ImageButton,
     UnityEngine::MonoBehaviour,
     DECLARE_INSTANCE_FIELD(Array<VRUIControls::VRPointer*>*, pointerArray);
     DECLARE_INSTANCE_FIELD(UnityEngine::Sprite*, sprite);

@@ -5,13 +5,9 @@
 #include "custom-types/shared/register.hpp"
 #include "custom-types/shared/types.hpp"
 
-namespace ScoreSaberUI {
-namespace Utils {
-namespace BeatmapUtils {
+namespace BeatmapUtils
+{
+    int getDiff(GlobalNamespace::IDifficultyBeatmap* beatmap);
+    int getMaxScore(GlobalNamespace::IDifficultyBeatmap* beatmap);
 
-int getDiff(GlobalNamespace::IDifficultyBeatmap* beatmap);
-int getMaxScore(GlobalNamespace::IDifficultyBeatmap* beatmap);
-
-}  // namespace BeatmapUtils
-}  // namespace Utils
-}  // namespace ScoreSaberUI
+} // namespace BeatmapUtils

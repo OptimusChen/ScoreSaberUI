@@ -113,8 +113,10 @@
         "xtr1common": "cpp",
         "xtree": "cpp",
         "xutility": "cpp",
-        "__functional_03": "cpp"
+        "__functional_03": "cpp",
+        "__functional_base_03": "cpp",
+        "__memory": "cpp"
     },
-    "C_Cpp.errorSquiggles": "Disabled",
-    "cmake.configureOnOpen": false
+    "cmake.configureOnOpen": false,
+    "editor.formatOnSave": true
 }

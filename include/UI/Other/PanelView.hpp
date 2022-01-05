@@ -24,7 +24,7 @@ using namespace UnityEngine;
 using namespace GlobalNamespace;
 
 DECLARE_CLASS_CODEGEN(
-    ScoreSaberUI::UI::Other, PanelView, HMUI::ViewController,
+    ScoreSaber::UI::Other, PanelView, HMUI::ViewController,
     DECLARE_INSTANCE_METHOD(void, Init, PlatformLeaderboardViewController*);
     DECLARE_INSTANCE_METHOD(void, Show);
     DECLARE_INSTANCE_FIELD(PlatformLeaderboardViewController*, leaderboardView);

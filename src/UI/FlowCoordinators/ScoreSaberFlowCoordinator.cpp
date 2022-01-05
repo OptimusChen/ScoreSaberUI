@@ -1,47 +1,38 @@
 #include "UI/FlowCoordinators/ScoreSaberFlowCoordinator.hpp"
-
 #include "HMUI/ViewController_AnimationDirection.hpp"
 #include "HMUI/ViewController_AnimationType.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
-#include "questui/shared/QuestUI.hpp"
+
+DEFINE_TYPE(ScoreSaber::UI::FlowCoordinators, ScoreSaberFlowCoordinator);
 
 using namespace QuestUI;
-using namespace ScoreSaberUI::UI::FlowCoordinators;
+using namespace QuestUI::BeatSaberUI;
+using namespace UnityEngine;
+using namespace UnityEngine::UI;
+using namespace HMUI;
 
-DEFINE_TYPE(ScoreSaberUI::UI::FlowCoordinators, ScoreSaberFlowCoordinator);
+namespace ScoreSaber::UI::FlowCoordinators
+{
+    void ScoreSaberFlowCoordinator::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
+    {
+        if (firstActivation)
+        {
+            globalViewController = CreateViewController<ScoreSaber::UI::ViewControllers::GlobalViewController*>();
+            faqViewController = CreateViewController<ScoreSaber::UI::ViewControllers::FAQViewController*>();
+            teamViewController = CreateViewController<ScoreSaber::UI::ViewControllers::TeamViewController*>();
 
-void ScoreSaberFlowCoordinator::DidActivate(bool firstActivation,
-                                            bool addedToHierarchy,
-                                            bool screenSystemEnabling) {
-  if (firstActivation) {
-    this->SetTitle(il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>(
-                       "SCORESABER"),
-                   HMUI::ViewController::AnimationDirection::Horizontal);
-    this->showBackButton = true;
-    if (!this->faqView) {
-      this->faqView = QuestUI::BeatSaberUI::CreateViewController<
-          ScoreSaberUI::UI::ViewControllers::FAQViewController*>();
-    }
-    if (!this->globalView) {
-      this->globalView = QuestUI::BeatSaberUI::CreateViewController<
-          ScoreSaberUI::UI::ViewControllers::GlobalViewController*>();
-    }
-    if (!this->teamView) {
-      this->teamView = QuestUI::BeatSaberUI::CreateViewController<
-          ScoreSaberUI::UI::ViewControllers::TeamViewController*>();
+            SetTitle(il2cpp_utils::newcsstr("ScoreSaber"), ViewController::AnimationType::Out);
+            set_showBackButton(true);
+            ProvideInitialViewControllers(globalViewController, teamViewController, faqViewController, nullptr, nullptr);
+        }
+        // HACK: if we don't do this the viewcontroller remains active when returning to the main song menu (don't ask me why)
+        faqViewController->get_gameObject()->SetActive(true);
     }
 
-    this->ProvideInitialViewControllers(globalView, teamView, faqView, nullptr,
-                                        nullptr);
-  }
-}
-
-void ScoreSaberFlowCoordinator::BackButtonWasPressed(
-    HMUI::ViewController* topView) {
-  faqView->get_gameObject()->SetActive(false);
-  SetRightScreenViewController(nullptr,
-                               HMUI::ViewController::AnimationType::Out);
-  this->parentFlowCoordinator->DismissFlowCoordinator(
-      this, HMUI::ViewController::AnimationDirection::Horizontal, nullptr,
-      false);
+    void ScoreSaberFlowCoordinator::BackButtonWasPressed(HMUI::ViewController* topViewController)
+    {
+        // HACK: if we don't do this the viewcontroller remains active when returning to the main song menu (don't ask me why)
+        faqViewController->get_gameObject()->SetActive(false);
+        this->parentFlowCoordinator->DismissFlowCoordinator(this, ViewController::AnimationDirection::Horizontal, nullptr, false);
+    }
 }
