@@ -150,7 +150,7 @@ void GlobalLeaderboardTableCell::Refresh(ScoreSaber::Data::Player& player, Leade
 
 GlobalLeaderboardTableCell* GlobalLeaderboardTableCell::CreateCell()
 {
-    static auto playerTableCellStr = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("CustomPlayerTableCell");
+    static auto playerTableCellStr = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("GlobalLeaderboardTableCell");
     auto cellGO = UnityEngine::GameObject::New_ctor();
     auto playerCell = cellGO->AddComponent<GlobalLeaderboardTableCell*>();
     cellGO->set_name(playerTableCellStr);

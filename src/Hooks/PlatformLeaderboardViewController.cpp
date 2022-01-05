@@ -2,6 +2,7 @@
 #include "Sprites.hpp"
 #include "hooks.hpp"
 
+#include "CustomTypes/Components/LeaderboardScoreInfoButtonHandler.hpp"
 #include "CustomTypes/CustomLeaderboardPlatformHandler.hpp"
 #include "UI/Other/Banner.hpp"
 
@@ -106,6 +107,14 @@ MAKE_AUTO_HOOK_MATCH(
                                                                 false, 2.0f, nullptr); });
         }
 
+        auto newGo = GameObject::New_ctor();
+        auto t = newGo->get_transform();
+        t->get_transform()->SetParent(self->get_transform(), false);
+        t->set_localScale({1, 1, 1});
+        auto leaderboardScoreInfoButtonHandler = newGo->AddComponent<ScoreSaber::CustomTypes::Components::LeaderboardScoreInfoButtonHandler*>();
+        leaderboardScoreInfoButtonHandler->Setup();
+        leaderboardScoreInfoButtonHandler->set_buttonCount(0);
+        leaderboardsHandler->leaderboardScoreInfoButtonHandler = leaderboardScoreInfoButtonHandler;
         /*
         view = BeatSaberUI::CreateViewController<
             ScoreSaber::UI::Other::PanelView*>();

@@ -69,6 +69,8 @@ custom_types::Helpers::Coroutine GetScoresInternal(
     PlatformLeaderboardsModel::ScoresScope scope,
     PlatformLeaderboardsModel::GetScoresCompletionHandler* completionHandler)
 {
+    self->leaderboardScoreInfoButtonHandler->set_buttonCount(0);
+
     Il2CppString* csHash =
         reinterpret_cast<IPreviewBeatmapLevel*>(beatmap->get_level())
             ->get_levelID();
@@ -81,6 +83,7 @@ custom_types::Helpers::Coroutine GetScoresInternal(
     if (gameMode == "Standard")
         gameMode = "SoloStandard";
 
+    // TODO: fix data fetching to use proper 10 sized pages, instead of 12 sized pages
     std::string url = string_format("https://scoresaber.com/api/leaderboard/by-hash/%s/scores?difficulty=%d&page=%d&gameMode=%s", hash.c_str(), getDiff(beatmap), self->page, gameMode.c_str());
     UnityEngine::Networking::UnityWebRequest* webRequest =
         UnityEngine::Networking::UnityWebRequest::Get(StrToIl2cppStr(url));
@@ -107,11 +110,10 @@ custom_types::Helpers::Coroutine GetScoresInternal(
                 // why calculate it every time if the beatmap pointer doesn't change?
                 int maxScore = BeatmapUtils::getMaxScore(beatmap);
 
-                const Data::ScoreCollection scoreCollection(doc.GetObject());
+                Data::ScoreCollection scoreCollection(doc.GetObject());
                 int length = scoreCollection.size();
-                for (int i = 0; i < length; i++)
+                for (auto& score : scoreCollection)
                 {
-                    const Data::Score& score = scoreCollection[i];
                     auto& leaderboardPlayerInfo = score.leaderboardPlayerInfo;
                     std::u16string coloredName = Colorize(leaderboardPlayerInfo.name, GetRoleColor(leaderboardPlayerInfo.role));
                     std::u16string formattedScore = FormatScore(((double)score.modifiedScore / (double)maxScore) * 100.0);
@@ -122,6 +124,8 @@ custom_types::Helpers::Coroutine GetScoresInternal(
                                                                                       StrToIl2cppStr("0"), modifiers));
                     self->mapRanked = score.pp > 0.0f;
                 }
+
+                self->leaderboardScoreInfoButtonHandler->set_scoreCollection(scoreCollection);
                 if (scores->size == 0)
                 {
                     scores->Add(PlatformLeaderboardsModel::LeaderboardScore::New_ctor(
@@ -143,6 +147,7 @@ custom_types::Helpers::Coroutine GetScoresInternal(
         }
         else
         {
+
             scores->Add(PlatformLeaderboardsModel::LeaderboardScore::New_ctor(
                 0, 0, StrToIl2cppStr("Received invalid response from server"),
                 StrToIl2cppStr("0"), modifiers));
@@ -153,6 +158,7 @@ custom_types::Helpers::Coroutine GetScoresInternal(
     }
     else
     {
+
         completionHandler->Invoke(
             PlatformLeaderboardsModel::GetScoresResult::Failed, scores->ToArray(),
             -1);

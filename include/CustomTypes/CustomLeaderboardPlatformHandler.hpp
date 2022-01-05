@@ -1,5 +1,6 @@
 #pragma once
 
+#include "CustomTypes/Components/LeaderboardScoreInfoButtonHandler.hpp"
 #include "UI/Other/Banner.hpp"
 
 #include "GlobalNamespace/HMAsyncRequest.hpp"
@@ -41,5 +42,6 @@ DECLARE_CLASS_CODEGEN(
     DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, ranked);
     DECLARE_INSTANCE_FIELD_DEFAULT(bool, mapRanked, true);
     DECLARE_INSTANCE_FIELD(ScoreSaber::UI::Other::Banner*, scoreSaberBanner);
+    DECLARE_INSTANCE_FIELD(ScoreSaber::CustomTypes::Components::LeaderboardScoreInfoButtonHandler*, leaderboardScoreInfoButtonHandler);
     public
     : void changePage(bool inc);)
