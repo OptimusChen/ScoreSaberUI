@@ -11,6 +11,8 @@
 #include "UnityEngine/RectTransform.hpp"
 #include "UnityEngine/Resources.hpp"
 #include "UnityEngine/Sprite.hpp"
+#include "UnityEngine/SpriteMeshType.hpp"
+#include "UnityEngine/Texture2D.hpp"
 #include "Utils/UIUtils.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
@@ -161,8 +163,8 @@ namespace ScoreSaber::UI::ViewControllers
                 scoreScopesHost->GetComponent<LayoutElement*>();
             scoreScopesHostElement->set_preferredWidth(9.0f);
 
-            ImageButton* arrow = UIUtils::CreateImageButton(
-                scoreScopesHost->get_gameObject(),
+            auto arrow = UIUtils::CreateClickableImage(
+                scoreScopesHost->get_transform(),
                 Base64ToSprite(carat_up_base64), {0.0f, 25.0f},
                 {9.0f, 9.0f}, std::bind(&GlobalViewController::UpButtonWasPressed, this));
 
@@ -191,29 +193,32 @@ namespace ScoreSaber::UI::ViewControllers
             LayoutElement* imagesGroupElement =
                 imagesGroup->GetComponent<LayoutElement*>();
             imagesGroupElement->set_preferredWidth(4.0f);
-            imagesGroupElement->set_preferredHeight(4.0f);
-            auto globalIcon = ArrayUtil::First(Resources::FindObjectsOfTypeAll<Sprite*>(), [](auto x)
-                                               { return to_utf8(csstrtostr(x->get_name())) == "GlobalIcon"; });
-            auto playerIcon = ArrayUtil::First(Resources::FindObjectsOfTypeAll<Sprite*>(), [](auto x)
-                                               { return to_utf8(csstrtostr(x->get_name())) == "PlayerIcon"; });
-            auto friendsIcon = ArrayUtil::First(Resources::FindObjectsOfTypeAll<Sprite*>(), [](auto x)
-                                                { return to_utf8(csstrtostr(x->get_name())) == "FriendsIcon"; });
-            UIUtils::CreateImageButton(imagesGroup->get_gameObject(),
-                                       globalIcon, {0.0f, 0.0f},
-                                       {4.0f, 4.0f}, std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType::Global));
-            UIUtils::CreateImageButton(imagesGroup->get_gameObject(),
-                                       playerIcon, {0.0f, 0.0f},
-                                       {4.0f, 4.0f}, std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType::AroundYou));
-            UIUtils::CreateImageButton(imagesGroup->get_gameObject(),
-                                       friendsIcon, {0.0f, 0.0f},
-                                       {4.0f, 4.0f}, std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType::Friends));
-            UIUtils::CreateImageButton(
-                imagesGroup->get_gameObject(),
-                Base64ToSprite(country_base64), {0.0f, 0.0f},
-                {4.0f, 4.0f}, std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType::Country));
+            imagesGroupElement->set_preferredHeight(20.0f);
+            imagesGroup->set_spacing(2);
+            auto countrySprite = Base64ToSprite(country_base64);
+            auto globalSprite = Base64ToSprite(global_base64);
+            auto playerSprite = Base64ToSprite(player_base64);
+            auto friendsSprite = Base64ToSprite(friends_base64);
 
-            ImageButton* downrrow = UIUtils::CreateImageButton(
-                scoreScopesHost->get_gameObject(),
+            auto globalButton = UIUtils::CreateClickableImage(imagesGroup->get_transform(),
+                                                              globalSprite, {0.0f, 0.0f},
+                                                              {4.0f, 4.0f}, std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType::Global));
+            globalButton->set_preserveAspect(true);
+            auto aroundYouButton = UIUtils::CreateClickableImage(imagesGroup->get_transform(),
+                                                                 playerSprite, {0.0f, 0.0f},
+                                                                 {4.0f, 4.0f}, std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType::AroundYou));
+            aroundYouButton->set_preserveAspect(true);
+            auto friendsButton = UIUtils::CreateClickableImage(imagesGroup->get_transform(),
+                                                               friendsSprite, {0.0f, 0.0f},
+                                                               {4.0f, 4.0f}, std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType::Friends));
+            friendsButton->set_preserveAspect(true);
+            auto countryButton = UIUtils::CreateClickableImage(imagesGroup->get_transform(),
+                                                               countrySprite, {0.0f, 0.0f},
+                                                               {4.0f, 4.0f}, std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType::Country));
+            countryButton->set_preserveAspect(true);
+
+            auto downrrow = UIUtils::CreateClickableImage(
+                scoreScopesHost->get_transform(),
                 Base64ToSprite(carat_down_base64), {0.0f, 25.0f},
                 {9.0f, 9.0f}, std::bind(&GlobalViewController::DownButtonWasPressed, this));
 

@@ -2,16 +2,20 @@
 #include "main.hpp"
 
 #include "CustomTypes/Components/ImageButton.hpp"
+#include "GlobalNamespace/HapticFeedbackController.hpp"
+#include "GlobalNamespace/MenuShockwave.hpp"
 #include "GlobalNamespace/SharedCoroutineStarter.hpp"
 #include "HMUI/ButtonSpriteSwap.hpp"
 #include "HMUI/CurvedCanvasSettingsHelper.hpp"
 #include "HMUI/ImageView.hpp"
+#include "Libraries/HM/HMLib/VR/HapticPresetSO.hpp"
 #include "UnityEngine/Application.hpp"
 #include "UnityEngine/GameObject.hpp"
 #include "UnityEngine/Networking/DownloadHandlerTexture.hpp"
 #include "UnityEngine/Networking/UnityWebRequest.hpp"
 #include "UnityEngine/Networking/UnityWebRequestTexture.hpp"
 #include "UnityEngine/Resources.hpp"
+#include "UnityEngine/ScriptableObject.hpp"
 #include "UnityEngine/Sprite.hpp"
 #include "UnityEngine/SpriteMeshType.hpp"
 #include "UnityEngine/SpriteRenderer.hpp"
@@ -53,6 +57,9 @@ using namespace QuestUI::BeatSaberUI;
     GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine( \
         reinterpret_cast<System::Collections::IEnumerator*>(                 \
             custom_types::Helpers::CoroutineHelper::New(method)));
+
+using HapticPresetSO = Libraries::HM::HMLib::VR::HapticPresetSO;
+static SafePtr<HapticPresetSO> hapticFeedbackPresetSO;
 
 static custom_types::Helpers::Coroutine WaitForImageDownload(std::string url, HMUI::ImageView* out)
 {
@@ -107,6 +114,22 @@ namespace UIUtils
         rectTransform->set_sizeDelta(sizeDelta);
 
         gameObj->AddComponent<LayoutElement*>();
+
+        auto menuShockWave = ArrayUtil::First(Resources::FindObjectsOfTypeAll<GlobalNamespace::MenuShockwave*>());
+        auto buttonClickedSignal = ArrayUtil::Last(menuShockWave->dyn__buttonClickEvents());
+        textMesh->buttonClickedSignal = buttonClickedSignal;
+
+        if (!hapticFeedbackPresetSO)
+        {
+            hapticFeedbackPresetSO.emplace(UnityEngine::ScriptableObject::CreateInstance<HapticPresetSO*>());
+            hapticFeedbackPresetSO->duration = 0.02f;
+            hapticFeedbackPresetSO->strength = 1.0f;
+            hapticFeedbackPresetSO->frequency = 0.2f;
+        }
+
+        auto hapticFeedbackController = UnityEngine::Object::FindObjectOfType<GlobalNamespace::HapticFeedbackController*>();
+        textMesh->hapticFeedbackController = hapticFeedbackController;
+        textMesh->hapticFeedbackPresetSO = (HapticPresetSO*)hapticFeedbackPresetSO;
 
         gameObj->SetActive(true);
         return textMesh;
@@ -184,6 +207,23 @@ namespace UIUtils
         image->set_sprite(sprite);
 
         go->AddComponent<LayoutElement*>();
+
+        auto menuShockWave = ArrayUtil::First(Resources::FindObjectsOfTypeAll<GlobalNamespace::MenuShockwave*>());
+        auto buttonClickedSignal = ArrayUtil::Last(menuShockWave->dyn__buttonClickEvents());
+        image->buttonClickedSignal = buttonClickedSignal;
+
+        if (!hapticFeedbackPresetSO)
+        {
+            hapticFeedbackPresetSO.emplace(UnityEngine::ScriptableObject::CreateInstance<HapticPresetSO*>());
+            hapticFeedbackPresetSO->duration = 0.01f;
+            hapticFeedbackPresetSO->strength = 0.75f;
+            hapticFeedbackPresetSO->frequency = 0.5f;
+        }
+
+        auto hapticFeedbackController = UnityEngine::Object::FindObjectOfType<GlobalNamespace::HapticFeedbackController*>();
+        image->hapticFeedbackController = hapticFeedbackController;
+        image->hapticFeedbackPresetSO = (HapticPresetSO*)hapticFeedbackPresetSO;
+
         return image;
     }
 

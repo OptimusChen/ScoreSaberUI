@@ -1,4 +1,5 @@
 #include "CustomTypes/Components/ClickableText.hpp"
+#include "VRUIControls/VRPointer.hpp"
 #include "logging.hpp"
 DEFINE_TYPE(ScoreSaber::CustomTypes::Components, ClickableText);
 
@@ -27,6 +28,7 @@ namespace ScoreSaber::CustomTypes::Components
     void ClickableText::OnPointerClick(EventSystems::PointerEventData* eventData)
     {
         set_isHighlighted(false);
+        if (buttonClickedSignal) buttonClickedSignal->Raise();
         onClickEvent.invoke(eventData);
     }
 
@@ -34,12 +36,19 @@ namespace ScoreSaber::CustomTypes::Components
     {
         set_isHighlighted(true);
         pointerEnterEvent.invoke(eventData);
+        Vibrate(!VRUIControls::VRPointer::_get__lastControllerUsedWasRight());
     }
 
     void ClickableText::OnPointerExit(EventSystems::PointerEventData* eventData)
     {
         set_isHighlighted(false);
         pointerExitEvent.invoke(eventData);
+    }
+
+    void ClickableText::Vibrate(bool left)
+    {
+        UnityEngine::XR::XRNode node = left ? UnityEngine::XR::XRNode::LeftHand : UnityEngine::XR::XRNode::RightHand;
+        hapticFeedbackController->PlayHapticFeedback(node, hapticFeedbackPresetSO);
     }
 
     void ClickableText::UpdateHighlight()

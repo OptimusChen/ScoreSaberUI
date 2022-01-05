@@ -1,4 +1,5 @@
 #include "CustomTypes/Components/ClickableImage.hpp"
+#include "VRUIControls/VRPointer.hpp"
 #include "logging.hpp"
 DEFINE_TYPE(ScoreSaber::CustomTypes::Components, ClickableImage);
 
@@ -27,6 +28,7 @@ namespace ScoreSaber::CustomTypes::Components
     void ClickableImage::OnPointerClick(EventSystems::PointerEventData* eventData)
     {
         set_isHighlighted(false);
+        if (buttonClickedSignal) buttonClickedSignal->Raise();
         onClickEvent.invoke(eventData);
     }
 
@@ -34,12 +36,19 @@ namespace ScoreSaber::CustomTypes::Components
     {
         set_isHighlighted(true);
         pointerEnterEvent.invoke(eventData);
+        Vibrate(!VRUIControls::VRPointer::_get__lastControllerUsedWasRight());
     }
 
     void ClickableImage::OnPointerExit(EventSystems::PointerEventData* eventData)
     {
         set_isHighlighted(false);
         pointerExitEvent.invoke(eventData);
+    }
+
+    void ClickableImage::Vibrate(bool left)
+    {
+        UnityEngine::XR::XRNode node = left ? UnityEngine::XR::XRNode::LeftHand : UnityEngine::XR::XRNode::RightHand;
+        hapticFeedbackController->PlayHapticFeedback(node, hapticFeedbackPresetSO);
     }
 
     void ClickableImage::UpdateHighlight()
