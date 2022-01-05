@@ -99,22 +99,25 @@ MAKE_AUTO_HOOK_MATCH(
         if (firstActivation)
         {
             leaderboardsHandler->scoreSaberBanner = ::ScoreSaber::UI::Other::Banner::Create(self->get_transform());
-            leaderboardsHandler->scoreSaberBanner->playerProfileModal = ::ScoreSaber::UI::Other::PlayerProfileModal::Create(self->get_transform());
+            auto playerProfileModal = ::ScoreSaber::UI::Other::PlayerProfileModal::Create(self->get_transform());
+            leaderboardsHandler->scoreSaberBanner->playerProfileModal = playerProfileModal;
 
             leaderboardsHandler->scoreSaberBanner->Prompt("Connecting to ScoreSaber", true, 5.0f, [=]()
                                                           { leaderboardsHandler->scoreSaberBanner->Prompt(
                                                                 "<color=green>Successfully Connected to ScoreSaber</color>",
                                                                 false, 2.0f, nullptr); });
-        }
 
-        auto newGo = GameObject::New_ctor();
-        auto t = newGo->get_transform();
-        t->get_transform()->SetParent(self->get_transform(), false);
-        t->set_localScale({1, 1, 1});
-        auto leaderboardScoreInfoButtonHandler = newGo->AddComponent<ScoreSaber::CustomTypes::Components::LeaderboardScoreInfoButtonHandler*>();
-        leaderboardScoreInfoButtonHandler->Setup();
-        leaderboardScoreInfoButtonHandler->set_buttonCount(0);
-        leaderboardsHandler->leaderboardScoreInfoButtonHandler = leaderboardScoreInfoButtonHandler;
+            auto newGo = GameObject::New_ctor();
+            auto t = newGo->get_transform();
+            t->get_transform()->SetParent(self->get_transform(), false);
+            t->set_localScale({1, 1, 1});
+            auto leaderboardScoreInfoButtonHandler = newGo->AddComponent<ScoreSaber::CustomTypes::Components::LeaderboardScoreInfoButtonHandler*>();
+            leaderboardScoreInfoButtonHandler->Setup();
+            leaderboardScoreInfoButtonHandler->scoreInfoModal->playerProfileModal = playerProfileModal;
+            leaderboardsHandler->leaderboardScoreInfoButtonHandler = leaderboardScoreInfoButtonHandler;
+
+            leaderboardScoreInfoButtonHandler->set_buttonCount(0);
+        }
         /*
         view = BeatSaberUI::CreateViewController<
             ScoreSaber::UI::Other::PanelView*>();

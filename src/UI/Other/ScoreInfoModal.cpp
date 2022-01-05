@@ -5,12 +5,14 @@
 #include "UnityEngine/Sprite.hpp"
 #include "UnityEngine/SpriteMeshType.hpp"
 #include "UnityEngine/Texture2D.hpp"
+#include "UnityEngine/UI/LayoutElement.hpp"
 
 #include "Utils/UIUtils.hpp"
 
 DEFINE_TYPE(ScoreSaber::UI::Other, ScoreInfoModal);
 
 using namespace UnityEngine;
+using namespace UnityEngine::UI;
 using namespace QuestUI;
 using namespace QuestUI::BeatSaberUI;
 namespace ScoreSaber::UI::Other
@@ -22,8 +24,6 @@ namespace ScoreSaber::UI::Other
 
     void ScoreInfoModal::Show(ScoreSaber::Data::Score& score)
     {
-
-        modal->Show(true, true, nullptr);
 
         set_player(score.leaderboardPlayerInfo.name);
         // TODO: get device from the score.hmd integer;
@@ -40,6 +40,7 @@ namespace ScoreSaber::UI::Other
         set_timeSet(score.timeSet);
 
         playerId = score.leaderboardPlayerInfo.id;
+        modal->Show(true, true, nullptr);
     }
 
     ScoreInfoModal* ScoreInfoModal::Create(UnityEngine::Transform* parent)
@@ -56,9 +57,17 @@ namespace ScoreSaber::UI::Other
         auto mainVertical = CreateVerticalLayoutGroup(get_transform());
         auto headerHorizontal = CreateHorizontalLayoutGroup(mainVertical->get_transform());
         player = CreateText(headerHorizontal->get_transform(), "", false);
+        player->set_alignment(TMPro::TextAlignmentOptions::MidlineLeft);
         auto userSprite = Base64ToSprite(user_base64);
-        UIUtils::CreateClickableImage(headerHorizontal->get_transform(), userSprite, {0, 0}, {0, 0}, std::bind(&ScoreInfoModal::ShowPlayerProfileModal, this));
+        auto userImage = UIUtils::CreateClickableImage(headerHorizontal->get_transform(), userSprite, {0, 0}, {0, 0}, std::bind(&ScoreInfoModal::ShowPlayerProfileModal, this));
+        userImage->set_preserveAspect(true);
         auto seperatorHorizontal = CreateHorizontalLayoutGroup(mainVertical->get_transform());
+        auto seperatorLayout = seperatorHorizontal->get_gameObject()->GetComponent<LayoutElement*>();
+        if (seperatorLayout)
+            seperatorLayout = seperatorHorizontal->get_gameObject()->AddComponent<LayoutElement*>();
+
+        seperatorLayout->set_preferredHeight(1.0f);
+
         auto texture = Texture2D::get_whiteTexture();
         auto whiteSprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)texture->get_width(), (float)texture->get_height()), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
         auto seperatorImage = CreateImage(seperatorHorizontal->get_transform(), whiteSprite, {0, 0}, {0, 0});
@@ -140,6 +149,9 @@ namespace ScoreSaber::UI::Other
     void ScoreInfoModal::ShowPlayerProfileModal()
     {
         if (playerProfileModal)
+        {
+            Hide();
             playerProfileModal->Show(playerId);
+        }
     }
 }
