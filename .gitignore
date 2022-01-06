@@ -58,4 +58,6 @@ mod.json
 !CMakeLists.txt
 tombstone_*
 *.~cpp
+*.~c
 *.~hpp
+*.~h

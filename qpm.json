@@ -54,6 +54,11 @@
       "id": "songdownloader",
       "versionRange": "^0.3.2",
       "additionalData": {}
+    },
+    {
+      "id": "gif-lib",
+      "versionRange": "^5.2.2",
+      "additionalData": {}
     }
   ],
   "additionalData": {}

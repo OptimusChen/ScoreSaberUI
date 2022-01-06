@@ -3,16 +3,19 @@
 #include "GlobalNamespace/SharedCoroutineStarter.hpp"
 #include "HMUI/ImageView.hpp"
 #include "HMUI/Touchable.hpp"
-#include "Sprites.hpp"
+
 #include "UnityEngine/Networking/DownloadHandlerTexture.hpp"
 #include "UnityEngine/Networking/UnityWebRequest.hpp"
 #include "UnityEngine/Networking/UnityWebRequestTexture.hpp"
 #include "UnityEngine/Sprite.hpp"
 #include "UnityEngine/SpriteMeshType.hpp"
 #include "UnityEngine/Texture2D.hpp"
+
+#include "Sprites.hpp"
 #include "Utils/StringUtils.hpp"
 #include "Utils/UIUtils.hpp"
 #include "Utils/WebUtils.hpp"
+
 #include "logging.hpp"
 #include "main.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
@@ -37,18 +40,9 @@ using LeaderboardType = ScoreSaber::CustomTypes::Components::GlobalLeaderboardTa
         reinterpret_cast<System::Collections::IEnumerator*>(                 \
             custom_types::Helpers::CoroutineHelper::New(method)));
 
-static custom_types::Helpers::Coroutine WaitForImageDownload(std::string url, HMUI::ImageView* out)
+void GlobalLeaderboardTableCell::ctor()
 {
-    UnityEngine::Networking::UnityWebRequest* www = UnityEngine::Networking::UnityWebRequestTexture::GetTexture(il2cpp_utils::newcsstr(url));
-    co_yield reinterpret_cast<System::Collections::IEnumerator*>(www->SendWebRequest());
-    auto downloadHandlerTexture = reinterpret_cast<UnityEngine::Networking::DownloadHandlerTexture*>(www->get_downloadHandler());
-    auto texture = downloadHandlerTexture->get_texture();
-    auto sprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)texture->get_width(), (float)texture->get_height()), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
-    out->set_sprite(sprite);
-    co_return;
 }
-
-void GlobalLeaderboardTableCell::ctor() {}
 
 VerticalLayoutGroup* CreateHost(Transform* parent, Vector2 anchoredPos,
                                 Vector2 size)
@@ -86,7 +80,14 @@ void GlobalLeaderboardTableCell::Refresh(ScoreSaber::Data::Player& player, Leade
     // if it ends with oculus.png then there is no reason to redownload the image, so let's not redownload it :)
     if (!player.profilePicture.ends_with("oculus.png"))
     {
-        profileRoutine = BeginCoroutine(WaitForImageDownload(player.profilePicture, profile));
+        if (player.profilePicture.ends_with(".gif"))
+        {
+            profileRoutine = BeginCoroutine(WebUtils::WaitForGifDownload(player.profilePicture, profile));
+        }
+        else
+        {
+            profileRoutine = BeginCoroutine(WebUtils::WaitForImageDownload(player.profilePicture, profile));
+        }
     }
 
     INFO("Setting playername %s", ::to_utf8(player.name).c_str());
@@ -108,7 +109,7 @@ void GlobalLeaderboardTableCell::Refresh(ScoreSaber::Data::Player& player, Leade
 
     INFO("Setting country %s", player.country.c_str());
     flag->set_sprite(Base64ToSprite(country_base64));
-    flagRoutine = BeginCoroutine(WaitForImageDownload(flag_url(player.country), flag));
+    flagRoutine = BeginCoroutine(WebUtils::WaitForImageDownload(flag_url(player.country), flag));
     this->country->set_text(StrToIl2cppStr(player.country));
 
     auto& histories = player.histories;

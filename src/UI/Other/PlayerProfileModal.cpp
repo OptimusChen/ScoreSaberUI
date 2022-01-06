@@ -18,6 +18,7 @@
 #include "UnityEngine/UI/LayoutElement.hpp"
 
 #include "Sprites.hpp"
+#include "Utils/WebUtils.hpp"
 #include "logging.hpp"
 
 DEFINE_TYPE(ScoreSaber::UI::Other, PlayerProfileModal);
@@ -39,17 +40,6 @@ using namespace QuestUI::BeatSaberUI;
     GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine( \
         reinterpret_cast<System::Collections::IEnumerator*>(                 \
             custom_types::Helpers::CoroutineHelper::New(method)))
-
-static custom_types::Helpers::Coroutine WaitForImageDownload(std::string url, HMUI::ImageView* out)
-{
-    UnityEngine::Networking::UnityWebRequest* www = UnityEngine::Networking::UnityWebRequestTexture::GetTexture(il2cpp_utils::newcsstr(url));
-    co_yield reinterpret_cast<System::Collections::IEnumerator*>(www->SendWebRequest());
-    auto downloadHandlerTexture = reinterpret_cast<UnityEngine::Networking::DownloadHandlerTexture*>(www->get_downloadHandler());
-    auto texture = downloadHandlerTexture->get_texture();
-    auto sprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)texture->get_width(), (float)texture->get_height()), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
-    out->set_sprite(sprite);
-    co_return;
-}
 
 #define WIDTH 80.0f
 #define HEIGHT 60.0f
@@ -85,7 +75,7 @@ namespace ScoreSaber::UI::Other
         set_averageRankedAccuracy(player.scoreStats->averageRankedAccuracy);
         set_totalScore(player.scoreStats->totalScore);
 
-        profileRoutine = BeginCoroutine(WaitForImageDownload(player.profilePicture, pfpImage));
+        profileRoutine = BeginCoroutine(WebUtils::WaitForImageDownload(player.profilePicture, pfpImage));
         for (auto& badge : player.badges)
         {
             AddBadge(badge);
@@ -229,7 +219,14 @@ namespace ScoreSaber::UI::Other
         auto image = CreateImage(badgeHorizontal->get_transform(), sprite, Vector2(0, 0), Vector2(0, 0));
         //TODO: fix size
         SetPreferredSize(image, 2, 3);
-        badgeRoutines->Add(BeginCoroutine(WaitForImageDownload(badge.image, image)));
+        if (badge.image.ends_with(".gif"))
+        {
+            badgeRoutines->Add(BeginCoroutine(WebUtils::WaitForGifDownload(badge.image, image)));
+        }
+        else
+        {
+            badgeRoutines->Add(BeginCoroutine(WebUtils::WaitForImageDownload(badge.image, image)));
+        }
         AddHoverHint(badgeVertical->get_gameObject(), badge.description);
 
         image->set_preserveAspect(true);
