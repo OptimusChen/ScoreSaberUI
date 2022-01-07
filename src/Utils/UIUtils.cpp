@@ -1,4 +1,5 @@
 #include "Utils/UIUtils.hpp"
+#include "Utils/WebUtils.hpp"
 #include "main.hpp"
 
 #include "CustomTypes/Components/ImageButton.hpp"
@@ -60,17 +61,6 @@ using namespace QuestUI::BeatSaberUI;
 
 using HapticPresetSO = Libraries::HM::HMLib::VR::HapticPresetSO;
 static SafePtr<HapticPresetSO> hapticFeedbackPresetSO;
-
-static custom_types::Helpers::Coroutine WaitForImageDownload(std::string url, HMUI::ImageView* out)
-{
-    UnityEngine::Networking::UnityWebRequest* www = UnityEngine::Networking::UnityWebRequestTexture::GetTexture(il2cpp_utils::newcsstr(url));
-    co_yield reinterpret_cast<System::Collections::IEnumerator*>(www->SendWebRequest());
-    auto downloadHandlerTexture = reinterpret_cast<UnityEngine::Networking::DownloadHandlerTexture*>(www->get_downloadHandler());
-    auto texture = downloadHandlerTexture->get_texture();
-    auto sprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)texture->get_width(), (float)texture->get_height()), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
-    out->set_sprite(sprite);
-    co_return;
-}
 
 namespace UIUtils
 {
@@ -159,7 +149,14 @@ namespace UIUtils
         horizontal->set_spacing(2.0f);
         auto url = member.get_profilePicture();
         auto image = CreateImage(horizontal->get_transform(), Base64ToSprite(oculus_base64), Vector2(0, 0), Vector2(0, 0));
-        BeginCoroutine(WaitForImageDownload(url, image));
+        if (url.ends_with(".gif"))
+        {
+            BeginCoroutine(WebUtils::WaitForGifDownload(url, image));
+        }
+        else
+        {
+            BeginCoroutine(WebUtils::WaitForImageDownload(url, image));
+        }
         SetPreferredSize(image, 12, 12);
         image->set_preserveAspect(true);
 

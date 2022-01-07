@@ -1,5 +1,8 @@
 #pragma once
 #include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
+#include "custom-types/shared/coroutine.hpp"
+
+#include "HMUI/ImageView.hpp"
 
 #include <functional>
 #include <string>
@@ -23,5 +26,10 @@ namespace WebUtils
     void GetJSONAsync(
         std::string url,
         std::function<void(long, bool, rapidjson::Document&)> finished);
+
+    /// @brief gets texture @ url and applies it to out->set_sprite() after downloading
+    custom_types::Helpers::Coroutine WaitForImageDownload(std::string url, HMUI::ImageView* out);
+    /// @brief gets gif @ url and applies it's first frame to out->set_sprite() after downloading
+    custom_types::Helpers::Coroutine WaitForGifDownload(std::string url, HMUI::ImageView* out);
 
 } // namespace WebUtils
