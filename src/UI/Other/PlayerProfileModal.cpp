@@ -16,6 +16,7 @@
 #include "UnityEngine/SpriteMeshType.hpp"
 #include "UnityEngine/Texture2D.hpp"
 #include "UnityEngine/UI/LayoutElement.hpp"
+#include "UnityEngine/TextAnchor.hpp"
 
 #include "Sprites.hpp"
 #include "logging.hpp"
@@ -86,9 +87,11 @@ namespace ScoreSaber::UI::Other
         set_totalScore(player.scoreStats->totalScore);
 
         profileRoutine = BeginCoroutine(WaitForImageDownload(player.profilePicture, pfpImage));
+        int i = 0;
         for (auto& badge : player.badges)
         {
-            AddBadge(badge);
+            i++;
+            AddBadge(badge, i);
         }
     }
 
@@ -165,6 +168,7 @@ namespace ScoreSaber::UI::Other
 
         badgeHorizontal = CreateHorizontalLayoutGroup(pfpVertical->get_transform());
         badgeHorizontal->set_spacing(1.0f);
+        badgeHorizontal->set_childAlignment(TextAnchor::MiddleCenter);
 
         // seperator setup
         auto texture = Texture2D::get_whiteTexture();
@@ -219,20 +223,28 @@ namespace ScoreSaber::UI::Other
         */
     }
 
-    void PlayerProfileModal::AddBadge(ScoreSaber::Data::Badge& badge)
+    void PlayerProfileModal::AddBadge(ScoreSaber::Data::Badge& badge, int index)
     {
         constexpr const float generalSize = 5.0f;
         auto badgeVertical = CreateVerticalLayoutGroup(badgeHorizontal->get_transform());
-        //SetPreferredSize(badgeVertical, ratio.x, ratio.y);'
+        //SetPreferredSize(badgeVertical, 9, 3.5);
         auto texture = Texture2D::get_blackTexture();
         auto sprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)texture->get_width(), (float)texture->get_height()), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
+        
+        UnityEngine::Vector2 pos = {-2.0f, 0.0f};
+
+        if ((index - 1) % 3 == 0 && index != 1){
+            pos.y = -100*(index)*10;
+        }
+
         auto image = CreateImage(badgeHorizontal->get_transform(), sprite, Vector2(0, 0), Vector2(0, 0));
         //TODO: fix size
-        SetPreferredSize(image, 2, 3);
+        SetPreferredSize(image, 9, 3.5);
         badgeRoutines->Add(BeginCoroutine(WaitForImageDownload(badge.image, image)));
         AddHoverHint(badgeVertical->get_gameObject(), badge.description);
 
         image->set_preserveAspect(true);
+        badgeVertical->get_rectTransform()->set_anchoredPosition(pos);
     }
 
     void PlayerProfileModal::set_player(std::u16string_view header)
