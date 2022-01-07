@@ -94,36 +94,35 @@ struct Gif
             }
         }
 
+        // entire texture size;
         int width = get_width();
         int height = get_height();
         auto texture = Texture2D::New_ctor(width, height);
-        // should be same size :)
+        // entire texture
         Array<Color32>* pixelData = texture->GetPixels32();
         uint8_t* px = reinterpret_cast<uint8_t*>(pixelData->values);
+        // top -> top + height
 
-        for (y = frameInfo->Top + frameInfo->Height; y >= frameInfo->Top; --y)
+        // left -> left + width
+
+        // if directly setting in the color array, the loc is y inverted
+        // A frame only describes part of a picture
+        long pixelDataOffset = frameInfo->Top * width + frameInfo->Left;
+        for (y = 0; y < frameInfo->Height; ++y)
         {
-            auto line = px;
-            for (x = frameInfo->Left; x < frameInfo->Left + frameInfo->Width; ++x)
+            for (x = 0; x < frameInfo->Width; ++x)
             {
-                loc = (y - frameInfo->Top) * frameInfo->Width + (x - frameInfo->Left);
+                loc = y * frameInfo->Width + x;
                 if (frame->RasterBits[loc] == ext->Bytes[3] && ext->Bytes[0])
                 {
                     continue;
                 }
 
                 color = &colorMap->Colors[frame->RasterBits[loc]];
-                int linepos = x * 4;
-
-                line[linepos] = color->Red;
-                line[linepos + 1] = color->Green;
-                line[linepos + 2] = color->Blue;
-                line[linepos + 3] = 0xff;
+                long locWithinFrame = (frameInfo->Height - y - 1) * frameInfo->Width + x + pixelDataOffset;
+                pixelData->values[locWithinFrame] = Color32(color->Red, color->Green, color->Blue, 0xff);
             }
-
-            px += (frameInfo->Width * 4);
         }
-
         texture->SetAllPixels32(pixelData, 0);
         texture->Apply();
         return texture;
