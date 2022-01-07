@@ -76,12 +76,9 @@ namespace ScoreSaber::UI::Other
         set_averageRankedAccuracy(player.scoreStats->averageRankedAccuracy);
         set_totalScore(player.scoreStats->totalScore);
 
-<<<<<<< HEAD
         profileRoutine = BeginCoroutine(WaitForImageDownload(player.profilePicture, pfpImage));
         int i = 0;
-=======
         profileRoutine = BeginCoroutine(WebUtils::WaitForImageDownload(player.profilePicture, pfpImage));
->>>>>>> 964f90b796c813abee983833af41e22eb5dca1d3
         for (auto& badge : player.badges)
         {
             i++;
