@@ -42,7 +42,7 @@ using namespace QuestUI::BeatSaberUI;
         reinterpret_cast<System::Collections::IEnumerator*>(                 \
             custom_types::Helpers::CoroutineHelper::New(method)))
 
-#define WIDTH 80.0f
+#define WIDTH 90.0f
 #define HEIGHT 60.0f
 namespace ScoreSaber::UI::Other
 {
@@ -76,7 +76,6 @@ namespace ScoreSaber::UI::Other
         set_averageRankedAccuracy(player.scoreStats->averageRankedAccuracy);
         set_totalScore(player.scoreStats->totalScore);
 
-        profileRoutine = BeginCoroutine(WaitForImageDownload(player.profilePicture, pfpImage));
         int i = 0;
         profileRoutine = BeginCoroutine(WebUtils::WaitForImageDownload(player.profilePicture, pfpImage));
         for (auto& badge : player.badges)
@@ -131,7 +130,7 @@ namespace ScoreSaber::UI::Other
         bgImage->set_color1(Color(1, 1, 1, 1));
 
         // placeholder color
-        bgImage->set_color(Color(1, 0, 0, 1));
+        bgImage->set_color(Color(85 / 255.0f, 94 / 255.0f, 188 / 255.0f, 1));
         bgImage->dyn__curvedCanvasSettingsHelper()->Reset();
 
         headerText = CreateText(headerHorizon->get_transform(), "Profile Placeholder");
@@ -230,10 +229,6 @@ namespace ScoreSaber::UI::Other
 
         auto image = CreateImage(badgeHorizontal->get_transform(), sprite, Vector2(0, 0), Vector2(0, 0));
         //TODO: fix size
-<<<<<<< HEAD
-        SetPreferredSize(image, 9, 3.5);
-        badgeRoutines->Add(BeginCoroutine(WaitForImageDownload(badge.image, image)));
-=======
         SetPreferredSize(image, 2, 3);
         if (badge.image.ends_with(".gif"))
         {
@@ -243,7 +238,6 @@ namespace ScoreSaber::UI::Other
         {
             badgeRoutines->Add(BeginCoroutine(WebUtils::WaitForImageDownload(badge.image, image)));
         }
->>>>>>> 964f90b796c813abee983833af41e22eb5dca1d3
         AddHoverHint(badgeVertical->get_gameObject(), badge.description);
 
         image->set_preserveAspect(true);
