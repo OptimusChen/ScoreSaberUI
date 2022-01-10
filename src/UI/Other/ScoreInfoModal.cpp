@@ -18,15 +18,14 @@
 #include "UnityEngine/UI/VerticalLayoutGroup.hpp"
 #include "UnityEngine/UI/HorizontalLayoutGroup.hpp"
 #include "UnityEngine/RectOffset.hpp"
+#include "Utils/StringUtils.hpp"
 #include "UnityEngine/Resources.hpp"
 
 #include "UnityEngine/SystemInfo.hpp"
 
 #include "Utils/UIUtils.hpp"
 
-#include <sstream>
-#include <iomanip>
-#include <locale>
+#include <map>
 
 DEFINE_TYPE(ScoreSaber::UI::Other, ScoreInfoModal);
 
@@ -37,6 +36,7 @@ using namespace GlobalNamespace;
 using namespace QuestUI::BeatSaberUI;
 using namespace TMPro;
 using namespace System;
+using namespace StringUtils;
 
 #define SetPreferredSize(identifier, width, height)                                         \
     auto layout##identifier = identifier->get_gameObject()->GetComponent<LayoutElement*>(); \
@@ -80,13 +80,93 @@ std::string GetDevice(int id){
         return "Oculus Quest";
     }else if (id == 16){
         return "Oculus Rift S";
-    }else if (id == 1){
-        return "Oculus Rift CV1";
     }else if (id == 2){
         return "Vive";
-    }else{
+    }else if (id == 1){
+        return "Oculus Rift CV1";
+    }else if (id == 0){
         return "Unknown";
+    }else{
+        return std::to_string(id);
     }
+}
+
+std::string GetUnit(std::string unit, int amount){
+    std::string s = std::to_string(amount);
+    return amount == 1 ? s + " " + unit : s + " " + unit + "s";
+}
+
+std::string GetDate(std::string date){
+    using namespace std;
+
+    Il2CppString* csDate = StrToIl2cppStr(date);
+
+    // Oh god this code is jank but CultureInfo doesn't inherit IFormatProvider
+    // for some reason & im not good at all this c# stuff ok
+    int scoreYear = stoi(Il2cppStrToStr(csDate->Split('-')->get(0)));
+    int scoreMonth = stoi(Il2cppStrToStr(csDate->Split('-')->get(1)));
+    int scoreDay = stoi(Il2cppStrToStr(csDate->Split('T')->get(0)->Split('-')->get(2)));
+    int scoreHour = stoi(Il2cppStrToStr(csDate->Split('T')->get(1)->Split(':')->get(0)));
+    int scoreMin = stoi(Il2cppStrToStr(csDate->Split('T')->get(1)->Split(':')->get(1)));
+    int scoreSec = stoi(Il2cppStrToStr(csDate->Split(':')->get(2)->Split('.')->get(0)));
+
+    DateTime scoreDate = DateTime(scoreYear, scoreMonth, scoreDay, scoreHour, scoreMin, scoreSec, 0);
+    int daysInMo = DateTime::DaysInMonth(scoreYear, scoreMonth);
+
+    DateTime now = DateTime::get_UtcNow();
+
+    TimeSpan diff = TimeSpan(now.get_Ticks() - scoreDate.get_Ticks());
+
+    std::vector<std::pair<std::string, int>> times = {};
+
+    long ticks = diff.get_Ticks();
+    long seconds = ticks / 10000000;
+    int secondsInYear = 31536000;
+    int secondsInWeek = 604800;
+    int secondsInDay = 86400;
+    int secondsInHour = 3600;
+    int secondsInMinute = 60;
+    
+    int year = floor(seconds / secondsInYear);
+    times.push_back({"Year", year});  
+    int yRemain = seconds % secondsInYear;
+
+    int month = floor(yRemain / (daysInMo * secondsInDay));
+    times.push_back({"Month", month});  
+    int mRemain = yRemain % (daysInMo * secondsInDay);
+
+    int week = floor(mRemain / secondsInWeek);
+    times.push_back({"Week", week});  
+    int wRemain = mRemain % secondsInWeek;
+
+    int day = floor(wRemain / secondsInDay);
+    times.push_back({"Day", day});  
+    int dRemain = wRemain % secondsInDay;
+
+    int hour = floor(dRemain / secondsInHour);
+    times.push_back({"Hour", hour});  
+    int hRemain = dRemain % secondsInHour;
+
+    int minute = floor(hRemain / secondsInMinute);
+    times.push_back({"Minute", minute});  
+
+    int second = floor(hRemain % secondsInMinute);
+    times.push_back({"Second", second});  
+
+    std::string s;
+
+    for (std::pair<std::string, int> pair : times){
+        if (pair.second > 0){
+            if (s.length() == 0){
+                s = string_format("%s and ", GetUnit(pair.first, pair.second).c_str());
+            }else{
+                s = string_format("%s%s ago", s.c_str(), GetUnit(pair.first, pair.second).c_str());
+                break;
+            }
+        }
+    }
+
+    return s;
 }
 
 namespace ScoreSaber::UI::Other
@@ -100,7 +180,6 @@ namespace ScoreSaber::UI::Other
     {
 
         set_player(score.leaderboardPlayerInfo.name);
-        // TODO: get device from the score.hmd integer;
         set_device(GetDevice(score.hmd));
 
         // Not sure if this is the best way to get the beatmap
@@ -117,7 +196,7 @@ namespace ScoreSaber::UI::Other
         set_missedNotes(score.missedNotes);
         set_modifiers(score.modifiers);
         // TODO: Modify timeset to be like "N hours and M minutes ago" instead of timestamp
-        set_timeSet(score.timeSet);
+        set_timeSet(GetDate(score.timeSet));
 
         playerId = score.leaderboardPlayerInfo.id;
         modal->Show(true, true, nullptr);
