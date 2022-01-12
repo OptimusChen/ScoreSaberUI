@@ -16,6 +16,7 @@
 #include "UnityEngine/SpriteMeshType.hpp"
 #include "UnityEngine/Texture2D.hpp"
 #include "UnityEngine/UI/LayoutElement.hpp"
+#include "UnityEngine/TextAnchor.hpp"
 
 #include "Sprites.hpp"
 #include "Utils/WebUtils.hpp"
@@ -41,7 +42,7 @@ using namespace QuestUI::BeatSaberUI;
         reinterpret_cast<System::Collections::IEnumerator*>(                 \
             custom_types::Helpers::CoroutineHelper::New(method)))
 
-#define WIDTH 80.0f
+#define WIDTH 90.0f
 #define HEIGHT 60.0f
 namespace ScoreSaber::UI::Other
 {
@@ -75,10 +76,12 @@ namespace ScoreSaber::UI::Other
         set_averageRankedAccuracy(player.scoreStats->averageRankedAccuracy);
         set_totalScore(player.scoreStats->totalScore);
 
+        int i = 0;
         profileRoutine = BeginCoroutine(WebUtils::WaitForImageDownload(player.profilePicture, pfpImage));
         for (auto& badge : player.badges)
         {
-            AddBadge(badge);
+            i++;
+            AddBadge(badge, i);
         }
     }
 
@@ -127,7 +130,7 @@ namespace ScoreSaber::UI::Other
         bgImage->set_color1(Color(1, 1, 1, 1));
 
         // placeholder color
-        bgImage->set_color(Color(1, 0, 0, 1));
+        bgImage->set_color(Color(85 / 255.0f, 94 / 255.0f, 188 / 255.0f, 1));
         bgImage->dyn__curvedCanvasSettingsHelper()->Reset();
 
         headerText = CreateText(headerHorizon->get_transform(), "Profile Placeholder");
@@ -155,6 +158,7 @@ namespace ScoreSaber::UI::Other
 
         badgeHorizontal = CreateHorizontalLayoutGroup(pfpVertical->get_transform());
         badgeHorizontal->set_spacing(1.0f);
+        badgeHorizontal->set_childAlignment(TextAnchor::MiddleCenter);
 
         // seperator setup
         auto texture = Texture2D::get_whiteTexture();
@@ -209,13 +213,20 @@ namespace ScoreSaber::UI::Other
         */
     }
 
-    void PlayerProfileModal::AddBadge(ScoreSaber::Data::Badge& badge)
+    void PlayerProfileModal::AddBadge(ScoreSaber::Data::Badge& badge, int index)
     {
         constexpr const float generalSize = 5.0f;
         auto badgeVertical = CreateVerticalLayoutGroup(badgeHorizontal->get_transform());
-        //SetPreferredSize(badgeVertical, ratio.x, ratio.y);'
+        //SetPreferredSize(badgeVertical, 9, 3.5);
         auto texture = Texture2D::get_blackTexture();
         auto sprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)texture->get_width(), (float)texture->get_height()), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
+        
+        UnityEngine::Vector2 pos = {-2.0f, 0.0f};
+
+        if ((index - 1) % 3 == 0 && index != 1){
+            pos.y = -100*(index)*10;
+        }
+
         auto image = CreateImage(badgeHorizontal->get_transform(), sprite, Vector2(0, 0), Vector2(0, 0));
         //TODO: fix size
         SetPreferredSize(image, 2, 3);
@@ -230,6 +241,7 @@ namespace ScoreSaber::UI::Other
         AddHoverHint(badgeVertical->get_gameObject(), badge.description);
 
         image->set_preserveAspect(true);
+        badgeVertical->get_rectTransform()->set_anchoredPosition(pos);
     }
 
     void PlayerProfileModal::set_player(std::u16string_view header)

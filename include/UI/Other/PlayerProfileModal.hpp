@@ -43,7 +43,7 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::UI::Other, PlayerProfileModal, UnityEngine::Mo
                       void set_totalScore(long totalScore);
                       void set_pfp(UnityEngine::Sprite* pfp);
                       void ClearBadges();
-                      void AddBadge(ScoreSaber::Data::Badge& badge);
+                      void AddBadge(ScoreSaber::Data::Badge& badge, int index);
 
                       custom_types::Helpers::Coroutine FetchPlayerData(std::string playerId);
                       void SetPlayerData(ScoreSaber::Data::Player& player);
