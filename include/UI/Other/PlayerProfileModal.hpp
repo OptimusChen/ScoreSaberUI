@@ -5,7 +5,7 @@
 #include "TMPro/TextMeshProUGUI.hpp"
 #include "UnityEngine/MonoBehaviour.hpp"
 #include "UnityEngine/Transform.hpp"
-#include "UnityEngine/UI/HorizontalLayoutGroup.hpp"
+#include "UnityEngine/UI/GridLayoutGroup.hpp"
 #include "custom-types/shared/coroutine.hpp"
 #include "custom-types/shared/macros.hpp"
 #include <string_view>
@@ -18,7 +18,7 @@
 DECLARE_CLASS_CODEGEN(ScoreSaber::UI::Other, PlayerProfileModal, UnityEngine::MonoBehaviour,
                       DECLARE_INSTANCE_FIELD(HMUI::ModalView*, modal);
                       DECLARE_INSTANCE_FIELD(HMUI::ImageView*, pfpImage);
-                      DECLARE_INSTANCE_FIELD(UnityEngine::UI::HorizontalLayoutGroup*, badgeHorizontal);
+                      DECLARE_INSTANCE_FIELD(UnityEngine::UI::GridLayoutGroup*, badgeParent);
                       DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, headerText);
                       DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, globalRanking);
                       DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, performancePoints);
@@ -30,6 +30,7 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::UI::Other, PlayerProfileModal, UnityEngine::Mo
                       public
                       :
 
+                      std::string playerId;
                       static ScoreSaber::UI::Other::PlayerProfileModal * Create(UnityEngine::Transform * parent);
                       void Show(std::string playerId);
 
@@ -49,5 +50,7 @@ DECLARE_CLASS_CODEGEN(ScoreSaber::UI::Other, PlayerProfileModal, UnityEngine::Mo
                       void SetPlayerData(ScoreSaber::Data::Player& player);
                       void stopProfileRoutine();
                       void stopBadgeRoutines();
+
+                      void OpenPlayerUrl();
 
 )
