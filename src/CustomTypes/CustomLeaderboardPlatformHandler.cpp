@@ -83,7 +83,7 @@ custom_types::Helpers::Coroutine GetScoresInternal(
     if (gameMode == "Standard")
         gameMode = "SoloStandard";
 
-    // TODO: fix data fetching to use proper 10 sized pages, instead of 12 sized pages
+    // TODO: fix data fetching to use proper 10 sized pages, instead of 12 sized pages, possibly just fixed by umby using a different endpoint
     std::string url = string_format("https://scoresaber.com/api/leaderboard/by-hash/%s/scores?difficulty=%d&page=%d&gameMode=%s", hash.c_str(), getDiff(beatmap), self->page, gameMode.c_str());
     UnityEngine::Networking::UnityWebRequest* webRequest =
         UnityEngine::Networking::UnityWebRequest::Get(StrToIl2cppStr(url));

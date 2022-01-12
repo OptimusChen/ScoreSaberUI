@@ -26,7 +26,6 @@ namespace ScoreSaber::Data
         bool fullCombo;
         int hmd;
         bool hasReplay;
-        /// TODO: Parse datetime
         std::string timeSet;
     };
 }

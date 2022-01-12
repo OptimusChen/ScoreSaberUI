@@ -1,25 +1,25 @@
 #include "UI/Other/ScoreInfoModal.hpp"
 #include "Sprites.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
 #include "System/DateTime.hpp"
-#include "System/TimeSpan.hpp"
 #include "System/DayOfWeek.hpp"
+#include "System/TimeSpan.hpp"
+#include "questui/shared/BeatSaberUI.hpp"
 
+#include "GlobalNamespace/PlatformLeaderboardViewController.hpp"
+#include "System/Globalization/CultureInfo.hpp"
+#include "System/Int32.hpp"
+#include "System/String.hpp"
+#include "UnityEngine/RectOffset.hpp"
+#include "UnityEngine/Resources.hpp"
 #include "UnityEngine/Sprite.hpp"
 #include "UnityEngine/SpriteMeshType.hpp"
-#include "System/String.hpp"
-#include "Utils/BeatmapUtils.hpp"
-#include "System/Globalization/CultureInfo.hpp"
-#include "GlobalNamespace/PlatformLeaderboardViewController.hpp"
-#include "System/Int32.hpp"
-#include "main.hpp"
 #include "UnityEngine/Texture2D.hpp"
+#include "UnityEngine/UI/HorizontalLayoutGroup.hpp"
 #include "UnityEngine/UI/LayoutElement.hpp"
 #include "UnityEngine/UI/VerticalLayoutGroup.hpp"
-#include "UnityEngine/UI/HorizontalLayoutGroup.hpp"
-#include "UnityEngine/RectOffset.hpp"
+#include "Utils/BeatmapUtils.hpp"
 #include "Utils/StringUtils.hpp"
-#include "UnityEngine/Resources.hpp"
+#include "main.hpp"
 
 #include "UnityEngine/SystemInfo.hpp"
 
@@ -45,18 +45,24 @@ using namespace StringUtils;
     layout##identifier->set_preferredWidth(width);                                          \
     layout##identifier->set_preferredHeight(height)
 
-#define SetFitMode(identifier, horizontal, vertical)                                         \
+#define SetFitMode(identifier, horizontal, vertical)                                            \
     auto fitter##identifier = identifier->get_gameObject()->GetComponent<ContentSizeFitter*>(); \
-    fitter##identifier->set_verticalFit(vertical);                                          \
+    fitter##identifier->set_verticalFit(vertical);                                              \
     fitter##identifier->set_horizontalFit(horizontal)
 
-std::string FormatNumber(int number) {
+#define CreateDefaultTextAndSetSize(identifier, size)                  \
+    identifier = CreateText(textVertical->get_transform(), "", false); \
+    identifier->set_fontSize(size);
+
+std::string FormatNumber(int number)
+{
     std::string s = std::to_string(number);
 
     int insertIndex = s.length() % 3;
     int count = s.length() / 3;
 
-    if (insertIndex == 0){
+    if (insertIndex == 0)
+    {
         insertIndex = insertIndex + 3;
         count--;
     }
@@ -64,53 +70,62 @@ std::string FormatNumber(int number) {
     {
         s.insert(insertIndex, ",");
         insertIndex = insertIndex + 4;
-    
+
         count--;
     }
-    
-    return s; 
+
+    return s;
 }
 
 // Not the ideal way to get the devices
 // but ill have to make do for now
-std::string GetDevice(int id){
-    if (id == 64){
+std::string GetDevice(int id)
+{
+    if (id == 64)
+    {
         return "Valve Index";
-    }else if (id == 32){
+    }
+    else if (id == 32)
+    {
         return "Oculus Quest";
-    }else if (id == 16){
+    }
+    else if (id == 16)
+    {
         return "Oculus Rift S";
-    }else if (id == 2){
+    }
+    else if (id == 2)
+    {
         return "Vive";
-    }else if (id == 1){
+    }
+    else if (id == 1)
+    {
         return "Oculus Rift CV1";
-    }else if (id == 0){
+    }
+    else if (id == 0)
+    {
         return "Unknown";
-    }else{
+    }
+    else
+    {
         return std::to_string(id);
     }
 }
 
-std::string GetUnit(std::string unit, int amount){
+std::string GetUnit(std::string unit, int amount)
+{
     std::string s = std::to_string(amount);
     return amount == 1 ? s + " " + unit : s + " " + unit + "s";
 }
 
-std::string GetDate(std::string date){
+std::string GetDate(std::string date)
+{
     using namespace std;
 
-    Il2CppString* csDate = StrToIl2cppStr(date);
+    //Time format example from scoresaber: 2021-09-18T12:48:07.000Z
+    int scoreYear, scoreMonth, scoreDay, scoreHour, scoreMin, scoreSec, scoreMillisec;
+    sscanf(date.c_str(), "%d-%d-%dT%d:%d:%d.%dZ", &scoreYear, &scoreMonth, &scoreDay, &scoreHour, &scoreMin, &scoreSec, &scoreMillisec);
 
-    // Oh god this code is jank but CultureInfo doesn't inherit IFormatProvider
-    // for some reason & im not good at all this c# stuff ok
-    int scoreYear = stoi(Il2cppStrToStr(csDate->Split('-')->get(0)));
-    int scoreMonth = stoi(Il2cppStrToStr(csDate->Split('-')->get(1)));
-    int scoreDay = stoi(Il2cppStrToStr(csDate->Split('T')->get(0)->Split('-')->get(2)));
-    int scoreHour = stoi(Il2cppStrToStr(csDate->Split('T')->get(1)->Split(':')->get(0)));
-    int scoreMin = stoi(Il2cppStrToStr(csDate->Split('T')->get(1)->Split(':')->get(1)));
-    int scoreSec = stoi(Il2cppStrToStr(csDate->Split(':')->get(2)->Split('.')->get(0)));
-
-    DateTime scoreDate = DateTime(scoreYear, scoreMonth, scoreDay, scoreHour, scoreMin, scoreSec, 0);
+    DateTime scoreDate = DateTime(scoreYear, scoreMonth, scoreDay, scoreHour, scoreMin, scoreSec, scoreMillisec);
     int daysInMo = DateTime::DaysInMonth(scoreYear, scoreMonth);
 
     DateTime now = DateTime::get_UtcNow();
@@ -121,45 +136,49 @@ std::string GetDate(std::string date){
 
     long ticks = diff.get_Ticks();
     long seconds = ticks / 10000000;
-    int secondsInYear = 31536000;
-    int secondsInWeek = 604800;
-    int secondsInDay = 86400;
-    int secondsInHour = 3600;
-    int secondsInMinute = 60;
-    
+    constexpr const unsigned int secondsInYear = 31536000;
+    constexpr const unsigned int secondsInWeek = 604800;
+    constexpr const unsigned int secondsInDay = 86400;
+    constexpr const unsigned int secondsInHour = 3600;
+    constexpr const unsigned int secondsInMinute = 60;
     int year = floor(seconds / secondsInYear);
-    times.push_back({"Year", year});  
+    times.push_back({"Year", year});
     int yRemain = seconds % secondsInYear;
 
     int month = floor(yRemain / (daysInMo * secondsInDay));
-    times.push_back({"Month", month});  
+    times.push_back({"Month", month});
     int mRemain = yRemain % (daysInMo * secondsInDay);
 
     int week = floor(mRemain / secondsInWeek);
-    times.push_back({"Week", week});  
+    times.push_back({"Week", week});
     int wRemain = mRemain % secondsInWeek;
 
     int day = floor(wRemain / secondsInDay);
-    times.push_back({"Day", day});  
+    times.push_back({"Day", day});
     int dRemain = wRemain % secondsInDay;
 
     int hour = floor(dRemain / secondsInHour);
-    times.push_back({"Hour", hour});  
+    times.push_back({"Hour", hour});
     int hRemain = dRemain % secondsInHour;
 
     int minute = floor(hRemain / secondsInMinute);
-    times.push_back({"Minute", minute});  
+    times.push_back({"Minute", minute});
 
     int second = floor(hRemain % secondsInMinute);
-    times.push_back({"Second", second});  
+    times.push_back({"Second", second});
 
     std::string s;
 
-    for (std::pair<std::string, int> pair : times){
-        if (pair.second > 0){
-            if (s.length() == 0){
+    for (std::pair<std::string, int> pair : times)
+    {
+        if (pair.second > 0)
+        {
+            if (s.length() == 0)
+            {
                 s = string_format("%s and ", GetUnit(pair.first, pair.second).c_str());
-            }else{
+            }
+            else
+            {
                 s = string_format("%s%s ago", s.c_str(), GetUnit(pair.first, pair.second).c_str());
                 break;
             }
@@ -187,15 +206,14 @@ namespace ScoreSaber::UI::Other
         PlatformLeaderboardViewController* lb = ArrayUtil::First(Resources::FindObjectsOfTypeAll<PlatformLeaderboardViewController*>());
 
         int modifiedScore = score.modifiedScore;
-        
-        set_score(modifiedScore, 100*((double) modifiedScore / (double) BeatmapUtils::getMaxScore(lb->difficultyBeatmap)));
+
+        set_score(modifiedScore, 100 * ((double)modifiedScore / (double)BeatmapUtils::getMaxScore(lb->difficultyBeatmap)));
         set_pp(score.pp);
         set_combo(score.maxCombo);
         set_fullCombo(score.fullCombo);
         set_badCuts(score.badCuts);
         set_missedNotes(score.missedNotes);
         set_modifiers(score.modifiers);
-        // TODO: Modify timeset to be like "N hours and M minutes ago" instead of timestamp
         set_timeSet(GetDate(score.timeSet));
 
         playerId = score.leaderboardPlayerInfo.id;
@@ -224,7 +242,7 @@ namespace ScoreSaber::UI::Other
         auto headerHorizontal = CreateHorizontalLayoutGroup(mainVertical->get_transform());
         SetPreferredSize(headerHorizontal, 50.0f, 5.0f);
         SetFitMode(headerHorizontal, pref, pref);
-        
+
         auto nameVertical = CreateVerticalLayoutGroup(headerHorizontal->get_transform());
         //SetPreferredSize(nameVertical, 38.0f, 5.5f);
         SetFitMode(nameVertical, pref, pref);
@@ -273,24 +291,15 @@ namespace ScoreSaber::UI::Other
         SetPreferredSize(textVertical, 50.0f, 40.0f);
         textVertical->set_spacing(0.1f);
 
-        device = CreateText(textVertical->get_transform(), "", false);
-        device->set_fontSize(3.5f);
-        score = CreateText(textVertical->get_transform(), "", false);
-        score->set_fontSize(3.5f);
-        pp = CreateText(textVertical->get_transform(), "", false);
-        pp->set_fontSize(3.5f);
-        combo = CreateText(textVertical->get_transform(), "", false);
-        combo->set_fontSize(3.5f);
-        fullCombo = CreateText(textVertical->get_transform(), "", false);
-        fullCombo->set_fontSize(3.5f);
-        badCuts = CreateText(textVertical->get_transform(), "", false);
-        badCuts->set_fontSize(3.5f);
-        missedNotes = CreateText(textVertical->get_transform(), "", false);
-        missedNotes->set_fontSize(3.5f);
-        modifiers = CreateText(textVertical->get_transform(), "", false);
-        modifiers->set_fontSize(3.5f);
-        timeSet = CreateText(textVertical->get_transform(), "", false);
-        timeSet->set_fontSize(3.5f);
+        CreateDefaultTextAndSetSize(device, 3.5f);
+        CreateDefaultTextAndSetSize(score, 3.5f);
+        CreateDefaultTextAndSetSize(pp, 3.5f);
+        CreateDefaultTextAndSetSize(combo, 3.5f);
+        CreateDefaultTextAndSetSize(fullCombo, 3.5f);
+        CreateDefaultTextAndSetSize(badCuts, 3.5f);
+        CreateDefaultTextAndSetSize(missedNotes, 3.5f);
+        CreateDefaultTextAndSetSize(modifiers, 3.5f);
+        CreateDefaultTextAndSetSize(timeSet, 3.5f);
 
         set_player(u"placeholder");
         set_device("Oculus Quest");
@@ -331,7 +340,6 @@ namespace ScoreSaber::UI::Other
 
     void ScoreInfoModal::set_fullCombo(bool value)
     {
-        // TODO: Set correct color values
         this->fullCombo->set_text(il2cpp_utils::newcsstr(string_format("<color=#6F6F6F>Full Combo:</color> %s", value ? "<color=#13fd81>Yes</color>" : "<color=\"red\">No</color>")));
     }
 

@@ -31,7 +31,6 @@ namespace ScoreSaber::Data
         Difficulty difficulty;
         int maxScore;
         std::string createdDate;
-        /// TODO: Parse datetime
         std::optional<std::string> rankedDate;
         std::optional<std::string> qualifiedDate;
         std::optional<std::string> lovedDate;
