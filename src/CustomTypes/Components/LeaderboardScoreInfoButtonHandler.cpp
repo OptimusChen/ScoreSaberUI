@@ -19,13 +19,19 @@ namespace ScoreSaber::CustomTypes::Components
 {
     void LeaderboardScoreInfoButtonHandler::Setup()
     {
-        buttons = Array<ScoreSaber::CustomTypes::Components::ClickableImage*>::NewLength(10);
+        // buttons = Array<ScoreSaber::CustomTypes::Components::ClickableImage*>::NewLength(10);
+        buttons = Array<UnityEngine::UI::Button*>::NewLength(10);
         auto infoSprite = Base64ToSprite(info_base64);
         Vector2 basePosition = {45.0f, 26.17f};
         for (int i = 0; i < 10; i++)
         {
-            auto btn = UIUtils::CreateClickableImage(get_transform(), infoSprite, basePosition, {3.5, 3.5}, std::bind(&LeaderboardScoreInfoButtonHandler::ShowScoreInfoModal, this, i));
-            btn->set_preserveAspect(true);
+            // auto btn = UIUtils::CreateClickableImage(get_transform(), infoSprite, basePosition, {3.5, 3.5}, std::bind(&LeaderboardScoreInfoButtonHandler::ShowScoreInfoModal, this, i));
+            // btn->set_preserveAspect(true);
+            auto btn = CreateUIButton(get_transform(), "", "SettingsButton", basePosition, {3.5, 3.5}, std::bind(&LeaderboardScoreInfoButtonHandler::ShowScoreInfoModal, this, i));
+            SetButtonSprites(btn, infoSprite, infoSprite);
+            auto btnRect = reinterpret_cast<UnityEngine::RectTransform*>(btn->get_transform()->GetChild(0));
+            btnRect->set_sizeDelta({3.5, 3.5f});
+            btnRect->set_anchoredPosition({0.0f, 0.0f});
             basePosition.y -= 6.0f;
             buttons->values[i] = btn;
         }

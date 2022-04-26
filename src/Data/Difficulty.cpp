@@ -3,6 +3,8 @@
 
 namespace ScoreSaber::Data
 {
+    Difficulty::Difficulty() {}
+
     Difficulty::Difficulty(const rapidjson::Value&& value)
     {
         leaderboardId = value["leaderboardId"].GetInt();

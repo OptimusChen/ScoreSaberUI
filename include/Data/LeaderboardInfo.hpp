@@ -10,6 +10,7 @@ namespace ScoreSaber::Data
 {
     struct LeaderboardInfo
     {
+        LeaderboardInfo();
         LeaderboardInfo(Il2CppString* string);
         LeaderboardInfo(std::string_view string);
         LeaderboardInfo(std::u16string_view string);

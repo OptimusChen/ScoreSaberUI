@@ -167,15 +167,30 @@ GlobalLeaderboardTableCell* GlobalLeaderboardTableCell::CreateCell()
     layout->set_preferredWidth(200.0f);
 
     Transform* t = playerCell->get_transform();
-
+    /*
     playerCell->profile = UIUtils::CreateClickableImage(
         CreateHost(t, {-45.0f, 0.0f}, {10.0f, 10.0f})->get_transform(),
         Base64ToSprite(oculus_base64), {0.0f, 0.0f},
         {10.0f, 10.0f}, std::bind(&GlobalLeaderboardTableCell::OpenPlayerProfileModal, playerCell));
+    */
+    auto oculusSprite = Base64ToSprite(oculus_base64);
+    auto btn = QuestUI::BeatSaberUI::CreateUIButton(CreateHost(t, {-45.0f, 0.0f}, {10.0f, 10.0f})->get_transform(), "", "SettingsButton", std::bind(&GlobalLeaderboardTableCell::OpenPlayerProfileModal, playerCell));
+    QuestUI::BeatSaberUI::SetButtonSprites(btn, oculusSprite, oculusSprite);
+    auto countryRect = reinterpret_cast<UnityEngine::RectTransform*>(btn->get_transform()->GetChild(0));
+    countryRect->set_sizeDelta({10.0, 10.0f});
+    countryRect->set_anchoredPosition({0.0f, 0.0f});
 
+    playerCell->profile = btn->get_gameObject()->GetComponentInChildren<HMUI::ImageView*>();
+
+    playerCell->name = CreateText(
+        CreateHost(t, {-11.0f, 2.8f}, {55.0f, 8.0f})->get_transform(),
+        u"Username", {0.0f, 0.0f}, {0.0f, 0.0f});
+
+    /*
     playerCell->name = UIUtils::CreateClickableText(
         CreateHost(t, {-11.0f, 2.8f}, {55.0f, 8.0f})->get_transform(),
         u"Username", {0.0f, 0.0f}, {0.0f, 0.0f}, std::bind(&GlobalLeaderboardTableCell::OpenPlayerProfileModal, playerCell));
+        */
     playerCell->name->set_overflowMode(TextOverflowModes::Ellipsis);
     playerCell->name->set_alignment(TextAlignmentOptions::Left);
     playerCell->name->set_fontSize(5.0f);

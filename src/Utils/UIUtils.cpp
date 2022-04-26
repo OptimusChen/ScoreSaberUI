@@ -44,14 +44,16 @@ using namespace QuestUI::BeatSaberUI;
     layout##identifier->set_preferredWidth(width);                                          \
     layout##identifier->set_preferredHeight(height)
 
-#define SocialButton(identifier)                                                                                                                                                                                     \
-    std::string str##identifier = member.get_##identifier();                                                                                                                                                         \
-    if (str##identifier != "")                                                                                                                                                                                       \
-    {                                                                                                                                                                                                                \
-        auto identifier##_sprite = Base64ToSprite(identifier##_base64);                                                                                                                                              \
-        auto btn##identifier = CreateClickableImage(socialHorizontal->get_transform(), identifier##_sprite, {0, 0}, {0, 0}, [str##identifier]() { Application::OpenURL(il2cpp_utils::newcsstr(str##identifier)); }); \
-        SetPreferredSize(btn##identifier, 3, 3);                                                                                                                                                                     \
-        AddHoverHint(btn##identifier->get_gameObject(), "Opens in Browser");                                                                                                                                         \
+#define SocialButton(identifier)                                                                                                                                                                                         \
+    std::string str##identifier = member.get_##identifier();                                                                                                                                                             \
+    if (str##identifier != "")                                                                                                                                                                                           \
+    {                                                                                                                                                                                                                    \
+        auto identifier##_sprite = Base64ToSprite(identifier##_base64);                                                                                                                                                  \
+        auto btn##identifier = QuestUI::BeatSaberUI::CreateUIButton(socialHorizontal->get_transform(), "", "SettingsButton", [str##identifier]() { Application::OpenURL(il2cpp_utils::newcsstr(str##identifier)); });    \
+        QuestUI::BeatSaberUI::SetButtonSprites(btn##identifier, identifier##_sprite, identifier##_sprite);                                                                                                               \
+        /*auto btn##identifier = CreateClickableImage(socialHorizontal->get_transform(), identifier##_sprite, {0, 0}, {0, 0}, [str##identifier]() { Application::OpenURL(il2cpp_utils::newcsstr(str##identifier)); });*/ \
+        SetPreferredSize(btn##identifier, 3, 3);                                                                                                                                                                         \
+        AddHoverHint(btn##identifier->get_gameObject(), "Opens in Browser");                                                                                                                                             \
     }
 
 #define BeginCoroutine(method)                                               \
@@ -64,6 +66,7 @@ static SafePtr<HapticPresetSO> hapticFeedbackPresetSO;
 
 namespace UIUtils
 {
+    /*
     ScoreSaber::CustomTypes::Components::ClickableText* CreateClickableText(UnityEngine::Transform* parent, std::u16string_view text, UnityEngine::Vector2 anchoredPosition, UnityEngine::Vector2 sizeDelta, std::function<void()> onClick)
     {
         auto clickableText = CreateClickableText(parent, text, anchoredPosition, sizeDelta);
@@ -129,7 +132,7 @@ namespace UIUtils
     {
         return CreateClickableText(parent, to_utf16(text), anchoredPosition, sizeDelta);
     };
-
+*/
     UnityEngine::GameObject* CreateLoadingIndicator(UnityEngine::Transform* parent)
     {
         auto original = QuestUI::ArrayUtil::First(UnityEngine::Resources::FindObjectsOfTypeAll<GameObject*>(), [](auto el)
@@ -178,52 +181,52 @@ namespace UIUtils
         SocialButton(youtube);
         return horizontal;
     }
-
-    ScoreSaber::CustomTypes::Components::ClickableImage* CreateClickableImage(UnityEngine::Transform* parent, UnityEngine::Sprite* sprite, UnityEngine::Vector2 anchoredPosition, UnityEngine::Vector2 sizeDelta, std::function<void()> onClick)
-    {
-        auto image = CreateClickableImage(parent, sprite, anchoredPosition, sizeDelta);
-        if (onClick)
-            image->get_onPointerClickEvent() += [onClick](auto _)
-            { onClick(); };
-        return image;
-    }
-
-    ScoreSaber::CustomTypes::Components::ClickableImage* CreateClickableImage(UnityEngine::Transform* parent, UnityEngine::Sprite* sprite, UnityEngine::Vector2 anchoredPosition, UnityEngine::Vector2 sizeDelta)
-    {
-        static auto name = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("ScoreSaberClickableImage");
-        auto go = GameObject::New_ctor(name);
-
-        auto image = go->AddComponent<ScoreSaber::CustomTypes::Components::ClickableImage*>();
-        auto mat_UINoGlow = ArrayUtil::First(Resources::FindObjectsOfTypeAll<Material*>(), [](Material* x)
-                                             { return to_utf8(csstrtostr(x->get_name())) == "UINoGlow"; });
-        image->set_material(mat_UINoGlow);
-
-        go->get_transform()->SetParent(parent, false);
-        image->get_rectTransform()->set_sizeDelta(sizeDelta);
-        image->get_rectTransform()->set_anchoredPosition(anchoredPosition);
-        image->set_sprite(sprite);
-
-        go->AddComponent<LayoutElement*>();
-
-        auto menuShockWave = ArrayUtil::First(Resources::FindObjectsOfTypeAll<GlobalNamespace::MenuShockwave*>());
-        auto buttonClickedSignal = ArrayUtil::Last(menuShockWave->dyn__buttonClickEvents());
-        image->buttonClickedSignal = buttonClickedSignal;
-
-        if (!hapticFeedbackPresetSO)
+    /*
+        ScoreSaber::CustomTypes::Components::ClickableImage* CreateClickableImage(UnityEngine::Transform* parent, UnityEngine::Sprite* sprite, UnityEngine::Vector2 anchoredPosition, UnityEngine::Vector2 sizeDelta, std::function<void()> onClick)
         {
-            hapticFeedbackPresetSO.emplace(UnityEngine::ScriptableObject::CreateInstance<HapticPresetSO*>());
-            hapticFeedbackPresetSO->duration = 0.01f;
-            hapticFeedbackPresetSO->strength = 0.75f;
-            hapticFeedbackPresetSO->frequency = 0.5f;
+            auto image = CreateClickableImage(parent, sprite, anchoredPosition, sizeDelta);
+            if (onClick)
+                image->get_onPointerClickEvent() += [onClick](auto _)
+                { onClick(); };
+            return image;
         }
 
-        auto hapticFeedbackController = UnityEngine::Object::FindObjectOfType<GlobalNamespace::HapticFeedbackController*>();
-        image->hapticFeedbackController = hapticFeedbackController;
-        image->hapticFeedbackPresetSO = (HapticPresetSO*)hapticFeedbackPresetSO;
+        ScoreSaber::CustomTypes::Components::ClickableImage* CreateClickableImage(UnityEngine::Transform* parent, UnityEngine::Sprite* sprite, UnityEngine::Vector2 anchoredPosition, UnityEngine::Vector2 sizeDelta)
+        {
+            static auto name = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("ScoreSaberClickableImage");
+            auto go = GameObject::New_ctor(name);
 
-        return image;
-    }
+            auto image = go->AddComponent<ScoreSaber::CustomTypes::Components::ClickableImage*>();
+            auto mat_UINoGlow = ArrayUtil::First(Resources::FindObjectsOfTypeAll<Material*>(), [](Material* x)
+                                                 { return to_utf8(csstrtostr(x->get_name())) == "UINoGlow"; });
+            image->set_material(mat_UINoGlow);
 
+            go->get_transform()->SetParent(parent, false);
+            image->get_rectTransform()->set_sizeDelta(sizeDelta);
+            image->get_rectTransform()->set_anchoredPosition(anchoredPosition);
+            image->set_sprite(sprite);
+
+            go->AddComponent<LayoutElement*>();
+
+            auto menuShockWave = ArrayUtil::First(Resources::FindObjectsOfTypeAll<GlobalNamespace::MenuShockwave*>());
+            auto buttonClickedSignal = ArrayUtil::Last(menuShockWave->dyn__buttonClickEvents());
+            image->buttonClickedSignal = buttonClickedSignal;
+
+            if (!hapticFeedbackPresetSO)
+            {
+                hapticFeedbackPresetSO.emplace(UnityEngine::ScriptableObject::CreateInstance<HapticPresetSO*>());
+                hapticFeedbackPresetSO->duration = 0.01f;
+                hapticFeedbackPresetSO->strength = 0.75f;
+                hapticFeedbackPresetSO->frequency = 0.5f;
+            }
+
+            auto hapticFeedbackController = UnityEngine::Object::FindObjectOfType<GlobalNamespace::HapticFeedbackController*>();
+            image->hapticFeedbackController = hapticFeedbackController;
+            image->hapticFeedbackPresetSO = (HapticPresetSO*)hapticFeedbackPresetSO;
+
+            return image;
+        }
+    */
     HorizontalLayoutGroup* CreateHeader(UnityEngine::Transform* parent,
                                         UnityEngine::Color color)
     {

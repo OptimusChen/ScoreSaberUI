@@ -137,7 +137,8 @@ namespace ScoreSaber::UI::Other
         bgImage->set_color(Color(85 / 255.0f, 94 / 255.0f, 188 / 255.0f, 1));
         bgImage->dyn__curvedCanvasSettingsHelper()->Reset();
 
-        headerText = UIUtils::CreateClickableText(headerHorizon->get_transform(), u"Profile Placeholder", {0, 0}, {0, 0}, std::bind(&PlayerProfileModal::OpenPlayerUrl, this));
+        // headerText = UIUtils::CreateClickableText(headerHorizon->get_transform(), u"Profile Placeholder", {0, 0}, {0, 0}, std::bind(&PlayerProfileModal::OpenPlayerUrl, this));
+        headerText = CreateText(headerHorizon->get_transform(), u"Profile Placeholder", {0, 0}, {0, 0});
         SetPreferredSize(headerText, 90, -1);
         headerHorizon->set_childAlignment(TextAnchor::MiddleCenter);
         headerText->set_alignment(TMPro::TextAlignmentOptions::Center);
@@ -230,8 +231,8 @@ namespace ScoreSaber::UI::Other
     void PlayerProfileModal::AddBadge(ScoreSaber::Data::Badge& badge, int index)
     {
         constexpr const float generalSize = 5.0f;
-        //auto badgeVertical = CreateVerticalLayoutGroup(badgeParent->get_transform());
-        //SetPreferredSize(badgeVertical, 9, 3.5);
+        // auto badgeVertical = CreateVerticalLayoutGroup(badgeParent->get_transform());
+        // SetPreferredSize(badgeVertical, 9, 3.5);
         auto texture = Texture2D::get_blackTexture();
         auto sprite = Sprite::Create(texture, Rect(0.0f, 0.0f, (float)texture->get_width(), (float)texture->get_height()), Vector2(0.5f, 0.5f), 1024.0f, 1u, SpriteMeshType::FullRect, Vector4(0.0f, 0.0f, 0.0f, 0.0f), false);
 

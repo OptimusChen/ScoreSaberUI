@@ -7,6 +7,7 @@ namespace ScoreSaber::Data
 {
     struct Difficulty
     {
+        Difficulty();
         Difficulty(const rapidjson::Value&& value);
         Difficulty(const rapidjson::GenericValue<rapidjson::UTF16<char16_t>>&& value);
         Difficulty(rapidjson::GenericObject<true, rapidjson::Value> value);

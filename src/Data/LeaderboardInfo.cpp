@@ -19,6 +19,8 @@ inline rapidjson::Document getdoc(std::string_view string)
 
 namespace ScoreSaber::Data
 {
+    LeaderboardInfo::LeaderboardInfo() {}
+
     LeaderboardInfo::LeaderboardInfo(const rapidjson::Document&& doc) : difficulty(doc["difficulty"].GetObject())
     {
         id = doc["id"].GetInt();

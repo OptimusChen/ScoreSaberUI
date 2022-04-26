@@ -117,14 +117,18 @@ namespace ScoreSaber::UI::Other
         imageLayout->set_preferredWidth(1.0f);
 
         // info setup
-        topText = UIUtils::CreateClickableText(infoVertical->get_transform(), "");
-        bottomText = UIUtils::CreateClickableText(infoVertical->get_transform(), "");
+        // topText = UIUtils::CreateClickableText(infoVertical->get_transform(), "");
+        // bottomText = UIUtils::CreateClickableText(infoVertical->get_transform(), "");
 
+        topText = CreateText(infoVertical->get_transform(), "");
+        bottomText = CreateText(infoVertical->get_transform(), "");
+        /*
+        // unused because no clickable text
         topText->get_onPointerClickEvent() += [&](auto _)
         { OpenPlayerInfoModal(); };
         bottomText->get_onPointerClickEvent() += [&](auto _)
         { OpenSongInBrowser(); };
-
+        */
         auto loadingHorizontal = CreateHorizontalLayoutGroup(loadingVertical->get_transform());
         UIUtils::CreateLoadingIndicator(loadingHorizontal->get_transform());
         SetPreferredSize(loadingHorizontal, 10, 10);

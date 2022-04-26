@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CustomTypes/Components/ClickableText.hpp"
+//#include "CustomTypes/Components/ClickableText.hpp"
 #include "UI/Other/PlayerProfileModal.hpp"
 
 #include "HMUI/ImageView.hpp"
@@ -20,8 +20,10 @@ DECLARE_CLASS_CODEGEN(
     DECLARE_INSTANCE_METHOD(void, Update);
     DECLARE_INSTANCE_FIELD(QuestUI::Backgroundable*, bg);
     DECLARE_INSTANCE_FIELD(HMUI::ImageView*, bgImage);
-    DECLARE_INSTANCE_FIELD(ScoreSaber::CustomTypes::Components::ClickableText*, topText);
-    DECLARE_INSTANCE_FIELD(ScoreSaber::CustomTypes::Components::ClickableText*, bottomText);
+    DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, topText);
+    DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, bottomText);
+    //DECLARE_INSTANCE_FIELD(ScoreSaber::CustomTypes::Components::ClickableText*, topText);
+    //DECLARE_INSTANCE_FIELD(ScoreSaber::CustomTypes::Components::ClickableText*, bottomText);
     DECLARE_INSTANCE_FIELD(ScoreSaber::UI::Other::PlayerProfileModal*, playerProfileModal);
     DECLARE_INSTANCE_FIELD(UnityEngine::UI::VerticalLayoutGroup*, loadingVertical);
     DECLARE_INSTANCE_FIELD(TMPro::TextMeshProUGUI*, promptText);

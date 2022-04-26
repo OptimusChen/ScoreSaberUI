@@ -121,7 +121,7 @@ std::string GetDate(std::string date)
 {
     using namespace std;
 
-    //Time format example from scoresaber: 2021-09-18T12:48:07.000Z
+    // Time format example from scoresaber: 2021-09-18T12:48:07.000Z
     int scoreYear, scoreMonth, scoreDay, scoreHour, scoreMin, scoreSec, scoreMillisec;
     sscanf(date.c_str(), "%d-%d-%dT%d:%d:%d.%dZ", &scoreYear, &scoreMonth, &scoreDay, &scoreHour, &scoreMin, &scoreSec, &scoreMillisec);
 
@@ -244,7 +244,7 @@ namespace ScoreSaber::UI::Other
         SetFitMode(headerHorizontal, pref, pref);
 
         auto nameVertical = CreateVerticalLayoutGroup(headerHorizontal->get_transform());
-        //SetPreferredSize(nameVertical, 38.0f, 5.5f);
+        // SetPreferredSize(nameVertical, 38.0f, 5.5f);
         SetFitMode(nameVertical, pref, pref);
 
         auto nameHorizontal = CreateHorizontalLayoutGroup(nameVertical->get_transform());
@@ -264,16 +264,22 @@ namespace ScoreSaber::UI::Other
         buttonHorizontal->set_spacing(0.2f);
 
         auto userSprite = Base64ToSprite(user_base64);
-        auto userImage = UIUtils::CreateClickableImage(buttonHorizontal->get_transform(), userSprite, {0, 0}, {0, 0}, std::bind(&ScoreInfoModal::ShowPlayerProfileModal, this));
-        userImage->set_preserveAspect(true);
+
+        // TODO: it uses the same sprite now for both hovered / unhovered, that might need changing
+        auto userImage = QuestUI::BeatSaberUI::CreateUIButton(buttonHorizontal->get_transform(), "", "SettingsButton", std::bind(&ScoreInfoModal::ShowPlayerProfileModal, this));
+        QuestUI::BeatSaberUI::SetButtonSprites(userImage, userSprite, userSprite);
+        // auto userImage = UIUtils::CreateClickableImage(buttonHorizontal->get_transform(), userSprite, {0, 0}, {0, 0}, std::bind(&ScoreInfoModal::ShowPlayerProfileModal, this));
+        // userImage->set_preserveAspect(true);
 
         // No replay functionality. Button doesnt do anything
         auto replaySprite = Base64ToSprite(replay_base64);
-        auto replayImage = UIUtils::CreateClickableImage(buttonHorizontal->get_transform(), replaySprite, {0, 0}, {0, 0}, nullptr);
-        replayImage->set_preserveAspect(true);
-        Color replayCol = replayImage->get_color();
-        replayImage->set_defaultColor(Color(replayCol.r * 0.4f, replayCol.g * 0.4f, replayCol.b * 0.4f, replayCol.a));
-        replayImage->set_highlightColor(Color(replayCol.r * 0.4f, replayCol.g * 0.4f, replayCol.b * 0.4f, replayCol.a));
+        auto replayImage = QuestUI::BeatSaberUI::CreateUIButton(buttonHorizontal->get_transform(), "", "SettingsButton", nullptr);
+        QuestUI::BeatSaberUI::SetButtonSprites(replayImage, replaySprite, replaySprite);
+        // auto replayImage = UIUtils::CreateClickableImage(buttonHorizontal->get_transform(), replaySprite, {0, 0}, {0, 0}, nullptr);
+        // replayImage->set_preserveAspect(true);
+        // Color replayCol = replayImage->get_color();
+        // replayImage->set_defaultColor(Color(replayCol.r * 0.4f, replayCol.g * 0.4f, replayCol.b * 0.4f, replayCol.a));
+        // replayImage->set_highlightColor(Color(replayCol.r * 0.4f, replayCol.g * 0.4f, replayCol.b * 0.4f, replayCol.a));
 
         auto seperatorHorizontal = CreateHorizontalLayoutGroup(mainVertical->get_transform());
         auto seperatorLayout = seperatorHorizontal->get_gameObject()->GetComponent<LayoutElement*>();

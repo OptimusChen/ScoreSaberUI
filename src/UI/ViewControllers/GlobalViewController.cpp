@@ -121,22 +121,21 @@ namespace ScoreSaber::UI::ViewControllers
             textHorizontal->set_childAlignment(TextAnchor::MiddleCenter);
             SetPreferredSize(textHorizontal, 80.0f, -1);
             textHorizontal->get_rectTransform()->set_sizeDelta(Vector2(-40.0f, 0.0f));
-            auto headerText = UIUtils::CreateClickableText(
+            auto headerText = CreateUIButton(
                 textHorizontal->get_transform(), u"Global Leaderboards", Vector2(0.0f, 0.0f), Vector2(0.0f, 0.0f), []()
                 {
                     static auto rankURL = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("https://scoresaber.com/rankings");
-                    Application::OpenURL(rankURL);
-                });
-            headerText->set_alignment(TMPro::TextAlignmentOptions::Center);
-            headerText->set_fontSize(7.0f);
+                    Application::OpenURL(rankURL); });
+            // headerText->set_alignment(TMPro::TextAlignmentOptions::Center);
+            // headerText->set_fontSize(7.0f);
 
             auto infoButton = CreateUIButton(headerHorizontal->get_transform(), " ?", Vector2(54.0f, 0.0f), Vector2(10.0f, 8.5f), std::bind(&GlobalViewController::OpenMoreInfoModal, this));
-            //SetPreferredSize(infoButton, 10.0f, 8.5f);
+            // SetPreferredSize(infoButton, 10.0f, 8.5f);
             auto layoutinfoButton = infoButton->GetComponent<LayoutElement*>();
             layoutinfoButton->set_ignoreLayout(true);
             auto textObject = infoButton->GetComponentInChildren<TMPro::TextMeshProUGUI*>();
             textObject->set_alignment(TMPro::TextAlignmentOptions::Left);
-            //reinterpret_cast<RectTransform*>(infoButton->get_transform())->set_anchoredPosition({40.0f, 0.0f});
+            // reinterpret_cast<RectTransform*>(infoButton->get_transform())->set_anchoredPosition({40.0f, 0.0f});
             auto headerBG = headerHorizontal->get_gameObject()->AddComponent<Backgroundable*>();
             headerBG->ApplyBackgroundWithAlpha(il2cpp_utils::newcsstr("round-rect-panel"), 0.5f);
             auto headerImageView = headerBG->get_gameObject()->GetComponentInChildren<HMUI::ImageView*>()->dyn__skew() = 0.18f;
@@ -163,11 +162,18 @@ namespace ScoreSaber::UI::ViewControllers
                 scoreScopesHost->GetComponent<LayoutElement*>();
             scoreScopesHostElement->set_preferredWidth(9.0f);
 
+            auto carat_up_sprite = Base64ToSprite(carat_up_base64);
+            auto arrow = QuestUI::BeatSaberUI::CreateUIButton(scoreScopesHost->get_transform(), "", "SettingsButton", std::bind(&GlobalViewController::UpButtonWasPressed, this));
+            QuestUI::BeatSaberUI::SetButtonSprites(arrow, carat_up_sprite, carat_up_sprite);
+            auto upRect = reinterpret_cast<UnityEngine::RectTransform*>(arrow->get_transform()->GetChild(0));
+            upRect->set_sizeDelta({9.0f, 9.0f});
+            upRect->set_anchoredPosition({0.0f, 0.0f});
+            /*
             auto arrow = UIUtils::CreateClickableImage(
                 scoreScopesHost->get_transform(),
                 Base64ToSprite(carat_up_base64), {0.0f, 25.0f},
                 {9.0f, 9.0f}, std::bind(&GlobalViewController::UpButtonWasPressed, this));
-
+            */
             VerticalLayoutGroup* scoreScopes = BeatSaberUI::CreateVerticalLayoutGroup(
                 scoreScopesHost->get_transform());
 
@@ -200,6 +206,7 @@ namespace ScoreSaber::UI::ViewControllers
             auto playerSprite = Base64ToSprite(player_base64);
             auto friendsSprite = Base64ToSprite(friends_base64);
 
+            /*
             auto globalButton = UIUtils::CreateClickableImage(imagesGroup->get_transform(),
                                                               globalSprite, {0.0f, 0.0f},
                                                               {4.0f, 4.0f}, std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType::Global));
@@ -216,12 +223,44 @@ namespace ScoreSaber::UI::ViewControllers
                                                                countrySprite, {0.0f, 0.0f},
                                                                {4.0f, 4.0f}, std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType::Country));
             countryButton->set_preserveAspect(true);
+            */
 
+            auto globalButton = QuestUI::BeatSaberUI::CreateUIButton(imagesGroup->get_transform(), "", "SettingsButton", std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType::Global));
+            QuestUI::BeatSaberUI::SetButtonSprites(globalButton, globalSprite, globalSprite);
+            auto globalRect = reinterpret_cast<UnityEngine::RectTransform*>(globalButton->get_transform()->GetChild(0));
+            globalRect->set_sizeDelta({4.0, 4.0f});
+            globalRect->set_anchoredPosition({0.0f, 0.0f});
+
+            auto aroundYouButton = QuestUI::BeatSaberUI::CreateUIButton(imagesGroup->get_transform(), "", "SettingsButton", std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType::AroundYou));
+            QuestUI::BeatSaberUI::SetButtonSprites(aroundYouButton, playerSprite, playerSprite);
+            auto aroundYouRect = reinterpret_cast<UnityEngine::RectTransform*>(aroundYouButton->get_transform()->GetChild(0));
+            aroundYouRect->set_sizeDelta({4.0, 4.0f});
+            aroundYouRect->set_anchoredPosition({0.0f, 0.0f});
+
+            auto friendsButton = QuestUI::BeatSaberUI::CreateUIButton(imagesGroup->get_transform(), "", "SettingsButton", std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType::Friends));
+            QuestUI::BeatSaberUI::SetButtonSprites(friendsButton, friendsSprite, friendsSprite);
+            auto friendsRect = reinterpret_cast<UnityEngine::RectTransform*>(friendsButton->get_transform()->GetChild(0));
+            friendsRect->set_sizeDelta({4.0, 4.0f});
+            friendsRect->set_anchoredPosition({0.0f, 0.0f});
+
+            auto countryButton = QuestUI::BeatSaberUI::CreateUIButton(imagesGroup->get_transform(), "", "SettingsButton", std::bind(&GlobalViewController::FilterWasClicked, this, ScoreSaber::CustomTypes::Components::GlobalLeaderboardTableData::LeaderboardType::Country));
+            QuestUI::BeatSaberUI::SetButtonSprites(countryButton, countrySprite, countrySprite);
+            auto countryRect = reinterpret_cast<UnityEngine::RectTransform*>(countryButton->get_transform()->GetChild(0));
+            countryRect->set_sizeDelta({4.0, 4.0f});
+            countryRect->set_anchoredPosition({0.0f, 0.0f});
+
+            auto carat_down_sprite = Base64ToSprite(carat_down_base64);
+            auto downrrow = QuestUI::BeatSaberUI::CreateUIButton(scoreScopesHost->get_transform(), "", "SettingsButton", std::bind(&GlobalViewController::DownButtonWasPressed, this));
+            QuestUI::BeatSaberUI::SetButtonSprites(arrow, carat_up_sprite, carat_up_sprite);
+            auto downRect = reinterpret_cast<UnityEngine::RectTransform*>(downrrow->get_transform()->GetChild(0));
+            downRect->set_sizeDelta({9.0f, 9.0f});
+            downRect->set_anchoredPosition({0.0f, 0.0f});
+            /*
             auto downrrow = UIUtils::CreateClickableImage(
                 scoreScopesHost->get_transform(),
                 Base64ToSprite(carat_down_base64), {0.0f, 25.0f},
                 {9.0f, 9.0f}, std::bind(&GlobalViewController::DownButtonWasPressed, this));
-
+            */
             VerticalLayoutGroup* globalVerticalHost =
                 BeatSaberUI::CreateVerticalLayoutGroup(globalHost->get_transform());
 

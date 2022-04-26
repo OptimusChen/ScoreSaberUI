@@ -48,8 +48,8 @@ extern "C" void setup(ModInfo& info)
 extern "C" void load()
 {
     il2cpp_functions::Init();
-    il2cpp_functions::Class_Init(classof(HMUI::ImageView*));
-    il2cpp_functions::Class_Init(classof(HMUI::CurvedTextMeshPro*));
+    // il2cpp_functions::Class_Init(classof(HMUI::ImageView*));
+    // il2cpp_functions::Class_Init(classof(HMUI::CurvedTextMeshPro*));
     QuestUI::Init();
     custom_types::Register::AutoRegister();
 
